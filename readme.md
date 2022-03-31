@@ -5,6 +5,7 @@ This is the official Curve graphQL code for the Casper network.
 ## Running Locally
 
 npm install to install the require packages
+
 npm start to start the server
 
 Heroku App Link:
