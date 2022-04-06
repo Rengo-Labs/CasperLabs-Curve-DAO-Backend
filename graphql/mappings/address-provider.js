@@ -1,55 +1,122 @@
-// import { BigInt, dataSource, ethereum } from '@graphprotocol/graph-ts'
-// import { integer } from '@protofire/subgraph-toolkit'
+require("dotenv").config();
+const { GraphQLString } = require("graphql");
 
-// import { AddressModified, AddressProvider, NewAddressIdentifier } from '../../generated/AddressProvider/AddressProvider'
+const { responseType } = require("../types/response");
 
-// import { Contract, ContractVersion } from '../../generated/schema'
+const Contract = require("../../models/contract");
+const ContractVersion = require("../../models/contractVersion");
+const { getSystemState } = require("../services/system-state");
 
-// import { getSystemState } from '../services/system-state'
+//const AddressProvider = require('../../JsClients/ADDRESSPROVIDER/test/installed.ts');
 
-// export function handleAddressModified(event: AddressModified): void {
-//   registerContract(event.params.id, event)
-// }
+async function registerContract(id, args) {
+  //let info = await AddressProvider.get_id_info(args.addressProviderContractHash,id);
 
-// export function handleNewAddressIdentifier(event: NewAddressIdentifier): void {
-//   registerContract(event.params.id, event)
-// }
+  let info = {
+    value0: "0",
+    value2: "2",
+    value4: "4",
+  };
+  let contract = await Contract.findOne({ id: id });
+  let state = await getSystemState(args);
 
-// function registerContract(id: BigInt, event: ethereum.Event): Contract {
-//   let info = AddressProvider.bind(dataSource.address()).get_id_info(id)
+  if (contract == null) {
+    let newData = new Contract({
+      id: id,
+      description: info.value4,
+      added: args.timestamp,
+      addedAtBlock: args.block,
+      addedAtTransaction: args.transactionHash,
+    });
+    await Contract.create(newData);
+    contract = newData;
+    state.contractCount = (
+      BigInt(state.contractCount) + BigInt("1")
+    ).toString();
+  }
 
-//   let contract = Contract.load(id.toString())
-//   let state = getSystemState(event)
+  contract.modified = args.timestamp;
+  contract.modifiedAtBlock = args.block;
+  contract.modifiedAtTransaction = args.transactionHash;
+  await contract.save();
 
-//   if (contract == null) {
-//     contract = new Contract(id.toString())
-//     contract.description = info.value4
-//     contract.added = event.block.timestamp
-//     contract.addedAtBlock = event.block.number
-//     contract.addedAtTransaction = event.transaction.hash
+  let newData2 = new ContractVersion({
+    id: id + "-" + info.value2,
+    contract: contract.id,
+    address: info.value0,
+    version: info.value2,
+    added: args.timestamp,
+    addedAtBlock: args.block,
+    addedAtTransaction: args.transactionHash,
+  });
+  await ContractVersion.create(newData2);
 
-//     state.contractCount = integer.increment(state.contractCount)
-//   }
+  if (contract.description == "Main Registry") {
+    state.registryContract = info.value0;
+  }
 
-//   contract.modified = event.block.timestamp
-//   contract.modifiedAtBlock = event.block.number
-//   contract.modifiedAtTransaction = event.transaction.hash
-//   contract.save()
+  await state.save();
 
-//   let version = new ContractVersion(id.toString() + '-' + info.value2.toString())
-//   version.contract = contract.id
-//   version.address = info.value0
-//   version.version = info.value2
-//   version.added = event.block.timestamp
-//   version.addedAtBlock = event.block.number
-//   version.addedAtTransaction = event.transaction.hash
-//   version.save()
+  return contract;
+}
+const handleAddressModified = {
+  type: responseType,
+  description: "Handle AddressModified",
+  args: {
+    addressProviderContractHash: { type: GraphQLString },
+    id: { type: GraphQLString },
+    transactionHash: { type: GraphQLString },
+    block: { type: GraphQLString },
+    timestamp: { type: GraphQLString },
+  },
+  async resolve(parent, args, context) {
+    try {
+      await registerContract(args.id, args);
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+          result: true,
+        });
+        await response.save();
+      }
+      return response;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+};
 
-//   if (contract.description == 'Main Registry') {
-//     state.registryContract = info.value0
-//   }
-
-//   state.save()
-
-//   return contract!
-// }
+const handleNewAddressIdentifier = {
+  type: responseType,
+  description: "Handle NewAddressIdentifier",
+  args: {
+    addressProviderContractHash: { type: GraphQLString },
+    id: { type: GraphQLString },
+    transactionHash: { type: GraphQLString },
+    block: { type: GraphQLString },
+    timestamp: { type: GraphQLString },
+  },
+  async resolve(parent, args, context) {
+    try {
+      await registerContract(args.id, args);
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+          result: true,
+        });
+        await response.save();
+      }
+      return response;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+};
+module.exports = {
+  handleAddressModified,
+  handleNewAddressIdentifier,
+};

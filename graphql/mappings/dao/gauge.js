@@ -1,43 +1,138 @@
-// import { decimal } from '@protofire/subgraph-toolkit'
+require("dotenv").config();
+const { GraphQLString } = require("graphql");
 
-// import { Deposit, UpdateLiquidityLimit, Withdraw } from '../../../generated/templates/LiquidityGauge/LiquidityGauge'
+const { responseType } = require("../../types/response");
 
-// import { GaugeDeposit, GaugeLiquidity, GaugeWithdraw } from '../../../generated/schema'
+const GaugeDeposit = require("../../../models/gaugeDeposit");
+const GaugeLiquidity = require("../../../models/gaugeLiquidity");
+const GaugeWithdraw = require("../../../models/gaugeWithdraw");
 
-// import { getOrRegisterAccount } from '../../services/accounts'
+const { getOrRegisterAccount } = require("../../services/accounts");
 
-// export function handleUpdateLiquidityLimit(event: UpdateLiquidityLimit): void {
-//   let account = getOrRegisterAccount(event.params.user)
+const handleUpdateLiquidityLimit = {
+  type: responseType,
+  description: "Handle UpdateLiquidityLimit",
+  args: {
+    user: { type: GraphQLString },
+    id: { type: GraphQLString },
+    original_balance: { type: GraphQLString },
+    original_supply: { type: GraphQLString },
+    working_balance: { type: GraphQLString },
+    working_supply: { type: GraphQLString },
+    transactionHash: { type: GraphQLString },
+    block: { type: GraphQLString },
+    timestamp: { type: GraphQLString },
+  },
+  async resolve(parent, args, context) {
+    try {
+      let account = await getOrRegisterAccount(args.user);
 
-//   let gauge = new GaugeLiquidity(account.id + '-' + event.address.toHexString())
-//   gauge.user = account.id
-//   gauge.gauge = event.address.toHexString()
-//   gauge.originalBalance = event.params.original_balance
-//   gauge.originalSupply = event.params.original_supply
-//   gauge.workingBalance = event.params.working_balance
-//   gauge.workingSupply = event.params.working_supply
-//   gauge.timestamp = event.block.timestamp
-//   gauge.block = event.block.number
-//   gauge.transaction = event.transaction.hash
-//   gauge.save()
-// }
+      let gauge = new GaugeLiquidity({
+        id: account.id + "-" + args.id,
+        user: account.id,
+        gauge: args.id,
+        originalBalance: args.original_balance,
+        originalSupply: args.original_supply,
+        workingBalance: args.working_balance,
+        workingSupply: args.working_supply,
+        timestamp: args.timestamp,
+        block: args.block,
+        transaction: args.transactionHash,
+      });
+      await GaugeLiquidity.create(gauge);
 
-// export function handleDeposit(event: Deposit): void {
-//   let provider = getOrRegisterAccount(event.params.provider)
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+          result: true,
+        });
+        await response.save();
+      }
+      return response;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+};
 
-//   let deposit = new GaugeDeposit(event.transaction.hash.toHexString() + '-' + event.logIndex.toString())
-//   deposit.gauge = event.address.toHexString()
-//   deposit.provider = provider.id
-//   deposit.value = decimal.fromBigInt(event.params.value)
-//   deposit.save()
-// }
+const handleDeposit = {
+  type: responseType,
+  description: "Handle Deposit",
+  args: {
+    provider: { type: GraphQLString },
+    id: { type: GraphQLString },
+    value: { type: GraphQLString },
+    transactionHash: { type: GraphQLString },
+    logIndex: { type: GraphQLString },
+  },
+  async resolve(parent, args, context) {
+    try {
+      let provider = await getOrRegisterAccount(args.provider);
 
-// export function handleWithdraw(event: Withdraw): void {
-//   let provider = getOrRegisterAccount(event.params.provider)
+      let deposit = new GaugeDeposit({
+        id: args.transactionHash + "-" + args.logIndex,
+        gauge: args.id,
+        provider: provider.id,
+        value: args.value,
+      });
+      await GaugeDeposit.create(deposit);
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+          result: true,
+        });
+        await response.save();
+      }
+      return response;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+};
 
-//   let withdraw = new GaugeWithdraw(event.transaction.hash.toHexString() + '-' + event.logIndex.toString())
-//   withdraw.gauge = event.address.toHexString()
-//   withdraw.provider = provider.id
-//   withdraw.value = decimal.fromBigInt(event.params.value)
-//   withdraw.save()
-// }
+const handleWithdraw = {
+  type: responseType,
+  description: "Handle Withdraw",
+  args: {
+    provider: { type: GraphQLString },
+    id: { type: GraphQLString },
+    value: { type: GraphQLString },
+    transactionHash: { type: GraphQLString },
+    logIndex: { type: GraphQLString },
+  },
+  async resolve(parent, args, context) {
+    try {
+      let provider = await getOrRegisterAccount(args.provider);
+
+      let withdraw = new GaugeWithdraw({
+        id: args.transactionHash + "-" + args.logIndex,
+        gauge: args.id,
+        provider: provider.id,
+        value: args.value,
+      });
+      await GaugeWithdraw.create(withdraw);
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+          result: true,
+        });
+        await response.save();
+      }
+      return response;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+};
+
+module.exports = {
+  handleUpdateLiquidityLimit,
+  handleDeposit,
+  handleWithdraw,
+};

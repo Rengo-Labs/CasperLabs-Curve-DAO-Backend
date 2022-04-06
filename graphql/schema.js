@@ -18,6 +18,22 @@ const {
   handleStopRampA,
 } = require("../graphql/mappings/pool");
 
+// Import Address-Provider mutations
+const {
+  handleAddressModified,
+  handleNewAddressIdentifier,
+} = require("../graphql/mappings/address-provider");
+
+// Import Dao mutations
+const { handleNewProxyApp } = require("../graphql/mappings/dao/kernel");
+
+// Import Gauge mutations
+const {
+  handleUpdateLiquidityLimit,
+  handleDeposit,
+  handleWithdraw,
+} = require("../graphql/mappings/dao/gauge");
+
 // Define QueryType
 const QueryType = new GraphQLObjectType({
   name: "QueryType",
@@ -41,6 +57,12 @@ const MutationType = new GraphQLObjectType({
     handleNewParameters,
     handleRampA,
     handleStopRampA,
+    handleAddressModified,
+    handleNewAddressIdentifier,
+    handleNewProxyApp,
+    handleUpdateLiquidityLimit,
+    handleDeposit,
+    handleWithdraw,
   },
 });
 

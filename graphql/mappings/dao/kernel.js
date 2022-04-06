@@ -1,45 +1,82 @@
-// import { DataSourceContext, Value } from '@graphprotocol/graph-ts'
-// import { integer } from '@protofire/subgraph-toolkit'
+require("dotenv").config();
+const { GraphQLString } = require("graphql");
 
-// import { NewAppProxy } from '../../../generated/DAO/Kernel'
-// import { Voting } from '../../../generated/templates'
+const { responseType } = require("../../types/response");
 
-// import { Contract, ContractVersion } from '../../../generated/schema'
+//const { Voting } = require('../../../generated/templates');
 
-// const VOTING_APP_ID = '0x2436adbbb3230545df6846695013211d36736f647c91b302b9591e5e2d013485'
-// const VOTING_TYPE: string[] = ['Ownership', 'Parameter']
+const Contract = require("../../../models/contract");
+const ContractVersion = require("../../../models/contractVersion");
 
-// export function handleNewProxyApp(event: NewAppProxy): void {
-//   if (event.params.appId.toHexString() == VOTING_APP_ID) {
-//     let i = 0
-//     let id = VOTING_TYPE[i]
+const VOTING_APP_ID =
+  "0x2436adbbb3230545df6846695013211d36736f647c91b302b9591e5e2d013485";
+const VOTING_TYPE = ["Ownership", "Parameter"];
 
-//     while (Contract.load(id) != null) {
-//       i = i + 1
-//       id = VOTING_TYPE[i] || 'crv-voting-' + i.toString()
-//     }
+const handleNewProxyApp = {
+  type: responseType,
+  description: "Handle NewProxyApp",
+  args: {
+    appId: { type: GraphQLString },
+    proxy: { type: GraphQLString },
+    context: { type: GraphQLString },
+    transactionHash: { type: GraphQLString },
+    block: { type: GraphQLString },
+    timestamp: { type: GraphQLString },
+  },
+  async resolve(parent, args, context) {
+    try {
+      if (args.appId == VOTING_APP_ID) {
+        let i = 0;
+        let id = VOTING_TYPE[i];
 
-//     // Register contract
-//     let contract = new Contract(id)
-//     contract.description = id.indexOf('crv-voting') == 0 ? id : id + ' Voting'
-//     contract.added = contract.modified = event.block.timestamp
-//     contract.addedAtBlock = contract.modifiedAtBlock = event.block.number
-//     contract.addedAtTransaction = contract.modifiedAtTransaction = event.transaction.hash
-//     contract.save()
+        while ((await Contract.findOne({ id: id })) != null) {
+          i = i + 1;
+          id = VOTING_TYPE[i] || "crv-voting-" + i.toString();
+        }
 
-//     let contractVersion = new ContractVersion(contract.id + '-1')
-//     contractVersion.contract = contract.id
-//     contractVersion.address = event.params.proxy
-//     contractVersion.version = integer.ONE
-//     contractVersion.added = contract.modified = event.block.timestamp
-//     contractVersion.addedAtBlock = contract.modifiedAtBlock = event.block.number
-//     contractVersion.addedAtTransaction = contract.modifiedAtTransaction = event.transaction.hash
-//     contractVersion.save()
+        // Register contract
+        let contract = new Contract({
+          id: id,
+          description: id.indexOf("crv-voting") == 0 ? id : id + " Voting",
+          added: args.timestamp,
+          addedAtBlock: args.block,
+          addedAtTransaction: args.transactionHash,
+        });
+        await Contract.create(contract);
 
-//     // Create dynamic data source
-//     let context = new DataSourceContext()
-//     context.set('type', Value.fromString(id))
+        let contractVersion = new ContractVersion({
+          id: contract.id + "-1",
+          contract: contract.id,
+          address: args.proxy,
+          version: "1",
+          added: args.timestamp,
+          addedAtBlock: args.block,
+          addedAtTransaction: args.transactionHash,
+        });
+        await Contract.create(contractVersion);
 
-//     Voting.createWithContext(event.params.proxy, context)
-//   }
-// }
+        // // Create dynamic data source
+        // let context = new DataSourceContext()
+        // context.set('type', Value.fromString(id))
+
+        //await Voting.createWithContext(args.proxy, args.context);
+      }
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+          result: true,
+        });
+        await response.save();
+      }
+      return response;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+};
+
+module.exports = {
+  handleNewProxyApp,
+};

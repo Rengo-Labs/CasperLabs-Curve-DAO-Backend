@@ -15,6 +15,7 @@ const FeeChangeLog = require("../../models/feeChangeLog");
 const TransferOwnershipEvent = require("../../models/transferOwnershipEvent");
 const FEE_PRECISION = require("../constants");
 const { getHourlyTradeVolume, getDailyTradeVolume, getWeeklyTradeVolume  }= require('../services/pools/volume');
+const { getOrRegisterAccount } =require('../services/accounts');
 
 const handleTokenExchange = {
     type: responseType,
@@ -50,7 +51,7 @@ const handleTokenExchange = {
 
           let amountBought = BigInt(args.tokens_bought); //issue
 
-          let buyer = getOrRegisterAccount(args.buyer);
+          let buyer = await getOrRegisterAccount(args.buyer);
 
           let eventId = await getEventId(args.transactionHash, args.logIndex);
 
@@ -144,7 +145,7 @@ const handleTokenExchangeUnderlying = {
 
         let amountBought = BigInt(args.tokens_bought); //issue
 
-        let buyer = getOrRegisterAccount(args.buyer);
+        let buyer = await getOrRegisterAccount(args.buyer);
 
         let eventId = await getEventId(args.transactionHash, args.logIndex);
   
