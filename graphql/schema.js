@@ -6,6 +6,15 @@ const { responses, response } = require("./queries");
 
 // Import mutations
 const { handleNewResponse } = require("./mutations");
+const {
+  handleTokenExchange,
+  handleTokenExchangeUnderlying,
+  handleNewAdmin,
+  handleNewFee,
+  handleNewParameters,
+  handleRampA,
+  handleStopRampA,
+} = require("../graphql/mappings/pool");
 
 // Define QueryType
 const QueryType = new GraphQLObjectType({
@@ -23,6 +32,13 @@ const MutationType = new GraphQLObjectType({
   description: "Mutations",
   fields: {
     handleNewResponse,
+    handleTokenExchange,
+    handleTokenExchangeUnderlying,
+    handleNewAdmin,
+    handleNewFee,
+    handleNewParameters,
+    handleRampA,
+    handleStopRampA,
   },
 });
 

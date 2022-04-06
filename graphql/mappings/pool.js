@@ -1,111 +1,202 @@
 const { responseType } = require("../types/response");
 
 const Pool = require("../../models/pool");
+const Exchange = require("../../models/exchange");
+const Coin = require("../../models/coin");
+const Token = require("../../models/token");
 const AmplificationCoeffChangelog = require("../../models/amplificationCoeffChangelog");
 const AdminFeeChangeLog = require("../../models/adminFeeChangeLog");
 const FeeChangeLog = require("../../models/feeChangeLog");
 const TransferOwnershipEvent = require("../../models/transferOwnershipEvent");
 const FEE_PRECISION = require("../constants");
+const { getHourlyTradeVolume, getDailyTradeVolume, getWeeklyTradeVolume  }= require('../services/pools/volume');
 
-// export function handleTokenExchange(event: TokenExchange): void {
-//     let pool = Pool.load(event.address.toHexString())
+const handleTokenExchange = {
+    type: responseType,
+    description: "Handle TokenExchange",
+    args: {
+      poolId: { type: GraphQLString },
+      transactionHash: { type: GraphQLString },
+      block: { type: GraphQLString },
+      timestamp: { type: GraphQLString },
+      logIndex: { type: GraphQLString },
+      buyer: { type: GraphQLString },
+      sold_id: { type: GraphQLString },
+      tokens_sold: { type: GraphQLString },
+      bought_id: { type: GraphQLString },
+      tokens_bought: { type: GraphQLString },
+    },
+    async resolve(parent, args, context) {
+      try {
+        let pool = await Pool.findOne({ id: args.poolId });
+  
+        if (pool != null) {
+          pool = await getPoolSnapshot(pool, args);
 
-//     if (pool != null) {
-//       pool = getPoolSnapshot(pool!, event)
+          let coinSold = await Coin.findOne({id: pool.id + '-' + args.sold_id});
+          let tokenSold = await Token.findOne({id:coinSold.token});
+          //let amountSold = decimal.fromBigInt(event.params.tokens_sold, tokenSold.decimals.toI32()) //issue
 
-//       let coinSold = Coin.load(pool.id + '-' + event.params.sold_id.toString())!
-//       let tokenSold = Token.load(coinSold.token)!
-//       let amountSold = decimal.fromBigInt(event.params.tokens_sold, tokenSold.decimals.toI32())
+          let amountSold = BigInt(args.tokens_sold);
 
-//       let coinBought = Coin.load(pool.id + '-' + event.params.bought_id.toString())!
-//       let tokenBought = Token.load(coinBought.token)!
-//       let amountBought = decimal.fromBigInt(event.params.tokens_bought, tokenBought.decimals.toI32())
+          let coinBought = await Coin.findOne({id:pool.id + '-' + args.bought_id});
+          let tokenBought = await Token.findOne({id:coinBought.token});
+          //let amountBought = decimal.fromBigInt(event.params.tokens_bought, tokenBought.decimals.toI32()); //issue
 
-//       let buyer = getOrRegisterAccount(event.params.buyer)
+          let amountBought = BigInt(args.tokens_bought); //issue
 
-//       // Save event log
-//       let exchange = new Exchange('e-' + getEventId(event))
-//       exchange.pool = pool.id
-//       exchange.buyer = buyer.id
-//       exchange.receiver = buyer.id
-//       exchange.tokenSold = tokenSold.id
-//       exchange.tokenBought = tokenBought.id
-//       exchange.amountSold = amountSold
-//       exchange.amountBought = amountBought
-//       exchange.block = event.block.number
-//       exchange.timestamp = event.block.timestamp
-//       exchange.transaction = event.transaction.hash
-//       exchange.save()
+          let buyer = getOrRegisterAccount(args.buyer);
 
-//       // Save trade volume
-//       let volume = exchange.amountSold.plus(exchange.amountBought).div(decimal.TWO)
+          let eventId = await getEventId(args.transactionHash, args.logIndex);
 
-//       let hourlyVolume = getHourlyTradeVolume(pool!, event.block.timestamp)
-//       hourlyVolume.volume = hourlyVolume.volume.plus(volume)
-//       hourlyVolume.save()
+          // Save event log
+          let newData = new Exchange({
+            id: "e-" + eventId,
+            pool : pool.id,
+            buyer : buyer.id,
+            receiver : buyer.id,
+            tokenSold : tokenSold.id,
+            tokenBought : tokenBought.id,
+            amountSold : amountSold,
+            amountBought : amountBought,
+            block : args.block,
+            timestamp : args.timestamp,
+            transaction : args.transactionHash
+          });
+          await Exchange.create(newData);
 
-//       let dailyVolume = getDailyTradeVolume(pool!, event.block.timestamp)
-//       dailyVolume.volume = dailyVolume.volume.plus(volume)
-//       dailyVolume.save()
+          let exchange=newData;
 
-//       let weeklyVolume = getWeeklyTradeVolume(pool!, event.block.timestamp)
-//       weeklyVolume.volume = weeklyVolume.volume.plus(volume)
-//       weeklyVolume.save()
+          // Save trade volume
+          let volume = BigInt(exchange.amountSold)+(BigInt(exchange.amountBought)/BigInt("2"));
 
-//       pool.exchangeCount = integer.increment(pool.exchangeCount)
-//       pool.save()
-//     }
-//   }
+          let hourlyVolume = await getHourlyTradeVolume(pool, args.timestamp);
+          hourlyVolume.volume = (BigInt(hourlyVolume.volume)+BigInt(volume)).toString();
+          await hourlyVolume.save();
 
-//   export function handleTokenExchangeUnderlying(event: TokenExchangeUnderlying): void {
-//     let pool = Pool.load(event.address.toHexString())
+          let dailyVolume = await getDailyTradeVolume(pool, args.timestamp);
+          dailyVolume.volume = (BigInt(dailyVolume.volume)+BigInt(volume)).toString();
+          await dailyVolume.save();
 
-//     if (pool != null) {
-//       pool = getPoolSnapshot(pool!, event)
+          let weeklyVolume = await getWeeklyTradeVolume(pool, args.timestamp);
+          weeklyVolume.volume = (BigInt(weeklyVolume.volume)+BigInt(volume)).toString();
+          await weeklyVolume.save();
 
-//       let coinSold = UnderlyingCoin.load(pool.id + '-' + event.params.sold_id.toString())!
-//       let tokenSold = Token.load(coinSold.token)!
-//       let amountSold = decimal.fromBigInt(event.params.tokens_sold, tokenSold.decimals.toI32())
+          pool.exchangeCount = (BigInt(pool.exchangeCount) + BigInt("1")).toString();
 
-//       let coinBought = UnderlyingCoin.load(pool.id + '-' + event.params.bought_id.toString())!
-//       let tokenBought = Token.load(coinBought.token)!
-//       let amountBought = decimal.fromBigInt(event.params.tokens_bought, tokenBought.decimals.toI32())
+          await pool.save();
 
-//       let buyer = getOrRegisterAccount(event.params.buyer)
+        }
+  
+        let response = await Response.findOne({ id: "1" });
+        if (response === null) {
+          // create new response
+          response = new Response({
+            id: "1",
+            result: true,
+          });
+          await response.save();
+        }
+        return response;
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+};
 
-//       // Save event log
-//       let exchange = new Exchange('e-' + getEventId(event))
-//       exchange.pool = pool.id
-//       exchange.buyer = buyer.id
-//       exchange.receiver = buyer.id
-//       exchange.tokenSold = tokenSold.id
-//       exchange.tokenBought = tokenBought.id
-//       exchange.amountSold = amountSold
-//       exchange.amountBought = amountBought
-//       exchange.block = event.block.number
-//       exchange.timestamp = event.block.timestamp
-//       exchange.transaction = event.transaction.hash
-//       exchange.save()
 
-//       // Save trade volume
-//       let volume = exchange.amountSold.plus(exchange.amountBought).div(decimal.TWO)
+const handleTokenExchangeUnderlying = {
+  type: responseType,
+  description: "Handle TokenExchangeUnderlying",
+  args: {
+    poolId: { type: GraphQLString },
+    transactionHash: { type: GraphQLString },
+    block: { type: GraphQLString },
+    timestamp: { type: GraphQLString },
+    logIndex: { type: GraphQLString },
+    buyer: { type: GraphQLString },
+    sold_id: { type: GraphQLString },
+    tokens_sold: { type: GraphQLString },
+    bought_id: { type: GraphQLString },
+    tokens_bought: { type: GraphQLString },
+  },
+  async resolve(parent, args, context) {
+    try {
+      let pool = await Pool.findOne({ id: args.poolId });
 
-//       let hourlyVolume = getHourlyTradeVolume(pool!, event.block.timestamp)
-//       hourlyVolume.volume = hourlyVolume.volume.plus(volume)
-//       hourlyVolume.save()
+      if (pool != null) {
+        pool = await getPoolSnapshot(pool, args);
 
-//       let dailyVolume = getDailyTradeVolume(pool!, event.block.timestamp)
-//       dailyVolume.volume = dailyVolume.volume.plus(volume)
-//       dailyVolume.save()
+        let coinSold = await UnderlyingCoin.findOne({id: pool.id + '-' + args.sold_id});
+        let tokenSold = await Token.findOne({id:coinSold.token});
+        //let amountSold = decimal.fromBigInt(event.params.tokens_sold, tokenSold.decimals.toI32()) //issue
 
-//       let weeklyVolume = getWeeklyTradeVolume(pool!, event.block.timestamp)
-//       weeklyVolume.volume = weeklyVolume.volume.plus(volume)
-//       weeklyVolume.save()
+        let amountSold = BigInt(args.tokens_sold);
 
-//       pool.exchangeCount = integer.increment(pool.exchangeCount)
-//       pool.save()
-//     }
-//   }
+        let coinBought = await UnderlyingCoin.findOne({id:pool.id + '-' + args.bought_id});
+        let tokenBought = await Token.findOne({id:coinBought.token});
+        //let amountBought = decimal.fromBigInt(event.params.tokens_bought, tokenBought.decimals.toI32()); //issue
+
+        let amountBought = BigInt(args.tokens_bought); //issue
+
+        let buyer = getOrRegisterAccount(args.buyer);
+
+        let eventId = await getEventId(args.transactionHash, args.logIndex);
+  
+        // Save event log
+        let newData = new Exchange({
+          id: "e-" + eventId,
+          pool : pool.id,
+          buyer : buyer.id,
+          receiver : buyer.id,
+          tokenSold : tokenSold.id,
+          tokenBought : tokenBought.id,
+          amountSold : amountSold,
+          amountBought : amountBought,
+          block : args.block,
+          timestamp : args.timestamp,
+          transaction : args.transactionHash
+        });
+        await Exchange.create(newData);
+
+        let exchange=newData;
+        
+        // Save trade volume
+        let volume = BigInt(exchange.amountSold)+(BigInt(exchange.amountBought)/BigInt("2"));
+
+        let hourlyVolume = await getHourlyTradeVolume(pool, args.timestamp);
+        hourlyVolume.volume = (BigInt(hourlyVolume.volume)+BigInt(volume)).toString();
+        await hourlyVolume.save();
+
+        let dailyVolume = await getDailyTradeVolume(pool, args.timestamp);
+        dailyVolume.volume = (BigInt(dailyVolume.volume)+BigInt(volume)).toString();
+        await dailyVolume.save();
+
+        let weeklyVolume = await getWeeklyTradeVolume(pool, args.timestamp);
+        weeklyVolume.volume = (BigInt(weeklyVolume.volume)+BigInt(volume)).toString();
+        await weeklyVolume.save();
+
+        pool.exchangeCount = (BigInt(pool.exchangeCount) + BigInt("1")).toString();
+
+        await pool.save();
+        
+      }
+
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+          result: true,
+        });
+        await response.save();
+      }
+      return response;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+};
 
 const handleNewAdmin = {
     type: responseType,
@@ -405,6 +496,8 @@ const handleStopRampA = {
 };
 
 module.exports = {
+  handleTokenExchange,
+  handleTokenExchangeUnderlying,
   handleNewAdmin,
   handleNewFee,
   handleNewParameters,
