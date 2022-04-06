@@ -1,3 +1,8 @@
+require("dotenv").config();
+const {
+  GraphQLString
+} = require("graphql");
+
 const { responseType } = require("../types/response");
 
 const Pool = require("../../models/pool");
@@ -290,7 +295,7 @@ const handleNewFee = {
           });
           await AdminFeeChangeLog.create(newData);
   
-          let newData = new FeeChangeLog({
+          let newData2 = new FeeChangeLog({
             id: "f-" + eventId,
             pool: pool.id,
             value: pool.fee,
@@ -298,7 +303,7 @@ const handleNewFee = {
             timestamp: args.timestamp,
             transaction: args.transactionHash,
           });
-          await FeeChangeLog.create(newData);
+          await FeeChangeLog.create(newData2);
           await pool.save();
         }
   
@@ -358,7 +363,7 @@ const handleNewParameters = {
         });
         await AdminFeeChangelog.create(newData);
 
-        let newData = new AmplificationCoeffChangelog({
+        let newData2 = new AmplificationCoeffChangelog({
           id: "a-" + eventId,
           pool: pool.id,
           value: pool.A,
@@ -366,9 +371,9 @@ const handleNewParameters = {
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
-        await AmplificationCoeffChangelog.create(newData);
+        await AmplificationCoeffChangelog.create(newData2);
 
-        let newData = new FeeChangelog({
+        let newData3 = new FeeChangelog({
           id: "f-" + eventId,
           pool: pool.id,
           value: pool.fee,
@@ -376,7 +381,7 @@ const handleNewParameters = {
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
-        await FeeChangelog.create(newData);
+        await FeeChangelog.create(newData3);
         await pool.save();
       }
 
