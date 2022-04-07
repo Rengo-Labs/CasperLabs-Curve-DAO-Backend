@@ -1,147 +1,184 @@
-// import { Address, dataSource, DataSourceContext, ethereum } from '@graphprotocol/graph-ts'
-// import { decimal, integer } from '@protofire/subgraph-toolkit'
 
-// import { PoolAdded, PoolRemoved, Registry } from '../../generated/MainRegistry/Registry'
-// import { StableSwap } from '../../generated/MainRegistry/StableSwap'
-// import { Pool as PoolDataSource } from '../../generated/templates'
+require("dotenv").config();
+const { GraphQLString } = require("graphql");
 
-// import { Gauge, Pool } from '../../generated/schema'
+const Response = require("../../models/response");
+const { responseType } = require("../types/response");
+const Pool = require("../../models/pool");
+const Gauge = require("../../models/gauge");
+const getSystemState = require("../services/system-state");
+const getOrCreateLpToken = require("../services/token");
+const FEE_PRECISION = require("../constants");
+const saveCoins = require("../services/pools/coins");
+// let registryContract= require('../JsClients/Registry/test/installed.ts')
+// let poolContract= require('../JsClients/Registry/test/installed.ts')
 
-// import { getSystemState } from '../services/system-state'
-// import { getOrCreateLpToken } from '../services/tokens'
+const handlePoolAdded = {
+  type: responseType,
+  description: "Handle PoolAdded",
+  args: {
+    poolId: { type: GraphQLString },
+    transactionHash: { type: GraphQLString },
+    block: { type: GraphQLString },
+    timestamp: { type: GraphQLString },
+  },
+  async resolve(parent, args, context) {
+    try {
+      await getOrCreatePool(args.pool.id, args);
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+          result: true,
+        });
+        await response.save();
+      }
+      return response;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+};
+const handlePoolRemoved = {
+  type: responseType,
+  description: "Handle PoolRemoved",
+  args: {
+    poolId: { type: GraphQLString },
+    transactionHash: { type: GraphQLString },
+    block: { type: GraphQLString },
+    timestamp: { type: GraphQLString },
+  },
+  async resolve(parent, args, context) {
+    try {
+      await removePool(args.pool.id, args);
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+          result: true,
+        });
+        await response.save();
+      }
+      return response;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+};
 
-// import { FEE_PRECISION } from '../constants'
-// import { saveCoins } from '../services/pools/coins'
+async function getOrCreatePool(address, args) {
+  let pool = await Pool.findOne({ id: args.poolId });
 
-// export function handlePoolAdded(event: PoolAdded): void {
-//   getOrCreatePool(event.params.pool, event)
-// }
+  if (pool === null) {
+    // await registryContract.setContractHash(args.registryAddress);
+    // await poolContract.setContractHash(args.poolAddress);
+    //let coinCount = await registryContract.get_n_coins(args.registryAddress,address);
+    let coinCount = "1000000000";
+    //let metapool = await registryContract.try_is_meta(args.registryAddress,address);
+    let metapool = "1000000000";
+    //let virtualPrice = await poolContract.try_get_virtual_price(args.poolAddress);
+    let virtualPrice = "1000000000";
 
-// export function handlePoolRemoved(event: PoolRemoved): void {
-//   removePool(event.params.pool, event)
-// }
+    let newData = new Pool({
+      swapAddress: poolContract._address,
+      registryAddress: registryContract._address,
+      coinCount: coinCount[0],
+      exchangeCount: 0,
+      gaugeCount: 0,
+      underlyingCount: coinCount[1],
+      isMeta: metapool !== null && metapool,
+      //name : registryContract.get_pool_name(address),
+      name: "1000000000",
+      locked: 0,
+      virtualPrice: virtualPrice === null ? 0 : BigInt(virtualPrice),
+      addedAt: args.timestamp,
+      addedAtBlock: args.blockNumber,
+      addedAtTransaction: args.transactionHash,
+    });
+    await Pool.create(newData);
+ 
+    await saveCoins(pool, args);
 
-// function getOrCreatePool(address: Address, event: ethereum.Event): Pool {
-//   let pool = Pool.load(address.toHexString())
+    //let lpToken = registryContract.try_get_lp_token(address);
+    let lpToken = "1000000000";
+    if (lpToken !== null) {
+      let token = await getOrCreateLpToken(lpToken);
+      token.pool = pool.id;
+      await token.save();
 
-//   if (pool == null) {
-//     let registryContract = Registry.bind(dataSource.address())
-//     let poolContract = StableSwap.bind(address)
+      pool.lpToken = token.id;
 
-//     let coinCount = registryContract.get_n_coins(address)
+      // Associate gauge to pool
+      if (token.gauge !== null) {
+        let gauge = await Gauge.findOne({id:token.gauge});
+        gauge.pool = pool.id;
+        await gauge.save();
 
-//     pool = new Pool(address.toHexString())
-//     pool.swapAddress = poolContract._address
-//     pool.registryAddress = registryContract._address
+        pool.gaugeCount = (BigInt(pool.gaugeCount) + BigInt("1")).toString();;
+      }
+    }
+    // let A = poolContract.try_A(args.poolAddress);
+    // let adminFee = poolContract.try_admin_fee(args.poolAddress);
+    // let fee = poolContract.try_fee(args.poolAddress);
+    let A = "1000000000";
+    let adminFee = "1000000000";
+    let fee = "1000000000";
 
-//     // Counters
-//     pool.coinCount = coinCount[0]
-//     pool.exchangeCount = integer.ZERO
-//     pool.gaugeCount = integer.ZERO
-//     pool.underlyingCount = coinCount[1]
+    if (A !== null) {
+      pool.A = A;
+    }
 
-//     // Identify metapools
-//     let metapool = registryContract.try_is_meta(address)
+    if (fee !== null) {
+      // pool.fee = BigInt(fee, FEE_PRECISION); //issue
+      pool.fee = fee;
+    }
 
-//     pool.isMeta = !metapool.reverted && metapool.value
+    if (adminFee !== null) {
+      // pool.adminFee = BigInt(adminFee, FEE_PRECISION); issue
+      pool.adminFee = adminFee;
+    }
 
-//     // Pool name
-//     pool.name = registryContract.get_pool_name(address)
+    //let owner = poolContract.try_owner()
+    let owner = "1000000000";
+    if (owner !== null) {
+      pool.owner = owner;
+    }
 
-//     // Coin balances and underlying coin balances/rates
-//     saveCoins(pool!, event)
+    let state = await getSystemState(args);
+    state.poolCount =  (BigInt(state.poolCount) + BigInt("1")).toString();
+    state.totalPoolCount = (BigInt(state.totalPoolCount) + BigInt("1")).toString();;
+    await state.save();
 
-//     // TODO: Calculate pool locked value
-//     pool.locked = decimal.ZERO
+    // let context = new DataSourceContext();
+    // context.setBytes("registry", registryContract._address);
 
-//     // LP token
-//     let lpToken = registryContract.try_get_lp_token(address)
+    // await PoolDataSource.createWithContext(address, context);
+  }
+  return pool;
+}
 
-//     if (!lpToken.reverted) {
-//       let token = getOrCreateLpToken(lpToken.value)
-//       token.pool = pool.id
-//       token.save()
+async function removePool(address, args) {
+  let pool = await Pool.findOne({ id: args.poolId });
 
-//       pool.lpToken = token.id
+  if (pool !== null) {
+    pool.removedAt = args.timestamp;
+    pool.removedAtBlock = args.blockNumber;
+    pool.removedAtTransaction = args.transactionHash;
+    await pool.save();
 
-//       // Associate gauge to pool
-//       if (token.gauge != null) {
-//         let gauge = Gauge.load(token.gauge)!
-//         gauge.pool = pool.id
-//         gauge.save()
+    // Count pools
+    let state = await getSystemState(args);
+    state.poolCount = (BigInt(state.poolCount) - BigInt("1")).toString();
+    await state.save();
 
-//         pool.gaugeCount = integer.increment(pool.gaugeCount)
-//       }
-//     }
+    // TODO: Stop indexing pool events (not yet supported)
+  }
 
-//     // Pool parameters
-//     let A = poolContract.try_A()
-//     let adminFee = poolContract.try_admin_fee()
-//     let fee = poolContract.try_fee()
-
-//     if (!A.reverted) {
-//       pool.A = A.value
-//     }
-
-//     if (!fee.reverted) {
-//       pool.fee = decimal.fromBigInt(fee.value, FEE_PRECISION)
-//     }
-
-//     if (!adminFee.reverted) {
-//       pool.adminFee = decimal.fromBigInt(adminFee.value, FEE_PRECISION)
-//     }
-
-//     // Owner
-//     let owner = poolContract.try_owner()
-
-//     if (!owner.reverted) {
-//       pool.owner = owner.value
-//     }
-
-//     // Virtual price
-//     let virtualPrice = poolContract.try_get_virtual_price()
-
-//     pool.virtualPrice = virtualPrice.reverted ? decimal.ZERO : decimal.fromBigInt(virtualPrice.value)
-
-//     // Save new pool entity
-//     pool.addedAt = event.block.timestamp
-//     pool.addedAtBlock = event.block.number
-//     pool.addedAtTransaction = event.transaction.hash
-
-//     pool.save()
-
-//     // Count pools
-//     let state = getSystemState(event)
-//     state.poolCount = integer.increment(state.poolCount)
-//     state.totalPoolCount = integer.increment(state.totalPoolCount)
-//     state.save()
-
-//     // Start indexing events from new pool
-//     let context = new DataSourceContext()
-//     context.setBytes('registry', registryContract._address)
-
-//     PoolDataSource.createWithContext(address, context)
-//   }
-
-//   return pool!
-// }
-
-// function removePool(address: Address, event: ethereum.Event): Pool {
-//   let pool = Pool.load(address.toHexString())
-
-//   if (pool != null) {
-//     pool.removedAt = event.block.timestamp
-//     pool.removedAtBlock = event.block.number
-//     pool.removedAtTransaction = event.transaction.hash
-//     pool.save()
-
-//     // Count pools
-//     let state = getSystemState(event)
-//     state.poolCount = integer.decrement(state.poolCount)
-//     state.save()
-
-//     // TODO: Stop indexing pool events (not yet supported)
-//   }
-
-//   return pool!
-// }
+  return pool;
+}
+module.exports = {
+  handlePoolAdded,
+  handlePoolRemoved
+};

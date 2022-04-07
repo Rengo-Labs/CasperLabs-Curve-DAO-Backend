@@ -9,6 +9,10 @@ const { handleNewResponse } = require("./mutations");
 
 // Import Pool mutations
 const {
+  handleAddLiquidity, 
+  handleRemoveLiquidity, 
+  handleRemoveLiquidityImbalance, 
+  handleRemoveLiquidityOne,
   handleTokenExchange,
   handleTokenExchangeUnderlying,
   handleNewAdmin,
@@ -23,6 +27,12 @@ const {
   handleAddressModified,
   handleNewAddressIdentifier,
 } = require("../graphql/mappings/address-provider");
+
+// Import registry mutations
+const {
+  handlePoolAdded,
+  handlePoolRemoved
+} = require("../graphql/mappings/registry");
 
 // Import Dao mutations
 const { handleNewProxyApp } = require("../graphql/mappings/dao/kernel");
@@ -49,6 +59,10 @@ const MutationType = new GraphQLObjectType({
   name: "MutationType",
   description: "Mutations",
   fields: {
+    handleAddLiquidity,
+    handleRemoveLiquidity,
+    handleRemoveLiquidityImbalance, 
+    handleRemoveLiquidityOne,
     handleNewResponse,
     handleTokenExchange,
     handleTokenExchangeUnderlying,
@@ -63,6 +77,8 @@ const MutationType = new GraphQLObjectType({
     handleUpdateLiquidityLimit,
     handleDeposit,
     handleWithdraw,
+    handlePoolAdded,
+    handlePoolRemoved
   },
 });
 

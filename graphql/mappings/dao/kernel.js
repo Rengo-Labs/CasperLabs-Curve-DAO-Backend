@@ -1,6 +1,7 @@
 require("dotenv").config();
 const { GraphQLString } = require("graphql");
 
+const Response = require("../../../models/response");
 const { responseType } = require("../../types/response");
 
 //const { Voting } = require('../../../generated/templates');

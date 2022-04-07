@@ -1,6 +1,6 @@
 require("dotenv").config();
 const { GraphQLString } = require("graphql");
-
+const Response = require("../../models/response");
 const { responseType } = require("../types/response");
 
 const Contract = require("../../models/contract");
