@@ -55,6 +55,15 @@ const {
   handleExecuteVote,
 } = require("../graphql/mappings/dao/voting");
 
+//Import Gauge-Controller mutations
+const {
+  handleAddType,
+  handleNewGauge,
+  handleNewGaugeWeight,
+  handleNewTypeWeight,
+  handleVoteForGauge
+} = require('../graphql/mappings/dao/gauge-controller');
+
 // Define QueryType
 const QueryType = new GraphQLObjectType({
   name: "QueryType",
@@ -97,6 +106,11 @@ const MutationType = new GraphQLObjectType({
     handleStartVote,
     handleCastVote,
     handleExecuteVote,
+    handleAddType,
+    handleNewGauge,
+    handleNewGaugeWeight,
+    handleNewTypeWeight,
+    handleVoteForGauge
   },
 });
 
