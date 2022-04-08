@@ -44,6 +44,17 @@ const {
   handleWithdraw,
 } = require("../graphql/mappings/dao/gauge");
 
+// Import voting mutations
+const {
+  handleMinimumBalanceSet,
+  handleMinimumTimeSet,
+  handleChangeMinQuorum,
+  handleChangeSupportRequired,
+  handleStartVote,
+  handleCastVote,
+  handleExecuteVote,
+} = require("../graphql/mappings/dao/voting");
+
 // Define QueryType
 const QueryType = new GraphQLObjectType({
   name: "QueryType",
@@ -78,7 +89,14 @@ const MutationType = new GraphQLObjectType({
     handleDeposit,
     handleWithdraw,
     handlePoolAdded,
-    handlePoolRemoved
+    handlePoolRemoved,
+    handleMinimumBalanceSet,
+    handleMinimumTimeSet,
+    handleChangeMinQuorum,
+    handleChangeSupportRequired,
+    handleStartVote,
+    handleCastVote,
+    handleExecuteVote,
   },
 });
 

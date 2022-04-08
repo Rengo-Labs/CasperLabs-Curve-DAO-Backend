@@ -1,195 +1,410 @@
-// import { Address, Bytes, dataSource /*, ipfs, json, log*/ } from '@graphprotocol/graph-ts'
-// import { decimal, integer } from '@protofire/subgraph-toolkit'
+require("dotenv").config();
+const { GraphQLString } = require("graphql");
 
-// import {
-//   CastVote,
-//   ChangeMinQuorum,
-//   ChangeSupportRequired,
-//   ExecuteVote,
-//   MinimumBalanceSet,
-//   MinimumTimeSet,
-//   StartVote,
-//   Voting,
-// } from '../../../generated/templates/Voting/Voting'
+const Response = require("../../../models/response");
+const { responseType } = require("../../types/response");
 
-// import { Proposal, ProposalVote, VotingApp } from '../../../generated/schema'
+const Proposal = require("../../../models/proposal");
+const ProposalVote = require("../../../models/proposalVote");
+const VotingApp = require("../../../models/votingApp");
+const { getOrRegisterAccount } = require("../../services/accounts");
+//const votingContract = require('../../../JsClients/VOTING/test/installed.ts');
 
-// import { getOrRegisterAccount } from '../../services/accounts'
+async function getOrRegisterVotingApp(address) {
+  let app = await VotingApp.findOne({ id: address });
 
-// export function handleMinimumBalanceSet(event: MinimumBalanceSet): void {
-//   let app = getOrRegisterVotingApp(event.address)
-//   app.minimumBalance = decimal.fromBigInt(event.params.minBalance)
-//   app.save()
-// }
+  if (app == null) {
+    let codename = "codename";
 
-// export function handleMinimumTimeSet(event: MinimumTimeSet): void {
-//   let app = getOrRegisterVotingApp(event.address)
-//   app.minimumTime = event.params.minTime
-//   app.save()
-// }
+    //   let minBalance =  await votingContract.minBalance(address);
+    //   let minAcceptQuorumPct =  await votingContract.minAcceptQuorumPct(address);
+    //   let minTime =  await votingContract.minTime(address);
+    //   let supportRequiredPct =  await votingContract.supportRequiredPct(address);
+    //   let voteTime =  await votingContract.voteTime(address);
+    //   let token =  await votingContract.token(address);
 
-// export function handleChangeMinQuorum(event: ChangeMinQuorum): void {
-//   let app = getOrRegisterVotingApp(event.address)
-//   app.minimumQuorum = decimal.fromBigInt(event.params.minAcceptQuorumPct)
-//   app.save()
-// }
+    let minBalance = "1000000000";
+    let minAcceptQuorumPct = "1000000000";
+    let minTime = "1000000000";
+    let supportRequiredPct = "1000000000";
+    let voteTime = "1000000000";
+    let token = "123";
 
-// export function handleChangeSupportRequired(event: ChangeSupportRequired): void {
-//   let app = getOrRegisterVotingApp(event.address)
-//   app.requiredSupport = decimal.fromBigInt(event.params.supportRequiredPct)
-//   app.save()
-// }
+    let app = new VotingApp({
+      id: address,
+      address: address,
+      codename: codename,
+      minimumBalance: minBalance,
+      minimumQuorum: minAcceptQuorumPct,
+      minimumTime: minTime,
+      requiredSupport: supportRequiredPct,
+      voteTime: voteTime,
+      token: token,
+      proposalCount: "0",
+      voteCount: "0",
+    });
+    await VotingApp.create(app);
+  }
 
-// export function handleStartVote(event: StartVote): void {
-//   let app = getOrRegisterVotingApp(event.address)
-//   let creator = getOrRegisterAccount(event.params.creator)
+  return app;
+}
 
-//   let votingContract = Voting.bind(event.address)
-//   let proposalData = votingContract.getVote(event.params.voteId)
+const handleMinimumBalanceSet = {
+  type: responseType,
+  description: "Handle MinimumBalanceSet",
+  args: {
+    address: { type: GraphQLString },
+    minBalance: { type: GraphQLString },
+  },
+  async resolve(parent, args, context) {
+    try {
+      let app = await getOrRegisterVotingApp(args.address);
+      app.minimumBalance = args.minBalance;
+      await app.save();
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+          result: true,
+        });
+        await response.save();
+      }
+      return response;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+};
+const handleMinimumTimeSet = {
+  type: responseType,
+  description: "Handle MinimumTimeSet",
+  args: {
+    address: { type: GraphQLString },
+    minTime: { type: GraphQLString },
+  },
+  async resolve(parent, args, context) {
+    try {
+      let app = await getOrRegisterVotingApp(args.address);
+      app.minTime = args.minTime;
+      await app.save();
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+          result: true,
+        });
+        await response.save();
+      }
+      return response;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+};
 
-//   let proposal = new Proposal(event.address.toHexString() + '-' + event.params.voteId.toString())
-//   proposal.number = event.params.voteId
-//   proposal.app = app.id
-//   proposal.creator = creator.id
-//   proposal.expireDate = proposalData.value2.plus(app.voteTime)
+const handleChangeMinQuorum = {
+  type: responseType,
+  description: "Handle ChangeMinQuorum",
+  args: {
+    address: { type: GraphQLString },
+    minAcceptQuorumPct: { type: GraphQLString },
+  },
+  async resolve(parent, args, context) {
+    try {
+      let app = await getOrRegisterVotingApp(args.address);
+      app.minAcceptQuorumPct = args.minAcceptQuorumPct;
+      await app.save();
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+          result: true,
+        });
+        await response.save();
+      }
+      return response;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+};
 
-//   // Proposal parameters
-//   proposal.executionScript = proposalData.value9
-//   proposal.minimumQuorum = decimal.fromBigInt(proposalData.value5)
-//   proposal.requiredSupport = decimal.fromBigInt(proposalData.value4)
-//   proposal.snapshotBlock = proposalData.value3
-//   proposal.votingPower = decimal.fromBigInt(proposalData.value8)
+const handleChangeSupportRequired = {
+  type: responseType,
+  description: "Handle ChangeSupportRequired",
+  args: {
+    address: { type: GraphQLString },
+    supportRequiredPct: { type: GraphQLString },
+  },
+  async resolve(parent, args, context) {
+    try {
+      let app = await getOrRegisterVotingApp(args.address);
+      app.supportRequiredPct = args.supportRequiredPct;
+      await app.save();
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+          result: true,
+        });
+        await response.save();
+      }
+      return response;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+};
 
-//   // Parse proposal metadata
-//   proposal.metadata = event.params.metadata
+const handleStartVote = {
+  type: responseType,
+  description: "Handle StartVote",
+  args: {
+    address: { type: GraphQLString },
+    creator: { type: GraphQLString },
+    voteId: { type: GraphQLString },
+    metadata: { type: GraphQLString },
+    creatorVotingPower: { type: GraphQLString },
+    timestamp: { type: GraphQLString },
+    block: { type: GraphQLString },
+    transactionHash: { type: GraphQLString },
+  },
+  async resolve(parent, args, context) {
+    try {
+      let app = await getOrRegisterVotingApp(args.address);
+      let creator = await getOrRegisterAccount(args.creator);
 
-//   // TODO: enable again when IPFS supported on Subgraph Studio
-//   // if (event.params.metadata.startsWith('ipfs:')) {
-//   //   let hash = event.params.metadata.slice(5) // because string.replace() is not supported on current AS version
-//   //   let content = ipfs.cat(hash)
-//   //
-//   //   if (content != null) {
-//   //     let jsonFile = json.try_fromBytes(content as Bytes)
-//   //
-//   //     if (jsonFile.isOk) {
-//   //       let value = jsonFile.value
-//   //
-//   //       if (value != null) {
-//   //         let metadata = value.toObject()
-//   //
-//   //         if (metadata.isSet('text')) {
-//   //           let text = metadata.get('text')
-//   //
-//   //           if (text != null) {
-//   //             proposal.text = text.toString()
-//   //           }
-//   //         }
-//   //       }
-//   //     } else {
-//   //       log.warning('Failed to parse JSON metadata, hash: {}, raw_data: {}', [hash, content.toHexString()])
-//   //     }
-//   //   } else {
-//   //     log.warning('Metadata failed to load from IPFS, hash: {}', [hash])
-//   //   }
-//   // }
+      //   let proposalData = await votingContract.getVote(args.address,args.voteId);
+      let proposalData = {
+        value2: "2",
+        value3: "3",
+        value4: "4",
+        value5: "5",
+        value6: "6",
+        value7: "7",
+        value8: "8",
+        value9: "9",
+      };
+      let proposal = new Proposal({
+        id: args.address + "-" + args.voteId,
+        number: args.voteId,
+        app: app.id,
+        creator: creator.id,
+        expireDate: (
+          BigInt(proposalData.value2) + BigInt(app.voteTime)
+        ).toString(),
+        // Proposal parameters
+        executionScript: proposalData.value9,
+        minimumQuorum: proposalData.value5,
+        requiredSupport: proposalData.value4,
+        snapshotBlock: proposalData.value3,
+        votingPower: proposalData.value8,
+        // Parse proposal metadata
+        metadata: args.metadata,
+        voteCount: "0",
+        positiveVoteCount: proposalData.value6,
+        negativeVoteCount: proposalData.value7,
 
-//   proposal.voteCount = integer.ZERO
-//   proposal.positiveVoteCount = proposalData.value6
-//   proposal.negativeVoteCount = proposalData.value7
+        totalStaked: args.creatorVotingPower,
+        stakedSupport: args.creatorVotingPower,
+        currentQuorum: (
+          BigInt(args.creatorVotingPower) / BigInt(proposalData.value8)
+        ).toString(),
+        currentSupport: (
+          BigInt(args.creatorVotingPower) / BigInt(proposalData.value8)
+        ).toString(),
+        created: args.timestamp,
+        createdAtBlock: args.block,
+        createdAtTransaction: args.transactionHash,
+      });
 
-//   proposal.totalStaked = decimal.fromBigInt(event.params.creatorVotingPower)
-//   proposal.stakedSupport = proposal.totalStaked
-//   proposal.currentQuorum = proposal.totalStaked.div(proposal.votingPower)
-//   proposal.currentSupport = proposal.stakedSupport.div(proposal.votingPower)
+      await Proposal.create(proposal);
+      // TODO: enable again when IPFS supported on Subgraph Studio
+      // if (event.params.metadata.startsWith('ipfs:')) {
+      //   let hash = event.params.metadata.slice(5) // because string.replace() is not supported on current AS version
+      //   let content = ipfs.cat(hash)
+      //
+      //   if (content != null) {
+      //     let jsonFile = json.try_fromBytes(content as Bytes)
+      //
+      //     if (jsonFile.isOk) {
+      //       let value = jsonFile.value
+      //
+      //       if (value != null) {
+      //         let metadata = value.toObject()
+      //
+      //         if (metadata.isSet('text')) {
+      //           let text = metadata.get('text')
+      //
+      //           if (text != null) {
+      //             proposal.text = text.toString()
+      //           }
+      //         }
+      //       }
+      //     } else {
+      //       log.warning('Failed to parse JSON metadata, hash: {}, raw_data: {}', [hash, content.toHexString()])
+      //     }
+      //   } else {
+      //     log.warning('Metadata failed to load from IPFS, hash: {}', [hash])
+      //   }
+      // }
 
-//   proposal.created = event.block.timestamp
-//   proposal.createdAtBlock = event.block.number
-//   proposal.createdAtTransaction = event.transaction.hash
+      // Voting app
+      app.proposalCount = (BigInt(app.proposalCount) + BigInt("1")).toString();
+      await app.save();
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+          result: true,
+        });
+        await response.save();
+      }
+      return response;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+};
 
-//   proposal.save()
+const handleCastVote = {
+  type: responseType,
+  description: "Handle CastVote",
+  args: {
+    address: { type: GraphQLString },
+    voteId: { type: GraphQLString },
+    voter: { type: GraphQLString },
+    stake: { type: GraphQLString },
+    supports: { type: GraphQLString },
+    timestamp: { type: GraphQLString },
+    block: { type: GraphQLString },
+    transactionHash: { type: GraphQLString },
+    logIndex: { type: GraphQLString },
+  },
+  async resolve(parent, args, context) {
+    try {
+      let proposal = await Proposal.findOne({
+        id: args.address + "-" + args.voteId.toString(),
+      });
 
-//   // Voting app
-//   app.proposalCount = integer.increment(app.proposalCount)
-//   app.save()
-// }
+      if (proposal != null) {
+        let voter = await getOrRegisterAccount(args.voter);
 
-// export function handleCastVote(event: CastVote): void {
-//   let proposal = Proposal.load(event.address.toHexString() + '-' + event.params.voteId.toString())
+        let vote = new ProposalVote({
+          id: args.transactionHash + "-" + args.logIndex,
+          proposal: proposal.id,
+          stake: args.stake,
+          supports: args.supports,
+          voter: voter.id,
+          created: args.timestamp,
+          createdAtBlock: args.block,
+          createdAtTransaction: args.transactionHash,
+        });
+        await ProposalVote.create(vote);
 
-//   if (proposal != null) {
-//     let voter = getOrRegisterAccount(event.params.voter)
+        // Update proposal counters
+        proposal.voteCount = (
+          BigInt(proposal.voteCount) + BigInt("1")
+        ).toString();
+        proposal.totalStaked = (
+          BigInt(proposal.totalStaked) + BigInt(vote.stake)
+        ).toString();
+        proposal.currentQuorum = (
+          BigInt(proposal.totalStaked) / BigInt(proposal.votingPower)
+        ).toString();
 
-//     let vote = new ProposalVote(event.transaction.hash.toHexString() + '-' + event.logIndex.toString())
-//     vote.proposal = proposal.id
-//     vote.stake = decimal.fromBigInt(event.params.stake)
-//     vote.supports = event.params.supports
-//     vote.voter = voter.id
-//     vote.created = event.block.timestamp
-//     vote.createdAtBlock = event.block.number
-//     vote.createdAtTransaction = event.transaction.hash
-//     vote.save()
+        if (vote.supports) {
+          proposal.positiveVoteCount = (
+            BigInt(proposal.positiveVoteCount) + BigInt("1")
+          ).toString();
+          proposal.stakedSupport = (
+            BigInt(proposal.stakedSupport) + BigInt(vote.stake)
+          ).toString();
+          proposal.currentSupport = (
+            BigInt(proposal.stakedSupport) / BigInt(proposal.votingPower)
+          ).toString();
+        } else {
+          proposal.negativeVoteCount = (
+            BigInt(proposal.negativeVoteCount) + BigInt("1")
+          ).toString();
+        }
 
-//     // Update proposal counters
-//     proposal.voteCount = integer.increment(proposal.voteCount)
-//     proposal.totalStaked = proposal.totalStaked.plus(vote.stake)
-//     proposal.currentQuorum = proposal.totalStaked.div(proposal.votingPower)
+        proposal.updated = args.timestamp;
+        proposal.updatedAtBlock = args.block;
+        proposal.updatedAtTransaction = args.transactionHash;
 
-//     if (vote.supports) {
-//       proposal.positiveVoteCount = integer.increment(proposal.positiveVoteCount)
-//       proposal.stakedSupport = proposal.stakedSupport.plus(vote.stake)
-//       proposal.currentSupport = proposal.stakedSupport.div(proposal.votingPower)
-//     } else {
-//       proposal.negativeVoteCount = integer.increment(proposal.negativeVoteCount)
-//     }
+        await proposal.save();
 
-//     proposal.updated = event.block.timestamp
-//     proposal.updatedAtBlock = event.block.number
-//     proposal.updatedAtTransaction = event.transaction.hash
+        // Update voting app counters
+        let app = await getOrRegisterVotingApp(args.address);
+        app.voteCount = (BigInt(app.voteCount) + BigInt("1")).toString();
+        await app.save();
+      }
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+          result: true,
+        });
+        await response.save();
+      }
+      return response;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+};
 
-//     proposal.save()
+const handleExecuteVote = {
+  type: responseType,
+  description: "Handle ExecuteVote",
+  args: {
+    address: { type: GraphQLString },
+    voteId: { type: GraphQLString },
+    timestamp: { type: GraphQLString },
+    block: { type: GraphQLString },
+    transactionHash: { type: GraphQLString },
+  },
+  async resolve(parent, args, context) {
+    try {
+      let proposal = await Proposal.findOne({
+        id: args.address + "-" + args.voteId.toString(),
+      });
 
-//     // Update voting app counters
-//     let app = getOrRegisterVotingApp(event.address)
-//     app.voteCount = integer.increment(app.voteCount)
-//     app.save()
-//   }
-// }
+      if (proposal != null) {
+        proposal.executed = args.timestamp;
+        proposal.executedAtBlock = args.block;
+        proposal.executedAtTransaction = args.transactionHash;
+        await proposal.save();
+      }
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+          result: true,
+        });
+        await response.save();
+      }
+      return response;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+};
 
-// export function handleExecuteVote(event: ExecuteVote): void {
-//   let proposal = Proposal.load(event.address.toHexString() + '-' + event.params.voteId.toString())
-
-//   if (proposal != null) {
-//     proposal.executed = event.block.timestamp
-//     proposal.executedAtBlock = event.block.number
-//     proposal.executedAtTransaction = event.transaction.hash
-//     proposal.save()
-//   }
-// }
-
-// function getOrRegisterVotingApp(address: Bytes): VotingApp {
-//   let app = VotingApp.load(address.toHexString())
-
-//   if (app == null) {
-//     let votingContract = Voting.bind(address as Address)
-
-//     let codename = dataSource
-//       .context()
-//       .get('type')!
-//       .toString()
-
-//     app = new VotingApp(address.toHexString())
-//     app.address = address
-//     app.codename = codename
-//     app.minimumBalance = decimal.fromBigInt(votingContract.minBalance())
-//     app.minimumQuorum = decimal.fromBigInt(votingContract.minAcceptQuorumPct())
-//     app.minimumTime = votingContract.minTime()
-//     app.requiredSupport = decimal.fromBigInt(votingContract.supportRequiredPct())
-//     app.voteTime = votingContract.voteTime()
-//     app.token = votingContract.token()
-//     app.proposalCount = integer.ZERO
-//     app.voteCount = integer.ZERO
-//     app.save()
-//   }
-
-//   return app!
-// }
+module.exports = {
+  handleMinimumBalanceSet,
+  handleMinimumTimeSet,
+  handleChangeMinQuorum,
+  handleChangeSupportRequired,
+  handleStartVote,
+  handleCastVote,
+  handleExecuteVote,
+};
