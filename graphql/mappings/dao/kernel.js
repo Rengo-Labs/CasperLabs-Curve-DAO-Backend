@@ -42,6 +42,9 @@ const handleNewProxyApp = {
           added: args.timestamp,
           addedAtBlock: args.block,
           addedAtTransaction: args.transactionHash,
+          modified: args.timestamp,
+          modifiedAtBlock: args.block,
+          modifiedAtTransaction: args.transactionHash,
         });
         await Contract.create(contract);
 
@@ -54,7 +57,7 @@ const handleNewProxyApp = {
           addedAtBlock: args.block,
           addedAtTransaction: args.transactionHash,
         });
-        await Contract.create(contractVersion);
+        await ContractVersion.create(contractVersion);
 
         // // Create dynamic data source
         // let context = new DataSourceContext()

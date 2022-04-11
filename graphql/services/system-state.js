@@ -1,25 +1,28 @@
 const SystemState = require("../../models/systemState");
 
 async function getSystemState(args) {
-  let state = await SystemState.findOne({id:"current"});
+  console.log("getSystemState");
+  let state = await SystemState.findOne({ id: "current" });
+
   if (state === null) {
-    let newData = new SystemState({
-      contractCount: 0,
-      gaugeCount: 0,
-      gaugeTypeCount: 0,
-      poolCount: 0,
-      tokenCount: 0,
-      totalPoolCount: 0,
+    state = new SystemState({
+      id: "current",
+      contractCount: "0",
+      gaugeCount: "0",
+      gaugeTypeCount: "0",
+      poolCount: "0",
+      tokenCount: "0",
+      totalPoolCount: "0",
     });
-    await SystemState.create(newData);
+    await SystemState.create(state);
   }
   state.updated = args.timestamp;
-  state.updatedAtBlock = args.blockNumber;
+  state.updatedAtBlock = args.block;
   state.updatedAtTransaction = args.transactionHash;
   await state.save();
   return state;
 }
 
 module.exports = {
-  getSystemState
+  getSystemState,
 };

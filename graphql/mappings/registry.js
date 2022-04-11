@@ -24,7 +24,7 @@ const handlePoolAdded = {
   },
   async resolve(parent, args, context) {
     try {
-      await getOrCreatePool(args.pool.id, args);
+      await getOrCreatePool(args.poolId, args);
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
         // create new response
@@ -51,7 +51,7 @@ const handlePoolRemoved = {
   },
   async resolve(parent, args, context) {
     try {
-      await removePool(args.pool.id, args);
+      await removePool(args.poolId, args);
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
         // create new response
@@ -69,7 +69,7 @@ const handlePoolRemoved = {
 };
 
 async function getOrCreatePool(address, args) {
-  let pool = await Pool.findOne({ id: args.poolId });
+  let pool = await Pool.findOne({ id: address });
 
   if (pool === null) {
     // await registryContract.setContractHash(args.registryAddress);
@@ -160,7 +160,7 @@ async function getOrCreatePool(address, args) {
 }
 
 async function removePool(address, args) {
-  let pool = await Pool.findOne({ id: args.poolId });
+  let pool = await Pool.findOne({ id: address });
 
   if (pool !== null) {
     pool.removedAt = args.timestamp;

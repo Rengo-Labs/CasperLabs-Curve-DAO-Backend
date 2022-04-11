@@ -6,12 +6,12 @@ async function getGaugeType(id) {
 }
 
 async function registerGaugeType(id, name) {
-  let newData = new GaugeType({
+  let gaugetype = new GaugeType({
     id: name,
     name: name,
-    gaugeCount: 0,
+    gaugeCount: "0",
   });
-  let gaugetype = await GaugeType.create(newData);
+  await GaugeType.create(gaugetype);
   return gaugetype;
 }
 

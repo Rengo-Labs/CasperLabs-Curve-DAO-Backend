@@ -15,7 +15,7 @@ async function getHourlyTradeVolume(pool, timestamp) {
       id: id,
       pool: pool.id,
       timestamp: hour,
-      voulume: 0,
+      volume: "0",
     });
     await HourlyVolume.create(newData);
   }
@@ -35,7 +35,7 @@ async function getDailyTradeVolume(pool, timestamp) {
       id: id,
       pool: pool.id,
       timestamp: day,
-      voulume: 0,
+      volume: "0",
     });
     await DailyVolume.create(newData);
   }
@@ -55,7 +55,7 @@ async function getWeeklyTradeVolume(pool, timestamp) {
       id: id,
       pool: pool.id,
       timestamp: week,
-      voulume: 0,
+      volume: "0",
     });
     await WeeklyVolume.create(newData);
   }

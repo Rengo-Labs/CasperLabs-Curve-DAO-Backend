@@ -10,6 +10,7 @@ const { getSystemState } = require("../services/system-state");
 //const AddressProvider = require('../../JsClients/ADDRESSPROVIDER/test/installed.ts');
 
 async function registerContract(id, args) {
+  console.log("registerContract");
   //let info = await AddressProvider.get_id_info(args.addressProviderContractHash,id);
 
   let info = {
@@ -71,6 +72,7 @@ const handleAddressModified = {
   },
   async resolve(parent, args, context) {
     try {
+      console.log("handleAddressModified");
       await registerContract(args.id, args);
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -100,7 +102,8 @@ const handleNewAddressIdentifier = {
   },
   async resolve(parent, args, context) {
     try {
-      await registerContract(args.id, args);
+      console.log("hello.");
+      //await registerContract(args.id, args);
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
         // create new response

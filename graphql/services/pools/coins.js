@@ -1,6 +1,7 @@
 const Pool = require("../../../models/pool");
 const Coin = require("../../../models/coin");
 const UnderlyingCoin = require("../../../models/underlyingCoin");
+const { getOrCreateToken } = require("../../services/token");
 // let registryContract= require('../JsClients/Registry/test/installed.ts')
 
 async function saveCoins(pool, args) {
@@ -27,7 +28,7 @@ async function saveCoins(pool, args) {
       return false;
     }
 
-    for (let i = 0, count = BigInt(pool.coinCount); i < count; ++i) {
+    for (let i = BigInt(0), count = BigInt(pool.coinCount); i < count; ++i) {
       let token = await getOrCreateToken(coins[i], args);
       let data = new Coin({
         id: pool.id + "-" + i.toString(),
@@ -52,8 +53,8 @@ async function saveCoins(pool, args) {
       return false;
     }
 
-    for (let i = 0, count = BigInt(pool.underlyingCount); i < count; ++i) {
-      let token = await getOrCreateToken(coins[i], args);
+    for (let i = BigInt(0), count = BigInt(pool.underlyingCount); i < count; ++i) {
+      let token = await getOrCreateToken(underlyingCoins[i], args);
       let data = new UnderlyingCoin({
         id: pool.id + "-" + i.toString(),
         index: i,

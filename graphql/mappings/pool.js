@@ -36,14 +36,14 @@ async function getPoolSnapshot(pool, args) {
    
     // Workaround needed because batch_set_pool_asset_type() doesn't emit events
     // See https://etherscan.io/tx/0xf8e8d67ec16657ecc707614f733979d105e0b814aa698154c153ba9b44bf779b
-    if (BigInt(args.blockNumber) >= BigInt("12667823")) {
+    if (BigInt(args.block) >= BigInt("12667823")) {
       // Reference asset
       if (pool.assetType === null) {
         //let assetType =  await registryContract.try_get_pool_asset_type(args.registryAddress,poolAddress)
-        let assetType = "1";
+        let assetType = 1;
 
         // if (!assetType.reverted) {
-        if (assetType!=null) {
+        if (assetType!==null) {
           // let type = assetType.value;
           let type = assetType;
 
@@ -107,8 +107,8 @@ const handleAddLiquidity = {
       let pool = await Pool.findOne({ id: args.poolId });
       if (pool !== null) {
         pool = await getPoolSnapshot(pool, args);
-        let provider = getOrRegisterAccount(args.providerId);
-        let eventId = await getEventId(args.transactionHash, args.logIndex);
+        let provider = await getOrRegisterAccount(args.providerId);
+        let eventId = getEventId(args.transactionHash, args.logIndex);
         let newData = new AddLiquidityEvent({
           id: "al-" + eventId,
           pool: pool.id,
@@ -162,8 +162,8 @@ const handleRemoveLiquidity = {
       let pool = await Pool.findOne({ id: args.poolId });
       if (pool !== null) {
         pool = await getPoolSnapshot(pool, args);
-        let provider = getOrRegisterAccount(args.providerId);
-        let eventId = await getEventId(args.transactionHash, args.logIndex);
+        let provider = await getOrRegisterAccount(args.providerId);
+        let eventId = getEventId(args.transactionHash, args.logIndex);
         let newData = new RemoveLiquidityEvent({
           id: "rl-" + eventId,
           pool: pool.id,
@@ -217,8 +217,8 @@ const handleRemoveLiquidityImbalance = {
       let pool = await Pool.findOne({ id: args.poolId });
       if (pool !== null) {
         pool = await getPoolSnapshot(pool, args);
-        let provider = getOrRegisterAccount(args.providerId);
-        let eventId = await getEventId(args.transactionHash, args.logIndex);
+        let provider = await getOrRegisterAccount(args.providerId);
+        let eventId = getEventId(args.transactionHash, args.logIndex);
         let newData = new RemoveLiquidityEvent({
           id: "rli-" + eventId,
           pool: pool.id,
@@ -271,8 +271,8 @@ const handleRemoveLiquidityOne = {
       let pool = await Pool.findOne({ id: args.poolId });
       if (pool !== null) {
         pool = await getPoolSnapshot(pool, args);
-        let provider = getOrRegisterAccount(args.providerId);
-        let eventId = await getEventId(args.transactionHash, args.logIndex);
+        let provider = await getOrRegisterAccount(args.providerId);
+        let eventId = getEventId(args.transactionHash, args.logIndex);
         let newData = new RemoveLiquidityOneEvent({
           id: "rlo-" + eventId,
           pool: pool.id,
@@ -341,10 +341,10 @@ const handleTokenExchange = {
 
         let buyer = await getOrRegisterAccount(args.buyer);
 
-        let eventId = await getEventId(args.transactionHash, args.logIndex);
+        let eventId = getEventId(args.transactionHash, args.logIndex);
 
         // Save event log
-        let newData = new Exchange({
+        let exchange = new Exchange({
           id: "e-" + eventId,
           pool: pool.id,
           buyer: buyer.id,
@@ -357,9 +357,7 @@ const handleTokenExchange = {
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
-        await Exchange.create(newData);
-
-        let exchange = newData;
+        await Exchange.create(exchange);
 
         // Save trade volume
         let volume =
@@ -447,10 +445,10 @@ const handleTokenExchangeUnderlying = {
 
         let buyer = await getOrRegisterAccount(args.buyer);
 
-        let eventId = await getEventId(args.transactionHash, args.logIndex);
+        let eventId = getEventId(args.transactionHash, args.logIndex);
 
         // Save event log
-        let newData = new Exchange({
+        let exchange = new Exchange({
           id: "e-" + eventId,
           pool: pool.id,
           buyer: buyer.id,
@@ -463,9 +461,7 @@ const handleTokenExchangeUnderlying = {
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
-        await Exchange.create(newData);
-
-        let exchange = newData;
+        await Exchange.create(exchange);
 
         // Save trade volume
         let volume =
@@ -526,6 +522,7 @@ const handleNewAdmin = {
   },
   async resolve(parent, args, context) {
     try {
+      console.log("hello.");
       let pool = await Pool.findOne({ id: args.poolId });
 
       if (pool != null) {
@@ -534,7 +531,7 @@ const handleNewAdmin = {
         // Save pool owner
         pool.owner = args.admin;
 
-        let eventId = await getEventId(args.transactionHash, args.logIndex);
+        let eventId = getEventId(args.transactionHash, args.logIndex);
 
         // Save event log
         let newData = new TransferOwnershipEvent({
@@ -592,7 +589,7 @@ const handleNewFee = {
         pool.fee = args.fee;
         pool.adminFee = args.admin_fee;
 
-        let eventId = await getEventId(args.transactionHash, args.logIndex);
+        let eventId = getEventId(args.transactionHash, args.logIndex);
         // Save event log
         let newData = new AdminFeeChangeLog({
           id: "af-" + eventId,
@@ -660,9 +657,9 @@ const handleNewParameters = {
         pool.fee = args.fee;
         pool.adminFee = args.admin_fee;
 
-        let eventId = await getEventId(args.transactionHash, args.logIndex);
+        let eventId = getEventId(args.transactionHash, args.logIndex);
         // Save event log
-        let newData = new AdminFeeChangelog({
+        let newData = new AdminFeeChangeLog({
           id: "af-" + eventId,
           pool: pool.id,
           value: pool.adminFee,
@@ -670,7 +667,7 @@ const handleNewParameters = {
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
-        await AdminFeeChangelog.create(newData);
+        await AdminFeeChangeLog.create(newData);
 
         let newData2 = new AmplificationCoeffChangelog({
           id: "a-" + eventId,
@@ -682,7 +679,7 @@ const handleNewParameters = {
         });
         await AmplificationCoeffChangelog.create(newData2);
 
-        let newData3 = new FeeChangelog({
+        let newData3 = new FeeChangeLog({
           id: "f-" + eventId,
           pool: pool.id,
           value: pool.fee,
@@ -690,7 +687,7 @@ const handleNewParameters = {
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
-        await FeeChangelog.create(newData3);
+        await FeeChangeLog.create(newData3);
         await pool.save();
       }
 
@@ -729,7 +726,7 @@ const handleRampA = {
 
         // Save pool parameters
         pool.A = args.new_A;
-        let eventId = await getEventId(args.transactionHash, args.logIndex);
+        let eventId = getEventId(args.transactionHash, args.logIndex);
 
         // Save event log
         let newData = new AmplificationCoeffChangelog({
@@ -779,7 +776,7 @@ const handleStopRampA = {
 
         // Save pool parameters
         pool.A = args.A;
-        let eventId = await getEventId(args.transactionHash, args.logIndex);
+        let eventId = getEventId(args.transactionHash, args.logIndex);
 
         // Save event log
         let newData = new AmplificationCoeffChangelog({

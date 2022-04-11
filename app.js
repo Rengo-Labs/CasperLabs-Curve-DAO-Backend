@@ -32,12 +32,7 @@ if (process.env.NODE_MODE == "deployed") {
 
 console.log("DB_URL : " + DB_URL);
 
-const connectionParams = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  autoIndex: false,
-};
-const connect = mongoose.connect(DB_URL, connectionParams);
+const connect = mongoose.connect(DB_URL);
 // connecting to the database
 connect.then(
   (db) => {
