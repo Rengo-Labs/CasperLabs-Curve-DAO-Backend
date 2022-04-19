@@ -296,14 +296,14 @@ const handleNewGaugeWeight = {
     try {
       let gauge = await Gauge.findOne({ id: args.gauge_address });
       //let gauge = '1000000000';
-      if (gauge !== null) {
+      if (gauge != null) {
         // await gaugeController.setContractHash(address);
         let nextWeek = nextPeriod(args.time, WEEK);
         let newData = new GaugeWeight({
           id: gauge.id + "-" + nextWeek.toString(),
           gauge: gauge.id,
           time: nextWeek,
-          weight: BigInt(args.weight),
+          weight: args.weight,
         // weight: '1000000000'
         });
         await GaugeWeight.create(newData);
@@ -318,7 +318,7 @@ const handleNewGaugeWeight = {
           weight: '1000000000'
         });
         await GaugeTotalWeight.create(data);
-
+      }
         let response = await Response.findOne({ id: "1" });
         if (response === null) {
           // create new response
@@ -329,7 +329,7 @@ const handleNewGaugeWeight = {
           await response.save();
         }
         return response;
-      }
+      
     } catch (error) {
       throw new Error(error);
     }
@@ -367,9 +367,9 @@ const handleNewTypeWeight = {
             //weight: "1000000000"
             });
             await GaugeTotalWeight.create(data);
-
+          }
             let response = await Response.findOne({ id: "1" });
-            if (response === null) {
+            if (response == null) {
               // create new response
               response = new Response({
                 id: "1",
@@ -378,8 +378,8 @@ const handleNewTypeWeight = {
               await response.save();
             }
             return response;
-          }
-          else{console.log('problem');}
+          
+          
       }  
       catch (error) {
         throw new Error(error);
@@ -426,7 +426,7 @@ const handleVoteForGauge = {
         });
         await GaugeTotalWeight.create(data);
 
-        let user = getOrRegisterAccount(args.user);
+        let user = await getOrRegisterAccount(args.user);
 
         let voteData = new GaugeWeightVote({
           id: gauge.id + "-" + user.id + "-" + args.time.toString(),
@@ -437,7 +437,7 @@ const handleVoteForGauge = {
         //weight:"1000000000"
         });
         await GaugeWeightVote.create(voteData);
-
+      }
         let response = await Response.findOne({ id: "1" });
         if (response === null) {
           // create new response
@@ -448,7 +448,7 @@ const handleVoteForGauge = {
           await response.save();
         }
         return response;
-      }
+      
     } catch (error) {
       throw new Error(error);
     }

@@ -4,20 +4,20 @@ const Pool = require("../../../models/pool");
 const WeeklyVolume = require("../../../models/weeklyVolume");
 
 async function getHourlyTradeVolume(pool, timestamp) {
-  let interval = BigInt('60') * BigInt('60');
+  let interval = BigInt("60") * BigInt("60");
   let hour = (BigInt(timestamp) / interval) * interval;
   let id = pool.id + "-hour-" + hour.toString();
-console.log("id:",id);
-  let volume = await HourlyVolume.findOne({id:id});
-console.log("volume", volume);
+  console.log("id:", id);
+  let volume = await HourlyVolume.findOne({ id: id });
+  console.log("volume", volume);
   if (volume === null) {
-    let newData = new HourlyVolume({
+    volume = new HourlyVolume({
       id: id,
       pool: pool.id,
       timestamp: hour,
       volume: "0",
     });
-    await HourlyVolume.create(newData);
+    await HourlyVolume.create(volume);
   }
 
   return volume;
@@ -28,16 +28,16 @@ async function getDailyTradeVolume(pool, timestamp) {
   let day = (BigInt(timestamp) / interval) * interval;
   let id = pool.id + "-day-" + day.toString();
 
-  let volume = await DailyVolume.findOne({id:id});
+  let volume = await DailyVolume.findOne({ id: id });
 
   if (volume == null) {
-    let newData = new DailyVolume({
+    volume = new DailyVolume({
       id: id,
       pool: pool.id,
       timestamp: day,
       volume: "0",
     });
-    await DailyVolume.create(newData);
+    await DailyVolume.create(volume);
   }
 
   return volume;
@@ -48,16 +48,16 @@ async function getWeeklyTradeVolume(pool, timestamp) {
   let week = (BigInt(timestamp) / interval) * interval;
   let id = pool.id + "-week-" + week.toString();
 
-  let volume = await WeeklyVolume.findOne({id:id});
+  let volume = await WeeklyVolume.findOne({ id: id });
 
   if (volume == null) {
-    let newData = new WeeklyVolume({
+    volume = new WeeklyVolume({
       id: id,
       pool: pool.id,
       timestamp: week,
       volume: "0",
     });
-    await WeeklyVolume.create(newData);
+    await WeeklyVolume.create(volume);
   }
 
   return volume;
@@ -66,5 +66,5 @@ async function getWeeklyTradeVolume(pool, timestamp) {
 module.exports = {
   getHourlyTradeVolume,
   getDailyTradeVolume,
-  getWeeklyTradeVolume
+  getWeeklyTradeVolume,
 };

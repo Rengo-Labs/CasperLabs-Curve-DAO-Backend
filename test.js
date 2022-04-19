@@ -82,7 +82,7 @@ async function RemoveLiquidity(
   registryAddress,
   blockNumber
 ) {
-  console.log("Calling handleAddLiquidity mutation...");
+  console.log("Calling handleRemoveLiquidity mutation...");
   let response = await request(
     process.env.GRAPHQL,
     `mutation handleRemoveLiquidity( 
@@ -1337,63 +1337,64 @@ async function ExecuteVote(address, voteId, timestamp, block, transactionHash) {
 }
 
 async function startTests() {
-  // await AddLiquidity(
-  //   "123",
-  //   "1",
-  //   "1",
-  //   "1",
-  //   "1",
-  //   "1",
-  //   "123",
-  //   "1",
-  //   "1",
-  //   "1",
-  //   "1",
-  //   "1"
-  // );
-   //await RemoveLiquidity('1','1','1','1','1','123','1','1','1','1','1');
-   //await RemoveLiquidityImbalance('1','1','1','1','1','1','123','1','1','1','1','1');
-   //await RemoveLiquidityOne('1','1','1','1','123','13344','1','1','1','1');
-  //await TokenExchange("123", "123", "123", "123", "123", "123", "123", "123", "123","1234");
-  //await TokenExchangeUnderlying("123", "123", "123", "123", "123", "123", "123", "123", "123","1234");
-  //await NewAdmin("123", "123", "1000000000", "123", "123","1234");
- // await NewFee("123", "123", "1000000000", "123", "123","1234","123327");
-  //await NewParameters("123", "123", "1000000000", "1233498729837489237", "123","1234","123327","123566");
- //await RampA("123333", "123", "1000000000", "123", "123","123");
- //await StopRampA("123333", "123", "1000000000", "123", "123","123");
 
+  //Registry-mutations
+  await PoolAdded("123","123","123","123");
+  await PoolRemoved("123","123","123","123");
 
+  //Pool mutations
+  await AddLiquidity(
+    "123",
+    "123",
+    "123",
+    "123",
+    "123",
+    "123",
+    "123",
+    "123",
+    "123",
+    "123",
+    "123",
+    "123"
+  );
+  await RemoveLiquidity("123","123","123","123","123","123","123","123","123","123","123");
+  await RemoveLiquidityImbalance("123","123","123","123","123","123","123","123","123","123","123","123");
+  await RemoveLiquidityOne("123","123","123","123","123","123","123","123","123","123");
+  await TokenExchange("123", "123", "123", "123", "123", "123", "0", "123", "1","123");
+  await TokenExchangeUnderlying("123", "123", "123", "123", "123", "123", "0", "123", "1","123");
+  await NewAdmin("123", "123", "123", "123", "123","123");
+  await NewFee("123", "123", "123", "123", "123","123","123");
+  await NewParameters("123", "123", "123", "123", "123","123","123","123");
+  await RampA("123", "123", "123", "123", "123","123");
+  await StopRampA("123", "123", "123", "123", "123","123");
 
   //AddressProvider mutations
-  // await AddressModified("123", "123", "123", "123", "123");
-  // await NewAddressIdentifier("123", "123", "123", "123", "123");
+  await AddressModified("123", "123", "123", "123", "123");
+  await NewAddressIdentifier("123", "123", "123", "123", "123");
 
-  //Gauge mutations
-  // await UpdateLiquidityLimit("123", "123", "123", "123", "123", "123", "123", "123", "123");
-  // await Deposit("123", "123", "123", "123", "123");
-  // await Withdraw("123", "123", "123", "123", "123");
+  // //Gauge mutations
+  await UpdateLiquidityLimit("123", "123", "123", "123", "123", "123", "123", "123", "123");
+  await Deposit("123", "123", "123", "123", "123");
+  await Withdraw("123", "123", "123", "123", "123");
 
   // //DAO mutations
-  // await NewProxyApp("0x2436adbbb3230545df6846695013211d36736f647c91b302b9591e5e2d013485", "123", "123", "123", "123","123");
+  await NewProxyApp("0x2436adbbb3230545df6846695013211d36736f647c91b302b9591e5e2d013485", "123", "123", "123", "123","123");
 
   // //voting mutations
-   //await StartVote("123","123","123","123","123","123","123","123");
-   //await MinimumBalanceSet("12344","123");
-   //await MinimumTimeSet("1234489","123787");
-   //await ChangeMinQuorum("1234421","1000000000");
-   //await ChangeSupportRequired("12344219091","1000000000");
-   //await CastVote("12345678","123","123","123","123","123","123","123","123");
-   //await ExecuteVote("123","123","123","123","123");
+  await StartVote("123","123","123","123","123","123","123","123");
+  await MinimumBalanceSet("123","123");
+  await MinimumTimeSet("123","123");
+  await ChangeMinQuorum("123","123");
+  await ChangeSupportRequired("123","123");
+  await CastVote("123","123","123","123","true","123","123","123","123");
+  await ExecuteVote("123","123","123","123","123");
 
-  // Gauge-Controller mutations
-  //await AddType('122','1238923','123447383829');
-  //await NewGauge("123", "12344332", "12390909", "1232343224", "123758997", "1230900000");
-  //await NewGaugeWeight("123454", "1231111", "12322222", "122222222")
-  //await NewTypeWeight("12346336444", "123444",'122442','1256454321','12344212123456');
- // await VoteForGauge("1", "1", "1", "1","1");
-
- //Registry-mutations
- await PoolAdded('123','123','123','123')
+  // // Gauge-Controller mutations
+  await AddType("123","123","123");
+  await NewGauge("123", "123", "123", "123", "123", "123");
+  await NewGaugeWeight("123", "123", "123", "123")
+  await NewTypeWeight("123", "123","123","123","123");
+  await VoteForGauge("123", "123", "123", "123","123");
  
 }
 
