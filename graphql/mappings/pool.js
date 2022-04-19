@@ -15,6 +15,7 @@ const AmplificationCoeffChangelog = require("../../models/amplificationCoeffChan
 const AdminFeeChangeLog = require("../../models/adminFeeChangeLog");
 const FeeChangeLog = require("../../models/feeChangeLog");
 const TransferOwnershipEvent = require("../../models/transferOwnershipEvent");
+const UnderlyingCoin = require("../../models/underlyingCoin");
 // let poolContract= require('../JsClients/Pool/test/installed.ts');
 // let registryContract= require('../JsClients/Registry/test/installed.ts');
 const { saveCoins } = require("../services/pools/coins");
@@ -31,12 +32,19 @@ function getEventId(transactionHash, logIndex) {
 }
 
 async function getPoolSnapshot(pool, args) {
+  console.log("block",args.block);
+    console.log("POOOOL",pool);
   if (pool !== null) {
+    console.log("helloWORKD")
     let poolAddress = pool.swapAddress;
    
     // Workaround needed because batch_set_pool_asset_type() doesn't emit events
     // See https://etherscan.io/tx/0xf8e8d67ec16657ecc707614f733979d105e0b814aa698154c153ba9b44bf779b
+    console.log("block-42",args.block);
+    
     if (BigInt(args.block) >= BigInt("12667823")) {
+    //if(args.block){
+      console.log("block-46",args.block);
       // Reference asset
       if (pool.assetType === null) {
         //let assetType =  await registryContract.try_get_pool_asset_type(args.registryAddress,poolAddress)
@@ -77,7 +85,8 @@ async function getPoolSnapshot(pool, args) {
 
     if (virtualPrice !== null) {
       // pool.virtualPrice = BigInt(virtualPrice.value);
-      pool.virtualPrice = BigInt(virtualPrice);
+      //pool.virtualPrice = BigInt(virtualPrice);
+      pool.virtualPrice = virtualPrice;
       await pool.save();
     }
   }
@@ -102,13 +111,16 @@ const handleAddLiquidity = {
     registryAddress: { type: GraphQLString },
     blockNumber: { type: GraphQLString },
   },
-  async resolve(args) {
+  async resolve(parent, args, context) {
     try {
+      console.log("args",args);
+      console.log("args.poolId",args.poolId);
+      console.log("hello");
       let pool = await Pool.findOne({ id: args.poolId });
       if (pool !== null) {
         pool = await getPoolSnapshot(pool, args);
         let provider = await getOrRegisterAccount(args.providerId);
-        let eventId = getEventId(args.transactionHash, args.logIndex);
+        let eventId =  getEventId(args.transactionHash, args.logIndex);
         let newData = new AddLiquidityEvent({
           id: "al-" + eventId,
           pool: pool.id,
@@ -124,6 +136,7 @@ const handleAddLiquidity = {
         await AddLiquidityEvent.create(newData);
         await pool.save();
       }
+      console.log("pool",pool);
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -157,7 +170,7 @@ const handleRemoveLiquidity = {
     registryAddress: { type: GraphQLString },
     blockNumber: { type: GraphQLString },
   },
-  async resolve(args) {
+  async resolve(parent, args, context) {
     try {
       let pool = await Pool.findOne({ id: args.poolId });
       if (pool !== null) {
@@ -212,7 +225,7 @@ const handleRemoveLiquidityImbalance = {
     registryAddress: { type: GraphQLString },
     blockNumber: { type: GraphQLString },
   },
-  async resolve(args) {
+  async resolve(parent, args, context) {
     try {
       let pool = await Pool.findOne({ id: args.poolId });
       if (pool !== null) {
@@ -255,6 +268,7 @@ const handleRemoveLiquidityOne = {
   type: responseType,
   description: "Handle Remove Liquidity One",
   args: {
+
     tokenAmount: { type: GraphQLString },
     coinAmount: { type: GraphQLString },
     block: { type: GraphQLString },
@@ -266,8 +280,9 @@ const handleRemoveLiquidityOne = {
     registryAddress: { type: GraphQLString },
     blockNumber: { type: GraphQLString },
   },
-  async resolve(args) {
+  async resolve(parent, args, context) {
     try {
+      console.log('here',args.poolId);
       let pool = await Pool.findOne({ id: args.poolId });
       if (pool !== null) {
         pool = await getPoolSnapshot(pool, args);
@@ -320,7 +335,7 @@ const handleTokenExchange = {
   },
   async resolve(parent, args, context) {
     try {
-      let pool = await Pool.findOne({ id: args.poolId });
+       let pool = await Pool.findOne({ id: args.poolId });
 
       if (pool != null) {
         pool = await getPoolSnapshot(pool, args);
@@ -364,7 +379,7 @@ const handleTokenExchange = {
           BigInt(exchange.amountSold) +
           BigInt(exchange.amountBought) / BigInt("2");
 
-        let hourlyVolume = await getHourlyTradeVolume(pool, args.timestamp);
+         let hourlyVolume = await getHourlyTradeVolume(pool, args.timestamp);
         hourlyVolume.volume = (
           BigInt(hourlyVolume.volume) + BigInt(volume)
         ).toString();
@@ -430,10 +445,11 @@ const handleTokenExchangeUnderlying = {
         let coinSold = await UnderlyingCoin.findOne({
           id: pool.id + "-" + args.sold_id,
         });
+        console.log("Token:",Token.token);
         let tokenSold = await Token.findOne({ id: coinSold.token });
         //let amountSold = decimal.fromBigInt(event.params.tokens_sold, tokenSold.decimals.toI32()) //issue
 
-        let amountSold = BigInt(args.tokens_sold);
+       let amountSold = BigInt(args.tokens_sold);
 
         let coinBought = await UnderlyingCoin.findOne({
           id: pool.id + "-" + args.bought_id,
@@ -644,10 +660,14 @@ const handleNewParameters = {
   },
   async resolve(parent, args, context) {
     try {
+      console.log("args",args);
+      console.log("args.poolId",args.poolId);
+      console.log("hello");
       let pool = await Pool.findOne({ id: args.poolId });
 
-      if (pool != null) {
-        pool = await getPoolSnapshot(pool, args);
+       if (pool != null) {
+         pool = await getPoolSnapshot(pool, args);
+
 
         // Save pool parameters
         pool.A = args.A;
@@ -689,7 +709,7 @@ const handleNewParameters = {
         });
         await FeeChangeLog.create(newData3);
         await pool.save();
-      }
+       }
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {

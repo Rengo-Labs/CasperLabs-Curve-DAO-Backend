@@ -30,7 +30,7 @@ async function getOrRegisterVotingApp(address) {
     let voteTime = "1000000000";
     let token = "123";
 
-    let app = new VotingApp({
+     app = new VotingApp({
       id: address,
       address: address,
       codename: codename,
@@ -306,6 +306,7 @@ const handleCastVote = {
           createdAtTransaction: args.transactionHash,
         });
         await ProposalVote.create(vote);
+        console.log(vote);
 
         // Update proposal counters
         proposal.voteCount = (

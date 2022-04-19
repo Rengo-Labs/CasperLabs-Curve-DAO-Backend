@@ -7,7 +7,7 @@ async function getGaugeType(id) {
 
 async function registerGaugeType(id, name) {
   let gaugetype = new GaugeType({
-    id: name,
+    id: id,
     name: name,
     gaugeCount: "0",
   });

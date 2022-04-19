@@ -6,10 +6,11 @@ const Response = require("../../models/response");
 const { responseType } = require("../types/response");
 const Pool = require("../../models/pool");
 const Gauge = require("../../models/gauge");
-const getSystemState = require("../services/system-state");
+const {getSystemState} = require("../services/system-state");
 const getOrCreateLpToken = require("../services/token");
 const FEE_PRECISION = require("../constants");
-const saveCoins = require("../services/pools/coins");
+const {saveCoins} = require("../services/pools/coins");
+//const { token } = require("morgan");
 // let registryContract= require('../JsClients/Registry/test/installed.ts')
 // let poolContract= require('../JsClients/Registry/test/installed.ts')
 
@@ -70,92 +71,109 @@ const handlePoolRemoved = {
 
 async function getOrCreatePool(address, args) {
   let pool = await Pool.findOne({ id: address });
+  console.log("check", pool);
+  
 
   if (pool === null) {
     // await registryContract.setContractHash(args.registryAddress);
     // await poolContract.setContractHash(args.poolAddress);
     //let coinCount = await registryContract.get_n_coins(args.registryAddress,address);
-    let coinCount = "1000000000";
+    let coinCount = ["3","4"];
     //let metapool = await registryContract.try_is_meta(args.registryAddress,address);
     let metapool = "1000000000";
     //let virtualPrice = await poolContract.try_get_virtual_price(args.poolAddress);
     let virtualPrice = "1000000000";
 
-    let newData = new Pool({
-      swapAddress: poolContract._address,
-      registryAddress: registryContract._address,
+     pool = new Pool({
+      //id: address,
+      id: '123',
+      //swapAddress: poolContract._address,
+      swapAddress:'1000000000',
+      //registryAddress: registryContract._address,
+      registryAddress:'1000000000',
       coinCount: coinCount[0],
       exchangeCount: 0,
       gaugeCount: 0,
       underlyingCount: coinCount[1],
-      isMeta: metapool !== null && metapool,
+      //underlyingCount: '123',
+      //isMeta: metapool !== null && metapool,
+      //isMeta: '123',
+      isMeta: 'true',
       //name : registryContract.get_pool_name(address),
       name: "1000000000",
       locked: 0,
+      lpToken: '1000000000',
+      gaugeCount:'112',
+      A:'1223',
+      fee: '4123',
+      admin: '112456',
+      owner: '1234',
       virtualPrice: virtualPrice === null ? 0 : BigInt(virtualPrice),
       addedAt: args.timestamp,
       addedAtBlock: args.blockNumber,
       addedAtTransaction: args.transactionHash,
     });
-    await Pool.create(newData);
+    await Pool.create(pool);
  
-    await saveCoins(pool, args);
+    
 
     //let lpToken = registryContract.try_get_lp_token(address);
-    let lpToken = "1000000000";
-    if (lpToken !== null) {
-      let token = await getOrCreateLpToken(lpToken);
-      token.pool = pool.id;
-      await token.save();
+    //  let lpToken = "1000000000";
+    //  if (lpToken !== null) {
+    //    let token = await getOrCreateLpToken(lpToken);
+    //    token.pool = pool.id;
+    //    await token.save();
 
-      pool.lpToken = token.id;
+    //   pool.lpToken = token.id;
 
-      // Associate gauge to pool
-      if (token.gauge !== null) {
-        let gauge = await Gauge.findOne({id:token.gauge});
-        gauge.pool = pool.id;
-        await gauge.save();
+    //   // Associate gauge to pool
+      //  if (token.gauge !== null) {
+      //    let gauge = await Gauge.findOne({id:token.gauge});
+      //    gauge.pool = pool.id;
+      //    await gauge.save();
 
-        pool.gaugeCount = (BigInt(pool.gaugeCount) + BigInt("1")).toString();;
-      }
-    }
+      //    pool.gaugeCount = (BigInt(pool.gaugeCount) + BigInt("1")).toString();;
+      //  }
+    // }
     // let A = poolContract.try_A(args.poolAddress);
     // let adminFee = poolContract.try_admin_fee(args.poolAddress);
     // let fee = poolContract.try_fee(args.poolAddress);
-    let A = "1000000000";
-    let adminFee = "1000000000";
-    let fee = "1000000000";
+    // let A = "1000000000";
+    // let adminFee = "1000000000";
+    // let fee = "1000000000";
 
-    if (A !== null) {
-      pool.A = A;
-    }
+    // if (A !== null) {
+    //   pool.A = A;
+    // }
 
-    if (fee !== null) {
-      // pool.fee = BigInt(fee, FEE_PRECISION); //issue
-      pool.fee = fee;
-    }
+    // if (fee !== null) {
+    //   // pool.fee = BigInt(fee, FEE_PRECISION); //issue
+    //   pool.fee = fee;
+    // }
 
-    if (adminFee !== null) {
-      // pool.adminFee = BigInt(adminFee, FEE_PRECISION); issue
-      pool.adminFee = adminFee;
-    }
+    // if (adminFee !== null) {
+    //   // pool.adminFee = BigInt(adminFee, FEE_PRECISION); issue
+    //   pool.adminFee = adminFee;
+    // }
 
     //let owner = poolContract.try_owner()
-    let owner = "1000000000";
-    if (owner !== null) {
-      pool.owner = owner;
-    }
+    // let owner = "1000000000";
+    // if (owner !== null) {
+    //   pool.owner = owner;
+    // }
 
-    let state = await getSystemState(args);
-    state.poolCount =  (BigInt(state.poolCount) + BigInt("1")).toString();
-    state.totalPoolCount = (BigInt(state.totalPoolCount) + BigInt("1")).toString();;
-    await state.save();
+    // let state = await getSystemState(args);
+    // state.poolCount =  (BigInt(state.poolCount) + BigInt("1")).toString();
+    // state.totalPoolCount = (BigInt(state.totalPoolCount) + BigInt("1")).toString();;
+    // await state.save();
 
     // let context = new DataSourceContext();
     // context.setBytes("registry", registryContract._address);
 
     // await PoolDataSource.createWithContext(address, context);
   }
+  await saveCoins(pool, args);
+    console.log("check again",pool);
   return pool;
 }
 
@@ -182,3 +200,26 @@ module.exports = {
   handlePoolAdded,
   handlePoolRemoved
 };
+
+
+// "id":"123",
+// "poolId":"123"
+// "swapAddress":"1000000000",
+// "registryAddress":"1000000000",
+// "coinCount":"1233",
+// "exchangeCount":"4124",
+// "gaugeCount":"123443",
+// "underlyingCount":"121314",
+// "isMeta":"true",
+// "name": "1000000000",
+// "locked": "0",
+// "lpToken": "1000000000",
+// "gaugeCount":"112",
+// "A":"1223",
+// "fee": "4123",
+// "admin": "112456",
+// "owner": "1234",
+// "virtualPrice": "123255334",
+// "addedAt": "11324234",
+// "addedAtBlock": "1000000000",
+// "addedAtTransaction": "1000000000"

@@ -4,12 +4,12 @@ const Pool = require("../../../models/pool");
 const WeeklyVolume = require("../../../models/weeklyVolume");
 
 async function getHourlyTradeVolume(pool, timestamp) {
-  let interval = BigInt(60 * 60);
-  let hour = (timestamp / interval) * interval;
+  let interval = BigInt('60') * BigInt('60');
+  let hour = (BigInt(timestamp) / interval) * interval;
   let id = pool.id + "-hour-" + hour.toString();
-
+console.log("id:",id);
   let volume = await HourlyVolume.findOne({id:id});
-
+console.log("volume", volume);
   if (volume === null) {
     let newData = new HourlyVolume({
       id: id,
@@ -24,8 +24,8 @@ async function getHourlyTradeVolume(pool, timestamp) {
 }
 
 async function getDailyTradeVolume(pool, timestamp) {
-  let interval = BigInt(60 * 60 * 24);
-  let day = (timestamp / interval) * interval;
+  let interval = BigInt(60) * BigInt(60) * BigInt(24);
+  let day = (BigInt(timestamp) / interval) * interval;
   let id = pool.id + "-day-" + day.toString();
 
   let volume = await DailyVolume.findOne({id:id});
@@ -44,8 +44,8 @@ async function getDailyTradeVolume(pool, timestamp) {
 }
 
 async function getWeeklyTradeVolume(pool, timestamp) {
-  let interval = BigInt(60 * 60 * 24 * 7);
-  let week = (timestamp / interval) * interval;
+  let interval = BigInt(60) * BigInt(60) * BigInt(24) * BigInt(7);
+  let week = (BigInt(timestamp) / interval) * interval;
   let id = pool.id + "-week-" + week.toString();
 
   let volume = await WeeklyVolume.findOne({id:id});
