@@ -288,16 +288,18 @@ const handleRemoveLiquidityOne = {
         pool = await getPoolSnapshot(pool, args);
         let provider = await getOrRegisterAccount(args.providerId);
         let eventId = getEventId(args.transactionHash, args.logIndex);
+        console.log('tokenAmount', args.tokenAmount)
         let newData = new RemoveLiquidityOneEvent({
           id: "rlo-" + eventId,
           pool: pool.id,
           provider: provider.id,
-          tokenAmount: args.tokenAmount,
-          coinAmount: args.coinAmount,
+          tokenAmounts: args.tokenAmount,
+          coinAmounts: args.coinAmount,
           block: args.block,
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
+        console.log('tokenAmount', args.tokenAmount)
         await RemoveLiquidityOneEvent.create(newData);
         await pool.save();
       }
@@ -548,12 +550,13 @@ const handleNewAdmin = {
         pool.owner = args.admin;
 
         let eventId = getEventId(args.transactionHash, args.logIndex);
-
+        console.log("pool.admin",pool.admin);
         // Save event log
         let newData = new TransferOwnershipEvent({
           id: "to-" + eventId,
           pool: pool.id,
-          value: pool.admin,
+          //value: pool.admin,
+          newAdmin: args.admin, 
           block: args.block,
           timestamp: args.timestamp,
           transaction: args.transactionHash,

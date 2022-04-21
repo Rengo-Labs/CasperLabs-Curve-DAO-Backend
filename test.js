@@ -656,7 +656,7 @@ async function NewAddressIdentifier(
   console.log(response);
 }
 
-async function AddType(id, type_id, timestamp) {
+async function AddType(id, type_id, timestamp, name) {
   console.log("Calling handleAddType mutation...");
   let response = await request(
     process.env.GRAPHQL,
@@ -664,11 +664,13 @@ async function AddType(id, type_id, timestamp) {
                 $id: String!,
                 $type_id: String!,
                 $timestamp: String!,
+                $name: String!
                 ){
                     handleAddType( 
                   id: $id,
                   type_id: $type_id,
                   timestamp: $timestamp,
+                  name:$name
                   ) {
                 result
             }
@@ -678,6 +680,7 @@ async function AddType(id, type_id, timestamp) {
       id: id,
       type_id: type_id,
       timestamp: timestamp,
+      name:name
     }
   );
   console.log(response);
@@ -1339,8 +1342,8 @@ async function ExecuteVote(address, voteId, timestamp, block, transactionHash) {
 async function startTests() {
 
   //Registry-mutations
-  await PoolAdded("123","123","123","123");
-  await PoolRemoved("123","123","123","123");
+   await PoolAdded("123","123","123","123");
+   await PoolRemoved("123","123","123","123");
 
   //Pool mutations
   await AddLiquidity(
@@ -1389,8 +1392,8 @@ async function startTests() {
   await CastVote("123","123","123","123","true","123","123","123","123");
   await ExecuteVote("123","123","123","123","123");
 
-  // // Gauge-Controller mutations
-  await AddType("123","123","123");
+  // // // Gauge-Controller mutations
+  await AddType("123","123","123","123");
   await NewGauge("123", "123", "123", "123", "123", "123");
   await NewGaugeWeight("123", "123", "123", "123")
   await NewTypeWeight("123", "123","123","123","123");

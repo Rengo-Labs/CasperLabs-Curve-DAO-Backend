@@ -35,6 +35,7 @@ const handleAddType = {
     try {
       // await gaugeController.setContractHash(address);
       let nextWeek = nextPeriod(args.timestamp, WEEK);
+      console.log("args-name", args);
 
       let gaugeType = await registerGaugeType(args.type_id, args.name);
       await gaugeType.save();
@@ -260,8 +261,8 @@ const handleNewGauge = {
       await GaugeTotalWeight.create(dataWeight);
 
       let state = await getSystemState(args);
-      //state.gaugeCount = (BigInt(state.gaugeCount)+ BigInt('1')).toString();
-      state.gaugeCount = '1000000000'
+      state.gaugeCount = (BigInt(state.gaugeCount)+ BigInt('1')).toString();
+      //state.gaugeCount = '1000000000'
       await state.save();
 
       //LiquidityGauge.create(args.addr);
@@ -348,7 +349,7 @@ const handleNewTypeWeight = {
   },
   async resolve(parent, args, context) {
     try {
-          let gaugeType = await GaugeType.findOne({ id: args.type_id });
+          let gaugeType = await GaugeType.findOne({ id: (args.type_id.toString()) });
           //let gaugeType = '1000000000';
           if (gaugeType !== null) {
             let d = new GaugeTypeWeight({
@@ -417,6 +418,7 @@ const handleVoteForGauge = {
         await GaugeWeight.create(newData);
 
         let data = new GaugeTotalWeight({
+          id: nextWeek.toString(),
           time: nextWeek,
           // weight: BigInt(
           //   gaugeController.points_total(nextWeek),

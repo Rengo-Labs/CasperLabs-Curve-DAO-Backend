@@ -103,7 +103,7 @@ const handleNewAddressIdentifier = {
   async resolve(parent, args, context) {
     try {
       console.log("hello.");
-      //await registerContract(args.id, args);
+      await registerContract(args.id, args);
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
         // create new response
