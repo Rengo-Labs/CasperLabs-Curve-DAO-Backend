@@ -1,4 +1,6 @@
 /node_modules
+/Scripts/GAUGECONTROLLER/keys
+
 # Logs
 logs
 *.log
