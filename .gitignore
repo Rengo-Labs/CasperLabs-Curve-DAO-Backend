@@ -1,4 +1,5 @@
 /node_modules
+/Scripts/MINTER/keys
 # Logs
 logs
 *.log
