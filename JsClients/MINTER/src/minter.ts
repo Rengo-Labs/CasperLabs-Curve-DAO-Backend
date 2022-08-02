@@ -15,6 +15,7 @@ import {
   EventStream,
   Keys,
   RuntimeArgs,
+  CLList,
 } from "casper-js-sdk";
 import { Some, None } from "ts-results";
 import * as blake from "blakejs";
@@ -25,9 +26,9 @@ import { RecipientType, IPendingDeploy } from "./types";
 import {createRecipientAddress } from "./utils";
 
 class MINTERClient {
-  private contractName: string = "erc20";
-  private contractHash: string= "erc20";
-  private contractPackageHash: string= "erc20";
+  private contractName: string = "minter";
+  private contractHash: string= "minter";
+  private contractPackageHash: string= "minter";
   private namedKeys: {
     allowed_to_mint_for : string, 
     minted : string
@@ -147,7 +148,34 @@ class MINTERClient {
     }
   }
 
-  //mint many function uses arguments of type vector which are not availabe in casper js sdk.
+  public async mint_many( keys: Keys.AsymmetricKey, gauge_addrs : string, paymentAmount: string){
+    let gaugeAddresses = [gauge_addrs];
+    let _gaugeAddresses : CLString[] = [];
+          for (let i = 0; i < gaugeAddresses.length; i++) {
+            const p = new CLString("hash-".concat(gaugeAddresses[i]));
+            _gaugeAddresses.push(p);
+          }
+const runtimeArgs = RuntimeArgs.fromMap({
+  gauge_addrs: new CLList(_gaugeAddresses),
+            });
+
+            const deployHash = await contractCall({
+              chainName: this.chainName,
+              contractHash: this.contractHash,
+              entryPoint: "mint_many",
+              keys,
+              nodeAddress: this.nodeAddress,
+              paymentAmount,
+              runtimeArgs,
+            });
+        
+            if (deployHash !== null) {
+              
+              return deployHash;
+            } else {
+              throw Error("Invalid Deploy");
+            }
+  }
 
   public async mint_for(
     keys: Keys.AsymmetricKey,
