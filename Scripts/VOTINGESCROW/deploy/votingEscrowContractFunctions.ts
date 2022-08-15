@@ -17,30 +17,22 @@ const {
   NODE_ADDRESS,
   EVENT_STREAM_ADDRESS,
   CHAIN_NAME,
-  MASTER_KEY_PAIR_PATH,
-  PAIR_CONTRACT_PACKAGE,
-  GRAPHQL,
-  PAYMENT_AMOUNT,
+  VOTING_ESCROW_MASTER_KEY_PAIR_PATH,
+  VOTING_ESCROW_PAYMENT_AMOUNT,
+  T,
   ADDRESS,
   IDX,
   VALUE,
   UNLOCK_TIME,
-  T,
   BLOCK,
-  NEW_CONTROLLER,
   VOTINGESCROW_CONTRACT_HASH
 } = process.env;
 
 
 const KEYS = Keys.Ed25519.parseKeyFiles(
-  `${MASTER_KEY_PAIR_PATH}/public_key.pem`,
-  `${MASTER_KEY_PAIR_PATH}/secret_key.pem`
+  `${VOTING_ESCROW_MASTER_KEY_PAIR_PATH}/public_key.pem`,
+  `${VOTING_ESCROW_MASTER_KEY_PAIR_PATH}/secret_key.pem`
 );
-
-// const ROUTERKEYS = Keys.Ed25519.parseKeyFiles(
-//   `${MASTER_KEY_PAIR_PATH}/public_key.pem`,
-//   `${MASTER_KEY_PAIR_PATH}/secret_key.pem`
-// );
 
 function splitdata(data:string)
 {
@@ -69,7 +61,7 @@ const test = async () => {
   //   KEYS!,
   //   //ADDRESS!,
   //   KEYS.publicKey,
-  //   PAYMENT_AMOUNT!
+  //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
   // console.log("... commitTransferOwnership deploy hash: ", commitTransferOwnershipDeployHash);
 
@@ -79,7 +71,7 @@ const test = async () => {
   // //applyTransferOwnership
   // const applyTransferOwnershipDeployHash = await votingEscrow.applyTransferOwnership(
   //   KEYS!,
-  //   PAYMENT_AMOUNT!
+  //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
   // console.log("...  deploy hash: ", applyTransferOwnershipDeployHash);
 
@@ -91,7 +83,7 @@ const test = async () => {
   //   KEYS!,
   //   //ADDRESS!,
   //   KEYS.publicKey,
-  //   PAYMENT_AMOUNT!
+  //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
   // console.log("... getLastUserSlopeJsClient deploy hash: ", getLastUserSlopeJsClientDeployHash);
 
@@ -104,7 +96,7 @@ const test = async () => {
   //   //ADDRESS!,
   //   KEYS.publicKey,
   //   IDX!,
-  //   PAYMENT_AMOUNT!
+  //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
   // console.log("... userPointHistoryTsJsclient deploy hash: ", userPointHistoryTsJsclientDeployHash);
 
@@ -116,7 +108,7 @@ const test = async () => {
   //   KEYS!,
   //   //ADDRESS!,
   //   KEYS.publicKey,
-  //   PAYMENT_AMOUNT!
+  //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
   // console.log("... lockedEndJsClient deploy hash: ", lockedEndJsClientDeployHash);
 
@@ -126,7 +118,7 @@ const test = async () => {
   // //checkpoint
   // const checkpointDeployHash = await votingEscrow.checkpoint(
   //   KEYS!,
-  //   PAYMENT_AMOUNT!
+  //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
   // console.log("... checkpoint deploy hash: ", checkpointDeployHash);
 
@@ -138,7 +130,7 @@ const test = async () => {
   //   KEYS,
   //   ADDRESS!,
   //   VALUE!,
-  //   PAYMENT_AMOUNT!
+  //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
   // console.log("... depositFor deploy hash: ", depositForDeployHash);
 
@@ -150,7 +142,7 @@ const test = async () => {
   //   KEYS!,
   //   VALUE!,
   //   UNLOCK_TIME!,
-  //   PAYMENT_AMOUNT!
+  //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
   // console.log("... createlock deploy hash: ", createlockDeployHash);
 
@@ -161,7 +153,7 @@ const test = async () => {
 //   const increaseAmountDeployHash = await votingEscrow.increaseAmount(
 //     KEYS,
 //     VALUE!,
-//     PAYMENT_AMOUNT!
+//     VOTING_ESCROW_PAYMENT_AMOUNT!
 //   );
 //   console.log("... increaseAmount deploy hash: ", increaseAmountDeployHash);
 
@@ -172,7 +164,7 @@ const test = async () => {
 //   const increaseUnlockTimeDeployHash = await votingEscrow.increaseUnlockTime(
 //     KEYS,
 //     UNLOCK_TIME!,
-//     PAYMENT_AMOUNT!
+//     VOTING_ESCROW_PAYMENT_AMOUNT!
 //   );
 //   console.log("... increaseUnlockTime deploy hash: ", increaseUnlockTimeDeployHash);
 
@@ -183,7 +175,7 @@ const test = async () => {
 //   //withdraw
 //   const withdrawDeployHash = await votingEscrow.withdraw(
 //     KEYS,
-//     PAYMENT_AMOUNT!
+//     VOTING_ESCROW_PAYMENT_AMOUNT!
 //   );
 //   console.log("... withdraw deploy hash: ", withdrawDeployHash);
 
@@ -197,7 +189,7 @@ const test = async () => {
   //   //ADDRESS!,
   //   KEYS.publicKey,
   //   T!,
-  //   PAYMENT_AMOUNT!
+  //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
   // console.log("... balanceOfJsClient deploy hash: ", balanceOfJsClientDeployHash);
 
@@ -211,7 +203,7 @@ const test = async () => {
 //    //ADDRESS!,
 //    KEYS.publicKey,
 //    BLOCK!,
-//    PAYMENT_AMOUNT!
+//    VOTING_ESCROW_PAYMENT_AMOUNT!
 //   );
 //   console.log("... balanceOfAtJsClient deploy hash: ", balanceOfAtJsClientDeployHash);
 
@@ -223,7 +215,7 @@ const test = async () => {
   const totalSupplyJsClientDeployHash = await votingEscrow.totalSupplyJsClient(
     KEYS,
     T!,
-    PAYMENT_AMOUNT!
+    VOTING_ESCROW_PAYMENT_AMOUNT!
   );
   console.log("... totalSupplyJsClient deploy hash: ", totalSupplyJsClientDeployHash);
 
@@ -235,7 +227,7 @@ const test = async () => {
   // const totalSupplyAtJsClientDeployHash = await votingEscrow.totalSupplyAtJsClient(
   //   KEYS,
   //   BLOCK!,
-  //   PAYMENT_AMOUNT!
+  //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
   // console.log("... totalSupplyAtJsClient deploy hash: ", totalSupplyAtJsClientDeployHash);
 
@@ -248,7 +240,7 @@ const test = async () => {
   //   KEYS,
   //   //NEW_CONTROLLER!,
   //   KEYS.publicKey,
-  //   PAYMENT_AMOUNT!
+  //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
   // console.log("... changeController deploy hash: ", changeControllerDeployHash);
 

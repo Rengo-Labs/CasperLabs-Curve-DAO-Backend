@@ -9,6 +9,10 @@ const { getSystemState } = require("../services/system-state");
 const { getOrCreateLpToken } = require("../services/token");
 const FEE_PRECISION = require("../constants");
 const { saveCoins } = require("../services/pools/coins");
+let eventsData= require("../../models/eventsData");
+const mongoose = require("mongoose")
+var bigdecimal = require("bigdecimal");
+
 
 // let registryContract= require('../JsClients/Registry/test/installed.ts')
 // let poolContract= require('../JsClients/Registry/test/installed.ts')
@@ -23,8 +27,19 @@ const handlePoolAdded = {
     timestamp: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
+
     try {
-      await getOrCreatePool(args.poolId, args);
+      await getOrCreatePool(args.poolId, args,session);
+
+       // updating mutation status
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
+       await eventDataResult.save({ session });
+
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
         // create new response
@@ -32,10 +47,21 @@ const handlePoolAdded = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+
+       //committing the transaction 
+       await session.commitTransaction();
+
+       // Ending the session
+       session.endSession();
+
       return response;
     } catch (error) {
+
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+
       throw new Error(error);
     }
   },
@@ -50,8 +76,19 @@ const handlePoolRemoved = {
     timestamp: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
+
     try {
-      await removePool(args.poolId, args);
+      await removePool(args.poolId, args, session);
+
+       // updating mutation status
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
+       await eventDataResult.save({ session });
+       
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
         // create new response
@@ -59,16 +96,27 @@ const handlePoolRemoved = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+
+       //committing the transaction 
+       await session.commitTransaction();
+
+       // Ending the session
+       session.endSession();
+
       return response;
     } catch (error) {
+
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+
       throw new Error(error);
     }
   },
 };
 
-async function getOrCreatePool(address, args) {
+async function getOrCreatePool(address, args, session) {
   let pool = await Pool.findOne({ id: address });
   console.log("check", pool);
 
@@ -96,18 +144,18 @@ async function getOrCreatePool(address, args) {
       //name : registryContract.get_pool_name(args.registryAddress,address),
       name: "Pool",
     });
-    await Pool.create(pool);
+    await Pool.create([pool],{session});
     console.log("pool: ", pool);
-    await saveCoins(pool, args);
+    await saveCoins(pool, args,session);
     pool.locked = "0";
 
     //let lpToken = registryContract.try_get_lp_token(args.registryAddress,address);
 
     let lpToken = "123";
     if (lpToken != null) {
-      let token = await getOrCreateLpToken(lpToken);
+      let token = await getOrCreateLpToken(lpToken,session);
       token.pool = pool.id;
-      await token.save();
+      await token.save({session});
 
       pool.lpToken = token.id;
 
@@ -115,9 +163,9 @@ async function getOrCreatePool(address, args) {
       if (token.gauge != null) {
         let gauge = await Gauge.findOne({ id: token.gauge });
         gauge.pool = pool.id;
-        await gauge.save();
+        await gauge.save({session});
 
-        pool.gaugeCount = (BigInt(pool.gaugeCount) + BigInt("1")).toString();
+        pool.gaugeCount = (new bigdecimal.BigDecimal(pool.gaugeCount).add (new bigdecimal.BigDecimal("1"))).toString();
       }
     }
     // let A = await poolContract.try_A(address);
@@ -133,12 +181,12 @@ async function getOrCreatePool(address, args) {
     }
 
     if (fee != null) {
-      // pool.fee = BigInt(fee, FEE_PRECISION); //issue
+      // pool.fee = new bigdecimal.BigDecimal(fee, FEE_PRECISION); //issue
       pool.fee = fee;
     }
 
     if (adminFee != null) {
-      // pool.adminFee = BigInt(adminFee, FEE_PRECISION); issue
+      // pool.adminFee = new bigdecimal.BigDecimal(adminFee, FEE_PRECISION); issue
       pool.adminFee = adminFee;
     }
     //let owner = await poolContract.try_owner(address);
@@ -158,14 +206,14 @@ async function getOrCreatePool(address, args) {
     pool.addedAtBlock = args.block;
     pool.addedAtTransaction = args.transactionHash;
 
-    await pool.save();
+    await pool.save({session});
 
-    let state = await getSystemState(args);
-    state.poolCount = (BigInt(state.poolCount) + BigInt("1")).toString();
+    let state = await getSystemState(args,session);
+    state.poolCount = (new bigdecimal.BigDecimal(state.poolCount).add( new bigdecimal.BigDecimal("1"))).toString();
     state.totalPoolCount = (
-      BigInt(state.totalPoolCount) + BigInt("1")
+      new bigdecimal.BigDecimal(state.totalPoolCount).add(new bigdecimal.BigDecimal("1"))
     ).toString();
-    await state.save();
+    await state.save({session});
 
     // let context = new DataSourceContext();
     // context.setBytes("registry", registryContract._address);
@@ -177,7 +225,7 @@ async function getOrCreatePool(address, args) {
   return pool;
 }
 
-async function removePool(address, args) {
+async function removePool(address, args,session) {
   let pool = await Pool.findOne({ id: address });
 
   console.log("pool: ", pool);
@@ -185,12 +233,12 @@ async function removePool(address, args) {
     pool.removedAt = args.timestamp;
     pool.removedAtBlock = args.block;
     pool.removedAtTransaction = args.transactionHash;
-    await pool.save();
+    await pool.save({session});
 
     // Count pools
-    let state = await getSystemState(args);
-    state.poolCount = (BigInt(state.poolCount) - BigInt("1")).toString();
-    await state.save();
+    let state = await getSystemState(args,session);
+    state.poolCount = (new bigdecimal.BigDecimal(state.poolCount).subtract( new bigdecimal.BigDecimal("1"))).toString();
+    await state.save({session});
 
     // TODO: Stop indexing pool events (not yet supported)
   }

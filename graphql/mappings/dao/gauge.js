@@ -1,5 +1,6 @@
 require("dotenv").config();
 const { GraphQLString } = require("graphql");
+const mongoose = require("mongoose")
 
 const Response = require("../../../models/response");
 const { responseType } = require("../../types/response");
@@ -7,6 +8,7 @@ const { responseType } = require("../../types/response");
 const GaugeDeposit = require("../../../models/gaugeDeposit");
 const GaugeLiquidity = require("../../../models/gaugeLiquidity");
 const GaugeWithdraw = require("../../../models/gaugeWithdraw");
+const eventsData = require("../../../models/eventsData");
 
 const { getOrRegisterAccount } = require("../../services/accounts");
 
@@ -25,8 +27,12 @@ const handleUpdateLiquidityLimit = {
     timestamp: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
+
     try {
-      let account = await getOrRegisterAccount(args.user);
+      let account = await getOrRegisterAccount(args.user,session);
 
       let gauge = new GaugeLiquidity({
         id: account.id + "-" + args.id,
@@ -40,7 +46,12 @@ const handleUpdateLiquidityLimit = {
         block: args.block,
         transaction: args.transactionHash,
       });
-      await GaugeLiquidity.create(gauge);
+      await GaugeLiquidity.create([gauge],{session});
+
+      // updating mutation status
+      let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      eventDataResult.status="completed"
+      await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -49,10 +60,19 @@ const handleUpdateLiquidityLimit = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+      //committing the transaction 
+      await session.commitTransaction();
+
+      // Ending the session
+      session.endSession();
+
       return response;
     } catch (error) {
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+
       throw new Error(error);
     }
   },
@@ -69,8 +89,12 @@ const handleDeposit = {
     logIndex: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
+
     try {
-      let provider = await getOrRegisterAccount(args.provider);
+      let provider = await getOrRegisterAccount(args.provider,session);
 
       let deposit = new GaugeDeposit({
         id: args.transactionHash + "-" + args.logIndex,
@@ -78,7 +102,13 @@ const handleDeposit = {
         provider: provider.id,
         value: args.value,
       });
-      await GaugeDeposit.create(deposit);
+      await GaugeDeposit.create([deposit],{session});
+
+       // updating mutation status
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
+       await eventDataResult.save({ session });
+
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
         // create new response
@@ -86,10 +116,21 @@ const handleDeposit = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+
+      //committing the transaction 
+      await session.commitTransaction();
+
+      // Ending the session
+      session.endSession();
+
       return response;
     } catch (error) {
+
+       // Rollback any changes made in the database
+       await session.abortTransaction();
+
       throw new Error(error);
     }
   },
@@ -106,8 +147,12 @@ const handleWithdraw = {
     logIndex: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
+
     try {
-      let provider = await getOrRegisterAccount(args.provider);
+      let provider = await getOrRegisterAccount(args.provider,session);
 
       let withdraw = new GaugeWithdraw({
         id: args.transactionHash + "-" + args.logIndex,
@@ -115,7 +160,13 @@ const handleWithdraw = {
         provider: provider.id,
         value: args.value,
       });
-      await GaugeWithdraw.create(withdraw);
+      await GaugeWithdraw.create([withdraw],{session});
+
+       // updating mutation status
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
+       await eventDataResult.save({ session });
+
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
         // create new response
@@ -123,10 +174,21 @@ const handleWithdraw = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+
+      //committing the transaction 
+      await session.commitTransaction();
+
+      // Ending the session
+      session.endSession();
+
       return response;
     } catch (error) {
+
+       // Rollback any changes made in the database
+       await session.abortTransaction();
+
       throw new Error(error);
     }
   },

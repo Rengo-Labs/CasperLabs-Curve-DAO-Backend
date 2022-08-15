@@ -16,6 +16,7 @@ const AdminFeeChangeLog = require("../../models/adminFeeChangeLog");
 const FeeChangeLog = require("../../models/feeChangeLog");
 const TransferOwnershipEvent = require("../../models/transferOwnershipEvent");
 const UnderlyingCoin = require("../../models/underlyingCoin");
+const eventsData = require("../../models/eventsData");
 // let poolContract= require('../JsClients/Pool/test/installed.ts');
 // let registryContract= require('../JsClients/Registry/test/installed.ts');
 const { saveCoins } = require("../services/pools/coins");
@@ -26,12 +27,15 @@ const {
   getWeeklyTradeVolume,
 } = require("../services/pools/volume");
 const { getOrRegisterAccount } = require("../services/accounts");
+const mongoose = require("mongoose");
+var bigdecimal = require("bigdecimal");
+var halfUp = bigdecimal.RoundingMode.HALF_UP();
 
 function getEventId(transactionHash, logIndex) {
   return transactionHash + "-" + logIndex;
 }
 
-async function getPoolSnapshot(pool, args) {
+async function getPoolSnapshot(pool, args, session) {
   console.log("block",args.block);
     console.log("POOOOL",pool);
   if (pool !== null) {
@@ -42,7 +46,7 @@ async function getPoolSnapshot(pool, args) {
     // See https://etherscan.io/tx/0xf8e8d67ec16657ecc707614f733979d105e0b814aa698154c153ba9b44bf779b
     console.log("block-42",args.block);
     
-    if (BigInt(args.block) >= BigInt("12667823")) {
+    if (new bigdecimal.BigDecimal(args.block) >= new bigdecimal.BigDecimal("12667823")) {
     //if(args.block){
       console.log("block-46",args.block);
       // Reference asset
@@ -77,17 +81,17 @@ async function getPoolSnapshot(pool, args) {
     }
 
     // Update coin balances and underlying coin balances/rates
-    await saveCoins(pool, args);
+    await saveCoins(pool, args, session);
 
     // Save current virtual price
     // let virtualPrice = await poolContract.try_get_virtual_price(poolAddress);
     let virtualPrice = "1000000000";
 
     if (virtualPrice !== null) {
-      // pool.virtualPrice = BigInt(virtualPrice.value);
-      //pool.virtualPrice = BigInt(virtualPrice);
+      // pool.virtualPrice = new bigdecimal.BigDecimal(virtualPrice.value);
+      //pool.virtualPrice = new bigdecimal.BigDecimal(virtualPrice);
       pool.virtualPrice = virtualPrice;
-      await pool.save();
+      await pool.save({session});
     }
   }
 
@@ -112,14 +116,17 @@ const handleAddLiquidity = {
     blockNumber: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
     try {
       console.log("args",args);
       console.log("args.poolId",args.poolId);
       console.log("hello");
       let pool = await Pool.findOne({ id: args.poolId });
       if (pool !== null) {
-        pool = await getPoolSnapshot(pool, args);
-        let provider = await getOrRegisterAccount(args.providerId);
+        pool = await getPoolSnapshot(pool, args,session);
+        let provider = await getOrRegisterAccount(args.providerId, session);
         let eventId =  getEventId(args.transactionHash, args.logIndex);
         let newData = new AddLiquidityEvent({
           id: "al-" + eventId,
@@ -133,10 +140,15 @@ const handleAddLiquidity = {
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
-        await AddLiquidityEvent.create(newData);
-        await pool.save();
+        await AddLiquidityEvent.create([newData],{session});
+        await pool.save({session});
       }
       console.log("pool",pool);
+
+       // updating mutation status
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
+       await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -145,10 +157,19 @@ const handleAddLiquidity = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+       //committing the transaction 
+       await session.commitTransaction();
+
+       // Ending the session
+       session.endSession();
+
       return response;
     } catch (error) {
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+
       throw new Error(error);
     }
   },
@@ -171,11 +192,14 @@ const handleRemoveLiquidity = {
     blockNumber: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
     try {
       let pool = await Pool.findOne({ id: args.poolId });
       if (pool !== null) {
-        pool = await getPoolSnapshot(pool, args);
-        let provider = await getOrRegisterAccount(args.providerId);
+        pool = await getPoolSnapshot(pool, args,session);
+        let provider = await getOrRegisterAccount(args.providerId, session);
         let eventId = getEventId(args.transactionHash, args.logIndex);
         let newData = new RemoveLiquidityEvent({
           id: "rl-" + eventId,
@@ -188,9 +212,14 @@ const handleRemoveLiquidity = {
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
-        await RemoveLiquidityEvent.create(newData);
-        await pool.save();
+        await RemoveLiquidityEvent.create([newData],{session});
+        await pool.save({session});
       }
+
+       // updating mutation status
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
+       await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -199,10 +228,19 @@ const handleRemoveLiquidity = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+       //committing the transaction 
+       await session.commitTransaction();
+
+       // Ending the session
+       session.endSession();
+
       return response;
     } catch (error) {
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+
       throw new Error(error);
     }
   },
@@ -226,11 +264,14 @@ const handleRemoveLiquidityImbalance = {
     blockNumber: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
     try {
       let pool = await Pool.findOne({ id: args.poolId });
       if (pool !== null) {
-        pool = await getPoolSnapshot(pool, args);
-        let provider = await getOrRegisterAccount(args.providerId);
+        pool = await getPoolSnapshot(pool, args, session);
+        let provider = await getOrRegisterAccount(args.providerId, session);
         let eventId = getEventId(args.transactionHash, args.logIndex);
         let newData = new RemoveLiquidityEvent({
           id: "rli-" + eventId,
@@ -244,9 +285,13 @@ const handleRemoveLiquidityImbalance = {
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
-        await RemoveLiquidityEvent.create( newData);
-        await pool.save();
+        await RemoveLiquidityEvent.create( [newData],{session});
+        await pool.save({session});
       }
+       // updating mutation status
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
+       await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -255,10 +300,19 @@ const handleRemoveLiquidityImbalance = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+       //committing the transaction 
+       await session.commitTransaction();
+
+       // Ending the session
+       session.endSession();
+
       return response;
     } catch (error) {
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+
       throw new Error(error);
     }
   },
@@ -281,12 +335,15 @@ const handleRemoveLiquidityOne = {
     blockNumber: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
     try {
       console.log('here',args.poolId);
       let pool = await Pool.findOne({ id: args.poolId });
       if (pool !== null) {
-        pool = await getPoolSnapshot(pool, args);
-        let provider = await getOrRegisterAccount(args.providerId);
+        pool = await getPoolSnapshot(pool, args, session);
+        let provider = await getOrRegisterAccount(args.providerId, session);
         let eventId = getEventId(args.transactionHash, args.logIndex);
         console.log('tokenAmount', args.tokenAmount)
         let newData = new RemoveLiquidityOneEvent({
@@ -300,9 +357,13 @@ const handleRemoveLiquidityOne = {
           transaction: args.transactionHash,
         });
         console.log('tokenAmount', args.tokenAmount)
-        await RemoveLiquidityOneEvent.create(newData);
-        await pool.save();
+        await RemoveLiquidityOneEvent.create([newData],{session});
+        await pool.save({session});
       }
+       // updating mutation status
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
+       await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -311,10 +372,19 @@ const handleRemoveLiquidityOne = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+       //committing the transaction 
+       await session.commitTransaction();
+
+       // Ending the session
+       session.endSession();
+
       return response;
     } catch (error) {
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+
       throw new Error(error);
     }
   },
@@ -336,17 +406,21 @@ const handleTokenExchange = {
     tokens_bought: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
     try {
        let pool = await Pool.findOne({ id: args.poolId });
 
       if (pool != null) {
-        pool = await getPoolSnapshot(pool, args);
+        pool = await getPoolSnapshot(pool, args, session);
 
         let coinSold = await Coin.findOne({ id: pool.id + "-" + args.sold_id });
         let tokenSold = await Token.findOne({ id: coinSold.token });
         //let amountSold = decimal.fromBigInt(event.params.tokens_sold, tokenSold.decimals.toI32()) //issue
+        let amountSold = new bigdecimal.BigDecimal(args.token_sold,tokenSold);
 
-        let amountSold = BigInt(args.tokens_sold);
+        //let amountSold = new bigdecimal.BigDecimal(args.tokens_sold);
 
         let coinBought = await Coin.findOne({
           id: pool.id + "-" + args.bought_id,
@@ -354,9 +428,9 @@ const handleTokenExchange = {
         let tokenBought = await Token.findOne({ id: coinBought.token });
         //let amountBought = decimal.fromBigInt(event.params.tokens_bought, tokenBought.decimals.toI32()); //issue
 
-        let amountBought = BigInt(args.tokens_bought); //issue
+        let amountBought = new bigdecimal.BigDecimal(args.tokens_bought); //issue
 
-        let buyer = await getOrRegisterAccount(args.buyer);
+        let buyer = await getOrRegisterAccount(args.buyer, session);
 
         let eventId = getEventId(args.transactionHash, args.logIndex);
 
@@ -374,37 +448,42 @@ const handleTokenExchange = {
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
-        await Exchange.create(exchange);
+        await Exchange.create([exchange],{session});
 
         // Save trade volume
         let volume =
-          BigInt(exchange.amountSold) +
-          BigInt(exchange.amountBought) / BigInt("2");
+          (new bigdecimal.BigDecimal(exchange.amountSold).add(
+          new bigdecimal.BigDecimal(exchange.amountBought))).divide( new bigdecimal.BigDecimal("2"),18,halfUp);
 
-         let hourlyVolume = await getHourlyTradeVolume(pool, args.timestamp);
+         let hourlyVolume = await getHourlyTradeVolume(pool, args.timestamp, session);
         hourlyVolume.volume = (
-          BigInt(hourlyVolume.volume) + BigInt(volume)
-        ).toString();
-        await hourlyVolume.save();
+          (new bigdecimal.BigDecimal(hourlyVolume.volume)).add( new bigdecimal.BigDecimal(volume)
+        )).toString();
+        await hourlyVolume.save({session});
 
-        let dailyVolume = await getDailyTradeVolume(pool, args.timestamp);
+        let dailyVolume = await getDailyTradeVolume(pool, args.timestamp, session);
         dailyVolume.volume = (
-          BigInt(dailyVolume.volume) + BigInt(volume)
-        ).toString();
-        await dailyVolume.save();
+          (new bigdecimal.BigDecimal(dailyVolume.volume)).add(new bigdecimal.BigDecimal(volume)
+        )).toString();
+        await dailyVolume.save({session});
 
-        let weeklyVolume = await getWeeklyTradeVolume(pool, args.timestamp);
+        let weeklyVolume = await getWeeklyTradeVolume(pool, args.timestamp, session);
         weeklyVolume.volume = (
-          BigInt(weeklyVolume.volume) + BigInt(volume)
-        ).toString();
-        await weeklyVolume.save();
+          (new bigdecimal.BigDecimal(weeklyVolume.volume)).add(new bigdecimal.BigDecimal(volume)
+        )).toString();
+        await weeklyVolume.save({session});
 
         pool.exchangeCount = (
-          BigInt(pool.exchangeCount) + BigInt("1")
-        ).toString();
+          (new bigdecimal.BigDecimal(pool.exchangeCount)).add(new bigdecimal.BigDecimal("1")
+        )).toString();
 
-        await pool.save();
+        await pool.save({session});
       }
+
+       // updating mutation status
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
+       await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -413,10 +492,19 @@ const handleTokenExchange = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+       //committing the transaction 
+       await session.commitTransaction();
+
+       // Ending the session
+       session.endSession();
+
       return response;
     } catch (error) {
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+
       throw new Error(error);
     }
   },
@@ -438,11 +526,14 @@ const handleTokenExchangeUnderlying = {
     tokens_bought: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
     try {
       let pool = await Pool.findOne({ id: args.poolId });
 
       if (pool != null) {
-        pool = await getPoolSnapshot(pool, args);
+        pool = await getPoolSnapshot(pool, args, session);
 
         let coinSold = await UnderlyingCoin.findOne({
           id: pool.id + "-" + args.sold_id,
@@ -451,7 +542,7 @@ const handleTokenExchangeUnderlying = {
         let tokenSold = await Token.findOne({ id: coinSold.token });
         //let amountSold = decimal.fromBigInt(event.params.tokens_sold, tokenSold.decimals.toI32()) //issue
 
-       let amountSold = BigInt(args.tokens_sold);
+       let amountSold = (new bigdecimal.BigDecimal(args.tokens_sold));
 
         let coinBought = await UnderlyingCoin.findOne({
           id: pool.id + "-" + args.bought_id,
@@ -459,9 +550,9 @@ const handleTokenExchangeUnderlying = {
         let tokenBought = await Token.findOne({ id: coinBought.token });
         //let amountBought = decimal.fromBigInt(event.params.tokens_bought, tokenBought.decimals.toI32()); //issue
 
-        let amountBought = BigInt(args.tokens_bought); //issue
+        let amountBought = (new bigdecimal.BigDecimal(args.tokens_bought)); //issue
 
-        let buyer = await getOrRegisterAccount(args.buyer);
+        let buyer = await getOrRegisterAccount(args.buyer, session);
 
         let eventId = getEventId(args.transactionHash, args.logIndex);
 
@@ -479,37 +570,42 @@ const handleTokenExchangeUnderlying = {
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
-        await Exchange.create(exchange);
+        await Exchange.create([exchange],{session});
 
         // Save trade volume
         let volume =
-          BigInt(exchange.amountSold) +
-          BigInt(exchange.amountBought) / BigInt("2");
+          ((new bigdecimal.BigDecimal(exchange.amountSold)).add(
+          new bigdecimal.BigDecimal(exchange.amountBought))).divide(new bigdecimal.BigDecimal("2"),18,halfUp);
 
-        let hourlyVolume = await getHourlyTradeVolume(pool, args.timestamp);
+        let hourlyVolume = await getHourlyTradeVolume(pool, args.timestamp, session);
         hourlyVolume.volume = (
-          BigInt(hourlyVolume.volume) + BigInt(volume)
-        ).toString();
-        await hourlyVolume.save();
+          (new bigdecimal.BigDecimal(hourlyVolume.volume)).add(new bigdecimal.BigDecimal(volume)
+        )).toString();
+        await hourlyVolume.save({session});
 
-        let dailyVolume = await getDailyTradeVolume(pool, args.timestamp);
+        let dailyVolume = await getDailyTradeVolume(pool, args.timestamp, session);
         dailyVolume.volume = (
-          BigInt(dailyVolume.volume) + BigInt(volume)
-        ).toString();
-        await dailyVolume.save();
+          (new bigdecimal.BigDecimal(dailyVolume.volume)).add(new bigdecimal.BigDecimal(volume)
+        )).toString();
+        await dailyVolume.save({session});
 
-        let weeklyVolume = await getWeeklyTradeVolume(pool, args.timestamp);
+        let weeklyVolume = await getWeeklyTradeVolume(pool, args.timestamp, session);
         weeklyVolume.volume = (
-          BigInt(weeklyVolume.volume) + BigInt(volume)
+          (new bigdecimal.BigDecimal(weeklyVolume.volume)).add(new bigdecimal.BigDecimal(volume))
         ).toString();
-        await weeklyVolume.save();
+        await weeklyVolume.save({session});
 
         pool.exchangeCount = (
-          BigInt(pool.exchangeCount) + BigInt("1")
+          (new bigdecimal.BigDecimal(pool.exchangeCount)).add(new bigdecimal.BigDecimal("1"))
         ).toString();
 
-        await pool.save();
+        await pool.save({session});
       }
+
+       // updating mutation status
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
+       await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -518,10 +614,19 @@ const handleTokenExchangeUnderlying = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+       //committing the transaction 
+       await session.commitTransaction();
+
+       // Ending the session
+       session.endSession();
+
       return response;
     } catch (error) {
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+
       throw new Error(error);
     }
   },
@@ -539,12 +644,15 @@ const handleNewAdmin = {
     admin: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
     try {
       console.log("hello.");
       let pool = await Pool.findOne({ id: args.poolId });
 
       if (pool != null) {
-        pool = await getPoolSnapshot(pool, args);
+        pool = await getPoolSnapshot(pool, args, session);
 
         // Save pool owner
         pool.owner = args.admin;
@@ -561,9 +669,14 @@ const handleNewAdmin = {
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
-        await TransferOwnershipEvent.create(newData);
-        await pool.save();
+        await TransferOwnershipEvent.create([newData],{session});
+        await pool.save({session});
       }
+
+       // updating mutation status
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
+       await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -572,10 +685,19 @@ const handleNewAdmin = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+       //committing the transaction 
+       await session.commitTransaction();
+
+       // Ending the session
+       session.endSession();
+
       return response;
     } catch (error) {
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+
       throw new Error(error);
     }
   },
@@ -594,11 +716,14 @@ const handleNewFee = {
     admin_fee: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
     try {
       let pool = await Pool.findOne({ id: args.poolId });
 
       if (pool != null) {
-        pool = await getPoolSnapshot(pool, args);
+        pool = await getPoolSnapshot(pool, args, session);
 
         // Save pool parameters
 
@@ -618,7 +743,7 @@ const handleNewFee = {
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
-        await AdminFeeChangeLog.create(newData);
+        await AdminFeeChangeLog.create([newData],{session});
 
         let newData2 = new FeeChangeLog({
           id: "f-" + eventId,
@@ -628,9 +753,14 @@ const handleNewFee = {
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
-        await FeeChangeLog.create(newData2);
-        await pool.save();
+        await FeeChangeLog.create([newData2],{session});
+        await pool.save({session});
       }
+
+       // updating mutation status
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
+       await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -639,10 +769,19 @@ const handleNewFee = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+       //committing the transaction 
+       await session.commitTransaction();
+
+       // Ending the session
+       session.endSession();
+
       return response;
     } catch (error) {
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+
       throw new Error(error);
     }
   },
@@ -662,6 +801,9 @@ const handleNewParameters = {
     admin_fee: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
     try {
       console.log("args",args);
       console.log("args.poolId",args.poolId);
@@ -669,7 +811,7 @@ const handleNewParameters = {
       let pool = await Pool.findOne({ id: args.poolId });
 
        if (pool != null) {
-         pool = await getPoolSnapshot(pool, args);
+         pool = await getPoolSnapshot(pool, args, session);
 
 
         // Save pool parameters
@@ -690,7 +832,7 @@ const handleNewParameters = {
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
-        await AdminFeeChangeLog.create(newData);
+        await AdminFeeChangeLog.create([newData],{session});
 
         let newData2 = new AmplificationCoeffChangelog({
           id: "a-" + eventId,
@@ -700,7 +842,7 @@ const handleNewParameters = {
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
-        await AmplificationCoeffChangelog.create(newData2);
+        await AmplificationCoeffChangelog.create([newData2],{session});
 
         let newData3 = new FeeChangeLog({
           id: "f-" + eventId,
@@ -710,9 +852,14 @@ const handleNewParameters = {
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
-        await FeeChangeLog.create(newData3);
-        await pool.save();
+        await FeeChangeLog.create([newData3],{session});
+        await pool.save({session});
        }
+       
+        // updating mutation status
+      let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      eventDataResult.status="completed"
+      await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -721,10 +868,19 @@ const handleNewParameters = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+       //committing the transaction 
+       await session.commitTransaction();
+
+       // Ending the session
+       session.endSession();
+
       return response;
     } catch (error) {
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+
       throw new Error(error);
     }
   },
@@ -741,11 +897,14 @@ const handleRampA = {
     logIndex: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
     try {
       let pool = await Pool.findOne({ id: args.poolId });
 
       if (pool != null) {
-        pool = await getPoolSnapshot(pool, args);
+        pool = await getPoolSnapshot(pool, args, session);
 
         // Save pool parameters
         pool.A = args.new_A;
@@ -760,9 +919,14 @@ const handleRampA = {
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
-        await AmplificationCoeffChangelog.create(newData);
-        await pool.save();
+        await AmplificationCoeffChangelog.create([newData],{session});
+        await pool.save({session});
       }
+       // updating mutation status
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
+       await eventDataResult.save({ session });
+
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
         // create new response
@@ -770,10 +934,19 @@ const handleRampA = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+       //committing the transaction 
+       await session.commitTransaction();
+
+       // Ending the session
+       session.endSession();
+
       return response;
     } catch (error) {
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+
       throw new Error(error);
     }
   },
@@ -791,11 +964,14 @@ const handleStopRampA = {
     logIndex: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
     try {
       let pool = await Pool.findOne({ id: args.poolId });
 
       if (pool != null) {
-        pool = await getPoolSnapshot(pool, args);
+        pool = await getPoolSnapshot(pool, args, session);
 
         // Save pool parameters
         pool.A = args.A;
@@ -810,9 +986,14 @@ const handleStopRampA = {
           timestamp: args.timestamp,
           transaction: args.transactionHash,
         });
-        await AmplificationCoeffChangelog.create(newData);
-        await pool.save();
+        await AmplificationCoeffChangelog.create([newData],{session});
+        await pool.save({session});
       }
+       // updating mutation status
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
+       await eventDataResult.save({ session });
+
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
         // create new response
@@ -820,10 +1001,19 @@ const handleStopRampA = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+       //committing the transaction 
+       await session.commitTransaction();
+
+       // Ending the session
+       session.endSession();
+
       return response;
     } catch (error) {
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+
       throw new Error(error);
     }
   },

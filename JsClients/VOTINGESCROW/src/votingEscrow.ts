@@ -36,7 +36,12 @@ class VOTINGESCROWClient {
     ownedTokens: string;
     owners: string;
     paused: string;
-    
+    minBalance: string;
+    minAcceptQuorumPct: string;
+    minTime:string;
+    supportRequiredPct: string;
+    voteTime: string;
+    token: string;
   };
 
   private isListening = false;
@@ -57,7 +62,13 @@ class VOTINGESCROWClient {
       allowances: "null",
       ownedTokens: "null",
       owners: "null",
-      paused: "null"
+      paused: "null",
+      minBalance: "null",
+      minAcceptQuorumPct: "null",
+      minTime: "null",
+      supportRequiredPct: "null",
+      voteTime: "null",
+      token: "null"
     }; 
   }
 
@@ -116,6 +127,12 @@ class VOTINGESCROWClient {
       'balances',
       'nonces',
       'allowances',
+      'minBalance',
+      'minAcceptQuorumPct',
+      'minTime',
+      'supportRequiredPct',
+      'voteTime',
+      'token',
       `${this.contractName}_package_hash`,
       `${this.contractName}_package_hash_wrapped`,
       `${this.contractName}_contract_hash`,
@@ -130,6 +147,110 @@ class VOTINGESCROWClient {
       return acc;
     }, {});
   }
+
+  //Backend Functions
+
+  public async minBalance(account: string) {
+		try {
+		
+		const result = await utils.contractDictionaryGetter(
+			this.nodeAddress,
+			account,
+			this.namedKeys.minBalance
+		);
+		const maybeValue = result.value().unwrap();
+		return maybeValue.value().toString();
+
+		} catch (error) {
+		return "0";
+		}
+		
+	}
+
+  public async minAcceptQuorumPct(account: string) {
+		try {
+		
+		const result = await utils.contractDictionaryGetter(
+			this.nodeAddress,
+			account,
+			this.namedKeys.minAcceptQuorumPct
+		);
+		const maybeValue = result.value().unwrap();
+		return maybeValue.value().toString();
+
+		} catch (error) {
+		return "0";
+		}
+		
+	}
+
+  public async minTime(account: string) {
+		try {
+		
+		const result = await utils.contractDictionaryGetter(
+			this.nodeAddress,
+			account,
+			this.namedKeys.minTime
+		);
+		const maybeValue = result.value().unwrap();
+		return maybeValue.value().toString();
+
+		} catch (error) {
+		return "0";
+		}
+		
+	}
+
+  public async supportRequiredPct(account: string) {
+		try {
+		
+		const result = await utils.contractDictionaryGetter(
+			this.nodeAddress,
+			account,
+			this.namedKeys.supportRequiredPct
+		);
+		const maybeValue = result.value().unwrap();
+		return maybeValue.value().toString();
+
+		} catch (error) {
+		return "0";
+		}
+		
+	}
+
+  public async voteTime(account: string) {
+		try {
+		
+		const result = await utils.contractDictionaryGetter(
+			this.nodeAddress,
+			account,
+			this.namedKeys.voteTime
+		);
+		const maybeValue = result.value().unwrap();
+		return maybeValue.value().toString();
+
+		} catch (error) {
+		return "0";
+		}
+		
+	}
+
+  public async token(account: string) {
+		try {
+		
+		const result = await utils.contractDictionaryGetter(
+			this.nodeAddress,
+			account,
+			this.namedKeys.token
+		);
+		const maybeValue = result.value().unwrap();
+		return maybeValue.value().toString();
+
+		} catch (error) {
+		return "0";
+		}
+		
+	}
 
   //VOTING_ESCROW FUNCTIONS
 
@@ -603,120 +724,6 @@ class VOTINGESCROWClient {
     }
   }
 
-
-
-
-
-  // public onEvent(
-  //   eventNames: ERC20Events[],
-  //   callback: (
-  //     eventName: ERC20Events,
-  //     deployStatus: {
-  //       deployHash: string;
-  //       success: boolean;
-  //       error: string | null;
-  //     },
-  //     result: any | null
-  //   ) => void
-  // ): any {
-  //   if (!this.eventStreamAddress) {
-  //     throw Error("Please set eventStreamAddress before!");
-  //   }
-  //   if (this.isListening) {
-  //     throw Error(
-  //       "Only one event listener can be create at a time. Remove the previous one and start new."
-  //     );
-  //   }
-  //   const es = new EventStream(this.eventStreamAddress);
-  //   this.isListening = true;
-
-  //   es.subscribe(EventName.DeployProcessed, (value: any) => {
-  //     const deployHash = value.body.DeployProcessed.deploy_hash;
-
-  //     const pendingDeploy = this.pendingDeploys.find(
-  //       (pending) => pending.deployHash === deployHash
-  //     );
-
-  //     if (!pendingDeploy) {
-  //       return;
-  //     }
-
-  //     if (
-  //       !value.body.DeployProcessed.execution_result.Success &&
-  //       value.body.DeployProcessed.execution_result.Failure
-  //     ) {
-  //       callback(
-  //         pendingDeploy.deployType,
-  //         {
-  //           deployHash,
-  //           error:
-  //             value.body.DeployProcessed.execution_result.Failure.error_message,
-  //           success: false,
-  //         },
-  //         null
-  //       );
-  //     } else {
-  //       const { transforms } =
-  //         value.body.DeployProcessed.execution_result.Success.effect;
-
-  //       const ERC20Events = transforms.reduce((acc: any, val: any) => {
-  //         if (
-  //           val.transform.hasOwnProperty("WriteCLValue") &&
-  //           typeof val.transform.WriteCLValue.parsed === "object" &&
-  //           val.transform.WriteCLValue.parsed !== null
-  //         ) {
-  //           const maybeCLValue = CLValueParsers.fromJSON(
-  //             val.transform.WriteCLValue
-  //           );
-  //           const clValue = maybeCLValue.unwrap();
-  //           if (clValue && clValue instanceof CLMap) {
-  //             const hash = clValue.get(
-  //               CLValueBuilder.string("contract_package_hash")
-  //             );
-  //             const event = clValue.get(CLValueBuilder.string("event_type"));
-  //             if (
-  //               hash &&
-  //               // NOTE: Calling toLowerCase() because current JS-SDK doesn't support checksumed hashes and returns all lower case value
-  //               // Remove it after updating SDK
-  //               hash.value() === this.contractPackageHash.toLowerCase() &&
-  //               event &&
-  //               eventNames.includes(event.value())
-  //             ) {
-  //               acc = [...acc, { name: event.value(), clValue }];
-  //             }
-  //           }
-  //         }
-  //         return acc;
-  //       }, []);
-
-  //       ERC20Events.forEach((d: any) =>
-  //         callback(
-  //           d.name,
-  //           { deployHash, error: null, success: true },
-  //           d.clValue
-  //         )
-  //       );
-  //     }
-
-  //     this.pendingDeploys = this.pendingDeploys.filter(
-  //       (pending) => pending.deployHash !== deployHash
-  //     );
-  //   });
-  //   es.start();
-
-  //   return {
-  //     stopListening: () => {
-  //       es.unsubscribe(EventName.DeployProcessed);
-  //       es.stop();
-  //       this.isListening = false;
-  //       this.pendingDeploys = [];
-  //     },
-  //   };
-  // }
-
-  // public addPendingDeploy(deployType: ERC20Events, deployHash: string) {
-  //   this.pendingDeploys = [...this.pendingDeploys, { deployHash, deployType }];
-  // }
 }
 
 interface IInstallParams {

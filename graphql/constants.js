@@ -1,3 +1,4 @@
+var bigdecimal = require("bigdecimal");
 // Number of decimals used for fees
 const FEE_PRECISION = "10";
 
@@ -5,7 +6,7 @@ const FEE_PRECISION = "10";
 const GAUGE_WEIGHT_PRECISION = "18";
 
 // Number of decimals used for total weight
-const GAUGE_TOTAL_WEIGHT_PRECISION = (BigInt(GAUGE_WEIGHT_PRECISION) * BigInt(2)).toString();
+const GAUGE_TOTAL_WEIGHT_PRECISION = ((new bigdecimal.BigDecimal(GAUGE_WEIGHT_PRECISION)).multiply(new bigdecimal.BigDecimal(2))).toString();
 
 module.exports = {
     FEE_PRECISION,

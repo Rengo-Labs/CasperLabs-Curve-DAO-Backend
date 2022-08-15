@@ -18,30 +18,10 @@ const {
   EVENT_STREAM_ADDRESS,
   CHAIN_NAME,
   CERC20_MASTER_KEY_PAIR_PATH,
-  CERC20_CONTRACT_NAME,
-  MINT_PAYMENT_AMOUNT,
   MINT_AMOUNT,
-  BURN_PAYMENT_AMOUNT,
-  BURN_AMOUNT,
-  APPROVE_PAYMENT_AMOUNT,
-  APPROVE_AMOUNT,
-  TRANSFER_PAYMENT_AMOUNT,
-  TRANSFER_AMOUNT,
-  TRANSFER_FROM_PAYMENT_AMOUNT,
-  TRANSFER_FROM_AMOUNT,
-  TOKEN0_CONTRACT,
-  TOKEN1_CONTRACT,
-  TOKEN1_CONTRACT_PACKAGE,
-  PAIR_CONTRACT,
-  PACKAGE_HASH,
-  AMOUNT_A_DESIRED,
-  AMOUNT_B_DESIRED,
-  MASTER_KEY_PAIR_PATH,
-  PAIR_CONTRACT_PACKAGE,
-  GRAPHQL,
+  CERC20_PAYMENT_AMOUNT,
   REDEEM_TOKEN,
   REDEEM_AMOUNT,
-  PAYMENT_AMOUNT,
   BORROW_AMOUNT,
   REPAY_AMOUNT,
   BORROWER,
@@ -54,11 +34,6 @@ const {
 const KEYS = Keys.Ed25519.parseKeyFiles(
   `${CERC20_MASTER_KEY_PAIR_PATH}/public_key.pem`,
   `${CERC20_MASTER_KEY_PAIR_PATH}/secret_key.pem`
-);
-
-const ROUTERKEYS = Keys.Ed25519.parseKeyFiles(
-  `${MASTER_KEY_PAIR_PATH}/public_key.pem`,
-  `${MASTER_KEY_PAIR_PATH}/secret_key.pem`
 );
 
 function splitdata(data:string)
@@ -83,7 +58,7 @@ const deploy = async () => {
   const mintDeployHash = await cerc20.mint(
     KEYS!,
     MINT_AMOUNT!,
-    PAYMENT_AMOUNT!
+    CERC20_PAYMENT_AMOUNT!
   );
   console.log("... Mint deploy hash: ", mintDeployHash);
 
@@ -94,7 +69,7 @@ const deploy = async () => {
   const redeemDeployHash = await cerc20.redeem(
     KEYS!,
     REDEEM_TOKEN!,
-    PAYMENT_AMOUNT!
+    CERC20_PAYMENT_AMOUNT!
   );
   console.log("... redeem deploy hash: ", redeemDeployHash);
 
@@ -105,7 +80,7 @@ const deploy = async () => {
   const redeemUnderLyingDeployHash = await cerc20.redeemUnderLying(
     KEYS!,
     REDEEM_AMOUNT!,
-    PAYMENT_AMOUNT!
+    CERC20_PAYMENT_AMOUNT!
   );
   console.log("... redeemUnderLying deploy hash: ", redeemUnderLyingDeployHash);
 
@@ -116,7 +91,7 @@ const deploy = async () => {
   const borrowDeployHash = await cerc20.borrow(
     KEYS!,
     BORROW_AMOUNT!,
-    PAYMENT_AMOUNT!
+    CERC20_PAYMENT_AMOUNT!
   );
   console.log("... borrow deploy hash: ", borrowDeployHash);
 
@@ -127,7 +102,7 @@ const deploy = async () => {
   const repayBorrowDeployHash = await cerc20.repayBorrow(
     KEYS!,
     REPAY_AMOUNT!,
-    PAYMENT_AMOUNT!
+    CERC20_PAYMENT_AMOUNT!
   );
   console.log("... repayBorrow deploy hash: ", repayBorrowDeployHash);
 
@@ -136,10 +111,10 @@ const deploy = async () => {
 
   //repayBorrowBehalf
   const repayBorrowBehalfDeployHash = await cerc20.repayBorrowBehalf(
-    ROUTERKEYS,
+    KEYS,
     BORROWER!,
     REPAY_AMOUNT!,
-    APPROVE_PAYMENT_AMOUNT!
+    CERC20_PAYMENT_AMOUNT!
   );
   console.log("... repayBorrowBehalf deploy hash: ", repayBorrowBehalfDeployHash);
 
@@ -148,11 +123,11 @@ const deploy = async () => {
 
   //liquidateBorrow
   const liquidateBorrowDeployHash = await cerc20.liquidateBorrow(
-    ROUTERKEYS,
+    KEYS,
     BORROWER!,
     REPAY_AMOUNT!,
     TOKEN_COLLATERAL!,
-    APPROVE_PAYMENT_AMOUNT!
+    CERC20_PAYMENT_AMOUNT!
   );
   console.log("... liquidateBorrow deploy hash: ", liquidateBorrowDeployHash);
 
@@ -161,9 +136,9 @@ const deploy = async () => {
 
   //sweepToken
   const sweepTokenDeployHash = await cerc20.sweepToken(
-    ROUTERKEYS,
+    KEYS,
     SWEEP_TOKEN!,
-    APPROVE_PAYMENT_AMOUNT!
+    CERC20_PAYMENT_AMOUNT!
   );
   console.log("... sweepToken deploy hash: ", sweepTokenDeployHash);
 
@@ -172,9 +147,9 @@ const deploy = async () => {
 
   //delegatCompLikeTo
   const delegatCompLikeToDeployHash = await cerc20.delegatCompLikeTo(
-    ROUTERKEYS,
+    KEYS,
     DELEGATEE!,
-    APPROVE_PAYMENT_AMOUNT!
+    CERC20_PAYMENT_AMOUNT!
   );
   console.log("... delegatCompLikeTo deploy hash: ", delegatCompLikeToDeployHash);
 
