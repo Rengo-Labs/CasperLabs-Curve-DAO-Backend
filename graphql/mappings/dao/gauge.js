@@ -49,9 +49,9 @@ const handleUpdateLiquidityLimit = {
       await GaugeLiquidity.create([gauge],{session});
 
       // updating mutation status
-      let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-      eventDataResult.status="completed"
-      await eventDataResult.save({ session });
+      // let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      // eventDataResult.status="completed"
+      // await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -105,9 +105,9 @@ const handleDeposit = {
       await GaugeDeposit.create([deposit],{session});
 
        // updating mutation status
-       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-       eventDataResult.status="completed"
-       await eventDataResult.save({ session });
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -163,9 +163,9 @@ const handleWithdraw = {
       await GaugeWithdraw.create([withdraw],{session});
 
        // updating mutation status
-       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-       eventDataResult.status="completed"
-       await eventDataResult.save({ session });
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {

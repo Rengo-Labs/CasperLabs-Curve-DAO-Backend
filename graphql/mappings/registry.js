@@ -7,8 +7,9 @@ const Pool = require("../../models/pool");
 const Gauge = require("../../models/gauge");
 const { getSystemState } = require("../services/system-state");
 const { getOrCreateLpToken } = require("../services/token");
-const FEE_PRECISION = require("../constants");
+const {FEE_PRECISION} = require("../constants");
 const { saveCoins } = require("../services/pools/coins");
+const bigDecimal = require("js-big-decimal");
 let eventsData= require("../../models/eventsData");
 const mongoose = require("mongoose")
 var bigdecimal = require("bigdecimal");
@@ -36,9 +37,9 @@ const handlePoolAdded = {
       await getOrCreatePool(args.poolId, args,session);
 
        // updating mutation status
-       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-       eventDataResult.status="completed"
-       await eventDataResult.save({ session });
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -85,9 +86,9 @@ const handlePoolRemoved = {
       await removePool(args.poolId, args, session);
 
        // updating mutation status
-       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-       eventDataResult.status="completed"
-       await eventDataResult.save({ session });
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
        
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -181,13 +182,13 @@ async function getOrCreatePool(address, args, session) {
     }
 
     if (fee != null) {
-      // pool.fee = new bigdecimal.BigDecimal(fee, FEE_PRECISION); //issue
-      pool.fee = fee;
+      pool.fee = bigDecimal.round(fee, parseFloat(FEE_PRECISION)); //issue fixed
+      // pool.fee = fee;
     }
 
     if (adminFee != null) {
-      // pool.adminFee = new bigdecimal.BigDecimal(adminFee, FEE_PRECISION); issue
-      pool.adminFee = adminFee;
+      pool.adminFee = bigDecimal.round(adminFee,  parseFloat(FEE_PRECISION)); //issue fixed
+      // pool.adminFee = adminFee;
     }
     //let owner = await poolContract.try_owner(address);
     let owner = "1000000000";

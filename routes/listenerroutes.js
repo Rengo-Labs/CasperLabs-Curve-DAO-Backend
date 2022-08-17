@@ -2,13 +2,13 @@ require("dotenv").config();
 var express = require("express");
 var router = express.Router();
 var { request } = require("graphql-request");
-var pairModel = require("../models/pair");
-var hashesofpairsModel = require("../models/hashesofpairs");
-var eventsModel = require("../models/events");
-var pairagainstuser = require("../models/pairagainstuser");
-var paircontract = require("../JsClients/PAIR/pairFunctionsForBackend/functions");
-var allcontractsDataModel = require("../models/allcontractsData");
-var RemoveReservesDataModel = require("../models/removeReservesData");
+// var pairModel = require("../models/pair");
+// var hashesofpairsModel = require("../models/hashesofpairs");
+// var eventsModel = require("../models/events");
+// var pairagainstuser = require("../models/pairagainstuser");
+// var paircontract = require("../JsClients/PAIR/pairFunctionsForBackend/functions");
+// var allcontractsDataModel = require("../models/allcontractsData");
+// var RemoveReservesDataModel = require("../models/removeReservesData");
 
 function splitdata(data) {
   var temp = data.split("(");
@@ -2005,9 +2005,9 @@ router
       }
 
       let packageHash = req.body.packageHash.toLowerCase();
-      let contractHash = await allcontractsDataModel.findOne({
-        packageHash: packageHash,
-      });
+      // let contractHash = await allcontractsDataModel.findOne({
+      //   packageHash: packageHash,
+      // });
 
       return res.status(200).json({
         success: true,

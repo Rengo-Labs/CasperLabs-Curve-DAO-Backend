@@ -213,7 +213,6 @@ class GaugeControllerClient {
   }
 
   public async setContractHash(hash: string) {
-    //debugger;
     const stateRootHash = await utils.getStateRootHash(this.nodeAddress);
     const contractData = await utils.getContractData(
       this.nodeAddress,
@@ -249,7 +248,7 @@ class GaugeControllerClient {
       `${this.contractName}_contract_hash_wrapped`,
       `${this.contractName}_package_access_token`,
     ];
-    //debugger;
+    
     // @ts-ignore
     this.namedKeys = namedKeys.reduce((acc, val) => {
       if (LIST_OF_NAMED_KEYS.includes(val.name)) {

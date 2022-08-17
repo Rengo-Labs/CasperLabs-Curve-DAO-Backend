@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
+    "test": "mocha tests/*.test.js --timeout 10000", 
+    "start": "ts-node ./bin/www",
     "deploy:erc20Crv": "ts-node Scripts/ERC20-CRV/deploy/erc20CrvContract.ts",
     "deploy:erc20CrvFunctions": "ts-node Scripts/ERC20-CRV/deploy/erc20CrvContractFunctions.ts",
     "deploy:liquidityGaugeReward": "ts-node Scripts/LIQUIDITYGAUGEREWARD/deploy/liquidityGaugeRewardContract.ts",
@@ -23,8 +24,6 @@
   },
   "dependencies": {
     "axios": "^0.24.0",
-    "redis": "^4.1.0",
-    "serialize-javascript": "^6.0.0",
     "bigdecimal": "^0.6.1",
     "blakejs": "^1.1.1",
     "casper-js-sdk": "^2.7.5",
@@ -38,17 +37,24 @@
     "graphql-request": "^3.6.1",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
+    "js-big-decimal": "^1.3.5",
     "kafkajs": "^2.1.0",
     "mongoose": "^6.2.10",
     "morgan": "~1.9.1",
     "nodemon": "^2.0.13",
     "prettier": "^2.3.2",
+    "redis": "^4.1.0",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
+    "serialize-javascript": "^6.0.0",
     "ts-node": "^10.1.0",
     "ts-results": "^3.3.0",
     "tslint": "^5.12.1",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.3.3"
+  },
+  "devDependencies": {
+    "chai": "^4.3.6",
+    "mocha": "^10.0.0"
   }
 }

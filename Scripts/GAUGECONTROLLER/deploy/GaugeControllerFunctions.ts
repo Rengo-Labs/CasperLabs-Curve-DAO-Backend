@@ -47,7 +47,7 @@ const gaugeController = new GaugeControllerClient(
 );
 
 const deploy = async () => {
-  debugger;
+  
 
   // await gaugeController.setContractHash(TOKEN1_CONTRACT!);
   // await gaugeController.setContractHash("9cc5f4dc6d94076a220bd472904d2823c5606d655067c88d0ecb0d45a06436f4");

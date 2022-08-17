@@ -37,7 +37,7 @@ var queuePopFlag=0;
 if (process.env.NODE_MODE == "deployed") {
   DB_URL = process.env.DATABASE_URL_ONLINE;
 } else {
-  DB_URL = process.env.DATABASE_URL_LOCAL;
+  DB_URL = process.env.DATABASE_URL_TEST;
 }
 
 console.log("DB_URL : " + DB_URL);

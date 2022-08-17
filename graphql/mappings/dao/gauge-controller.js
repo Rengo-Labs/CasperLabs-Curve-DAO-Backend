@@ -17,6 +17,7 @@ const { responseType } = require("../../types/response");
 const { GraphQLString } = require("graphql");
 let gaugeController = require('../../../JsClients/GAUGECONTROLLER/gaugeControllerFunctionsForBackend/functions');
 const mongoose = require("mongoose");
+const bigDecimal = require("js-big-decimal");
 // let gaugeController= require('../JsClients/Registry/test/installed.ts')
 // let LpToken= require('../JsClients/Registry/test/installed.ts')
 
@@ -42,6 +43,7 @@ const handleAddType = {
 
     try {
       // await gaugeController.setContractHash(address);
+      
       let nextWeek = nextPeriod(args.timestamp, WEEK);
       console.log("args-name", args);
 
@@ -52,8 +54,8 @@ const handleAddType = {
         type: gaugeType.id,
         time: nextWeek.toString(),
         weight: 
-          gaugeController.points_type_weight(args.type_id, nextWeek)
-         //'1000000000'
+          // gaugeController.points_type_weight(args.type_id, nextWeek)
+         '1000000000'
         
       });
       await GaugeTypeWeight.create([newData],{session});
@@ -61,14 +63,13 @@ const handleAddType = {
       let data = new GaugeTotalWeight({
         id: nextWeek.toString(),
         time: nextWeek.toString(),
-        // weight: new bigdecimal.BigDecimal(  //ISSUE
+        weight : bigDecimal.round(
+          // parseFloat(gaugeController.points_total(nextWeek)),
+          '1000000000',
+          parseFloat(GAUGE_TOTAL_WEIGHT_PRECISION)), //issue fixed
+        // weight:
         //   //gaugeController.points_total(nextWeek),
-        //   '1000000000',
-        //   GAUGE_TOTAL_WEIGHT_PRECISION
-        // ),
-        weight:
-          gaugeController.points_total(nextWeek),
-          //'1000000000'
+        //   '1000000000'
       });
       await GaugeTotalWeight.create([data], {session});
 
@@ -219,15 +220,16 @@ const handleNewGauge = {
     session.startTransaction();
 
     try {
+      
       let nextWeek = nextPeriod(args.timestamp, WEEK);
        let gaugeType = await getGaugeType((args.gaugeType).toString());
 
       if (gaugeType === null) {
         gaugeType = await registerGaugeType(
           (args.gaugeType).toString(),
-          gaugeController.gauge_type_names(args.gauge_type),
+          // gaugeController.gauge_type_names(args.gauge_type),
+          '1000000000',
           session
-         //'1000000000'
         );
       }
 
@@ -275,11 +277,11 @@ const handleNewGauge = {
       let dataWeight = new GaugeTotalWeight({
         id: nextWeek.toString(),
         time: nextWeek.toString(),
-        weight: new bigdecimal.BigDecimal(
-          gaugeController.points_total(nextWeek),
-          GAUGE_TOTAL_WEIGHT_PRECISION
-        ),
-        //weight: '1000000000'
+        weight : bigDecimal.round(
+          // parseFloat(gaugeController.points_total(nextWeek)),
+          '1000000000',
+          parseFloat(GAUGE_TOTAL_WEIGHT_PRECISION)), //issue fixed 
+        // weight: '1000000000'
       });
       await GaugeTotalWeight.create([dataWeight], {session});
 
@@ -349,11 +351,11 @@ const handleNewGaugeWeight = {
         let data = new GaugeTotalWeight({
           id: nextWeek.toString(),
           time: nextWeek,
-          weight: new bigdecimal.BigDecimal(
-            gaugeController.points_total(nextWeek),
-            GAUGE_TOTAL_WEIGHT_PRECISION
-          ),
-          //weight: '1000000000'
+          weight : bigDecimal.round(
+            // parseFloat(gaugeController.points_total(nextWeek)),
+            '1000000000',
+            parseFloat(GAUGE_TOTAL_WEIGHT_PRECISION)), //issue fixed
+          // weight: '1000000000'
         });
         await GaugeTotalWeight.create([data],{session});
       }
@@ -414,7 +416,9 @@ const handleNewTypeWeight = {
             let data = new GaugeTotalWeight({
               id: gaugeType.id + "-" + args.time.toString(),
               time: args.time,
-              weight: new bigdecimal.BigDecimal(args.total_weight, GAUGE_TOTAL_WEIGHT_PRECISION),
+              weight : bigDecimal.round(
+                args.total_weight,
+                parseFloat(GAUGE_TOTAL_WEIGHT_PRECISION)), //issue fixed
             //weight: "1000000000"
             });
             await GaugeTotalWeight.create([data], {session});
@@ -474,21 +478,21 @@ const handleVoteForGauge = {
           id: gauge.id + "-" + nextWeek.toString(),
           gauge: gauge.id,
           time: nextWeek,
-          weight: new bigdecimal.BigDecimal(
-            gaugeController.points_weight(args.gauge_addr, nextWeek).value0
-          ),
-          //weight: "1000000000"
+          // weight: new bigdecimal.BigDecimal(
+          //   gaugeController.points_weight(args.gauge_addr, nextWeek).value0
+          // ),
+          weight: "1000000000"
         });
         await GaugeWeight.create([newData],{ session });
 
         let data = new GaugeTotalWeight({
           id: nextWeek.toString(),
           time: nextWeek,
-          weight: new bigdecimal.BigDecimal(
-            gaugeController.points_total(nextWeek),
-            GAUGE_TOTAL_WEIGHT_PRECISION
-          ),
-          //weight: "1000000000"
+          weight : bigDecimal.round(
+            // parseFloat(gaugeController.points_total(nextWeek)),
+            '1000000000',
+            parseFloat(GAUGE_TOTAL_WEIGHT_PRECISION)), //issue fixed
+          // weight: "1000000000"
         });
         await GaugeTotalWeight.create([data],{ session });
 
@@ -535,7 +539,7 @@ function nextPeriod(timestamp, period) {
   console.log(timestamp);
   console.log(period);
   let nextPeriod = (new bigdecimal.BigDecimal(timestamp)).add(new bigdecimal.BigDecimal(period));
-  return (nextPeriod / (new bigdecimal.BigDecimal(period))).multiply(new bigdecimal.BigDecimal(period));
+  return (nextPeriod.divide((new bigdecimal.BigDecimal(period)))).multiply(new bigdecimal.BigDecimal(period));
   
 }
 

@@ -20,7 +20,8 @@ const eventsData = require("../../models/eventsData");
 // let poolContract= require('../JsClients/Pool/test/installed.ts');
 // let registryContract= require('../JsClients/Registry/test/installed.ts');
 const { saveCoins } = require("../services/pools/coins");
-const FEE_PRECISION = require("../constants");
+const {FEE_PRECISION} = require("../constants");
+const bigDecimal = require("js-big-decimal");
 const {
   getHourlyTradeVolume,
   getDailyTradeVolume,
@@ -726,12 +727,11 @@ const handleNewFee = {
         pool = await getPoolSnapshot(pool, args, session);
 
         // Save pool parameters
+        pool.fee = bigDecimal.round(args.fee, parseFloat(FEE_PRECISION)); //issue fixed
+        pool.adminFee = bigDecimal.round(args.admin_fee,  parseFloat(FEE_PRECISION)); //issue fixed
 
-        // pool.fee = decimal.fromBigInt(args.fee, FEE_PRECISION);  //issue
-        // pool.adminFee = decimal.fromBigInt(args.admin_fee, FEE_PRECISION);  //issue
-
-        pool.fee = args.fee;
-        pool.adminFee = args.admin_fee;
+        // pool.fee = args.fee;
+        // pool.adminFee = args.admin_fee;
 
         let eventId = getEventId(args.transactionHash, args.logIndex);
         // Save event log
@@ -816,11 +816,12 @@ const handleNewParameters = {
 
         // Save pool parameters
         pool.A = args.A;
-        // pool.fee = decimal.fromBigInt(args.fee, FEE_PRECISION);  //issue
-        // pool.adminFee = decimal.fromBigInt(args.admin_fee, FEE_PRECISION);  //issue
 
-        pool.fee = args.fee;
-        pool.adminFee = args.admin_fee;
+        pool.fee = bigDecimal.round(args.fee, parseFloat(FEE_PRECISION)); //issue fixed
+        pool.adminFee = bigDecimal.round(args.admin_fee,  parseFloat(FEE_PRECISION)); //issue fixed
+
+        // pool.fee = args.fee;
+        // pool.adminFee = args.admin_fee;
 
         let eventId = getEventId(args.transactionHash, args.logIndex);
         // Save event log
