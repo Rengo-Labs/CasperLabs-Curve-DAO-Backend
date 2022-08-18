@@ -3,6 +3,8 @@ const assert = chai.assert;
 
 require("dotenv").config();
 var { request } = require("graphql-request");
+const mongoose  = require('mongoose');
+const Pool = require('../models/pool');
 
 async function PoolAdded(poolId, transactionHash, block, timestamp) {
     console.log("Calling handlePoolAdded mutation...");
@@ -68,14 +70,30 @@ async function PoolRemoved(poolId, transactionHash, block, timestamp) {
     return response;
   }
 
+  before(async function(){
+    await mongoose.connect(process.env.DATABASE_URL_TEST);
+    // connecting to the database
+    console.log("Connected to the MongoDB server\n\n");
+  });
+
 describe('GraphQL Mutations for registry', () => {     
     it('handlePoolAdded should return true', async () => {
-        const {handlePoolAdded : {result}} = await PoolAdded('poolId', 'txhash', 'block', '64800');
+        const {handlePoolAdded : {result}} = await PoolAdded('poolid', 'txhash', 'block', '604800');
         assert.equal(result, true);
+       let pool = await Pool.findOne({ id: 'poolid' });
+       assert.equal(pool.id, 'poolid');
+       assert.equal(pool.addedAt, '604800');
+       assert.equal(pool.addedAtBlock, 'block');
+       assert.equal(pool.addedAtTransaction, 'txhash');
     })
 
     it('handlePoolRemoved should return true', async () => {
-        const {handlePoolRemoved : {result}} = await PoolRemoved('poolId', 'txhash', 'block', '64800');
+        const {handlePoolRemoved : {result}} = await PoolRemoved('poolid', 'txhash', 'block', '604800');
         assert.equal(result, true);
+        let pool = await Pool.findOne({ id: 'poolid' });
+        assert.equal(pool.id, 'poolid');
+        assert.equal(pool.removedAt, '604800');
+        assert.equal(pool.removedAtBlock, 'block');
+        assert.equal(pool.removedAtTransaction, 'txhash');
     })
 });

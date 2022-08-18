@@ -130,7 +130,7 @@ async function Withdraw(provider, id, value, transactionHash, logIndex) {
     return response;
   }
 
-describe('GraphQL Mutations for registry', () => {     
+describe('GraphQL Mutations for Gauge', () => {     
     it('handleUpdateLiquidityLimit should return true', async () => {
         const {handleUpdateLiquidityLimit : {result}} = await UpdateLiquidityLimit('user', 'id', '1000', '10000','2000','20000','txhash', 'block', '604800');
         assert.equal(result, true);

@@ -19,7 +19,7 @@ async function getOrRegisterVotingApp(address,session) {
 
   if (app == null) {
     let codename = "codename";
-
+    
        let minBalance =  await votingEscrow.minBalance(address);
       let minAcceptQuorumPct =  await votingEscrow.minAcceptQuorumPct(address);
        let minTime =  await votingEscrow.minTime(address);
@@ -72,9 +72,9 @@ const handleMinimumBalanceSet = {
       await app.save({session});
 
        // updating mutation status
-       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-       eventDataResult.status="completed"
-       await eventDataResult.save({ session });
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -120,9 +120,9 @@ const handleMinimumTimeSet = {
       await app.save({session});
 
        // updating mutation status
-       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-       eventDataResult.status="completed"
-       await eventDataResult.save({ session });
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -169,9 +169,9 @@ const handleChangeMinQuorum = {
       await app.save({session});
 
        // updating mutation status
-       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-       eventDataResult.status="completed"
-       await eventDataResult.save({ session });
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -217,9 +217,9 @@ const handleChangeSupportRequired = {
       await app.save({session});
 
        // updating mutation status
-       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-       eventDataResult.status="completed"
-       await eventDataResult.save({ session });
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
