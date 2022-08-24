@@ -2,7 +2,14 @@
 const { GraphQLSchema, GraphQLObjectType } = require("graphql");
 
 // Import queries
-const { responses, response } = require("./queries");
+const { responses, response, 
+  gaugeVotes, 
+  votingEscrows, 
+  daoPowers, 
+  votingPower, 
+  gauges, 
+  userBalances 
+} = require("./queries");
 
 // Import mutations
 const { handleNewResponse } = require("./mutations");
@@ -71,6 +78,12 @@ const QueryType = new GraphQLObjectType({
   fields: {
     responses,
     response,
+    gaugeVotes,
+    votingEscrows, 
+    daoPowers,
+    votingPower, 
+    gauges, 
+    userBalances
   },
 });
 

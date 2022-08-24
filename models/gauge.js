@@ -30,6 +30,7 @@ const gaugeSchema = new Schema({
     weightVotes:[{
         type:String
     }],
+    originalBalance : {type : String}
   
   
 });
