@@ -3,7 +3,7 @@
 const express = require("express");
 // const graphqlHTTP = require("express-graphql");
 const { graphqlHTTP } = require("express-graphql");
-const { startDatabase } = require("../mock-database/database");
+const { startReplicaSet } = require("../mock-database/database");
 const schema = require("../../graphql/schema");
 // const resolvers = require("./resolvers");
 // const expressPlayground = require("graphql-playground-middleware-express")
@@ -12,7 +12,7 @@ const schema = require("../../graphql/schema");
 // Create a context for holding contextual data (db info in this case)
 const app = express();
 
-startDatabase().then(res => {
+startReplicaSet().then(res => {
   console.log("Connected to test mongo database");
 }).catch(err => {
   console.log(err.message);

@@ -12,7 +12,6 @@ const AdminFeeChangeLog = require("../models/adminFeeChangeLog");
 const FeeChangeLog = require("../models/feeChangeLog");
 const TransferOwnershipEvent = require("../models/transferOwnershipEvent");
 const UnderlyingCoin = require("../models/underlyingCoin");
-const mongoose  = require('mongoose');
 
 require("dotenv").config();
 var { request } = require("graphql-request");
@@ -585,14 +584,8 @@ async function AddLiquidity(
     return response;
   }
 
-  before(async function(){
-    await mongoose.connect(process.env.DATABASE_URL_TEST);
-    // connecting to the database
-    console.log("Connected to the MongoDB server\n\n");
-  });
 
-
-describe('GraphQL Mutations for pool', () => {     
+module.exports = describe('GraphQL Mutations for pool', () => {     
 
   it('handleAddLiquidity should return true', async () => {
     const {handleAddLiquidity : {result}} = await AddLiquidity("1000","100","1000","1000","399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c","604800","22","12","399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c","11","399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c","50");

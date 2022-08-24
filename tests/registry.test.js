@@ -1,11 +1,8 @@
 const chai = require('chai');
 const assert = chai.assert;
-
 require("dotenv").config();
 var { request } = require("graphql-request");
-const mongoose  = require('mongoose');
 const Pool = require('../models/pool');
-const { startDatabase } = require('./mock-database/database');
 
 async function PoolAdded(poolId, transactionHash, block, timestamp) {
     console.log("Calling handlePoolAdded mutation...");
@@ -72,12 +69,7 @@ async function PoolRemoved(poolId, transactionHash, block, timestamp) {
     return response;
   }
 
-  before(async function(){
-    
-    await startDatabase();
-  });
-
-describe('GraphQL Mutations for registry', () => {     
+module.exports = describe('GraphQL Mutations for registry', () => {     
     it('handlePoolAdded should return true', async () => {
       
         const {handlePoolAdded : {result}} = await PoolAdded('poolid', 'txhash', 'block', '604800');

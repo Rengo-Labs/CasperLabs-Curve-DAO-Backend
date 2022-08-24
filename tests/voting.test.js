@@ -3,7 +3,6 @@ const assert = chai.assert;
 const Proposal = require("../models/proposal");
 const ProposalVote = require("../models/proposalVote");
 const VotingApp = require("../models/votingApp");
-const mongoose  = require('mongoose');
 
 require("dotenv").config();
 var { request } = require("graphql-request");
@@ -254,14 +253,7 @@ async function ExecuteVote(address, voteId, timestamp, block, transactionHash) {
     return response;
   }
 
-  before(async function(){
-    await mongoose.connect(process.env.DATABASE_URL_TEST);
-    // connecting to the database
-    console.log("Connected to the MongoDB server\n\n");
-  });
-
-
-  describe('GraphQL Mutations for voting', () => {     
+  module.exports = describe('GraphQL Mutations for voting', () => {     
 
       it('handleMinimumBalanceSet should return true', async () => {
         const {handleMinimumBalanceSet : {result}} = await MinimumBalanceSet('388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '500');

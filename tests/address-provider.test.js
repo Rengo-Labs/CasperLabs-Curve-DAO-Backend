@@ -1,6 +1,5 @@
 const chai = require('chai');
 const assert = chai.assert;
-const mongoose  = require('mongoose');
 const Contract = require("../models/contract");
 const ContractVersion = require("../models/contractVersion");
 
@@ -87,13 +86,7 @@ async function AddressModified(
     return response;
   }
 
-  before(async function(){
-    await mongoose.connect(process.env.DATABASE_URL_TEST);
-    // connecting to the database
-    console.log("Connected to the MongoDB server\n\n");
-  });
-
-describe('GraphQL Mutations for Address-Provider', () => {     
+  module.exports = describe('GraphQL Mutations for Address-Provider', () => {     
     it('handleAddressModified should return true', async () => {
         const {handleAddressModified : {result}} = await AddressModified("5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d5", "01", "5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d5", "604800", "5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d5");
         assert.equal(result, true);

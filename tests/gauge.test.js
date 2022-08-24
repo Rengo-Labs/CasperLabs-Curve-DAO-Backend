@@ -3,7 +3,6 @@ const assert = chai.assert;
 
 require("dotenv").config();
 var { request } = require("graphql-request");
-const mongoose  = require('mongoose');
 const GaugeDeposit = require("../models/gaugeDeposit");
 const GaugeLiquidity = require("../models/gaugeLiquidity");
 const GaugeWithdraw = require("../models/gaugeWithdraw");
@@ -134,13 +133,7 @@ async function Withdraw(provider, id, value, transactionHash, logIndex) {
     return response;
   }
 
-  before(async function(){
-    await mongoose.connect(process.env.DATABASE_URL_TEST);
-    // connecting to the database
-    console.log("Connected to the MongoDB server\n\n");
-  });
-
-describe('GraphQL Mutations for Gauge', () => {     
+module.exports = describe('GraphQL Mutations for Gauge', () => {     
     it('handleUpdateLiquidityLimit should return true', async () => {
         const {handleUpdateLiquidityLimit : {result}} = await UpdateLiquidityLimit('user', '01', '1000', '1000','2000','2000','388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '604800');
         assert.equal(result, true);

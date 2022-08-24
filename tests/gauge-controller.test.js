@@ -6,7 +6,6 @@ const GaugeType = require("../models/guageType");
 const GaugeTypeWeight = require("../models/gaugeTypeWeight");
 const GaugeWeight = require("../models/gaugeWeight");
 const GaugeWeightVote = require("../models/gaugeWeightVote");
-const mongoose  = require('mongoose');
 
 require("dotenv").config();
 var { request } = require("graphql-request");
@@ -187,14 +186,7 @@ async function VoteForGauge(id, time, weight, gauge_addr, user) {
     return response;
   }
 
-  before(async function(){
-    await mongoose.connect(process.env.DATABASE_URL_TEST);
-    // connecting to the database
-    console.log("Connected to the MongoDB server\n\n");
-  });
-
-
-describe('GraphQL Mutations for guage-controller', () => {     
+module.exports = describe('GraphQL Mutations for guage-controller', () => {     
 
   it('handleAddType should return true', async () => {
     const {handleAddType : {result}} = await AddType('01', '22', '6048000', 'type-name');

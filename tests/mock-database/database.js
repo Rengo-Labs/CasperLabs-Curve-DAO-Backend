@@ -3,9 +3,8 @@
 const mongoose = require('mongoose');
 const { MongoMemoryReplSet } = require('mongodb-memory-server');
 const fs =require("fs");
-let mongoReplicaSet;
 
-async function startDatabase() {
+async function startReplicaSet() {
     
 try{ 
   let connectionString;
@@ -16,24 +15,26 @@ fs.writeFileSync('mongoConnectionString.txt', "");
   
       
       if(connectionString){
-        fs.writeFileSync('mongoConnectionString.txt', ""); 
+        // fs.writeFileSync('mongoConnectionString.txt', ""); 
+        fs.unlink("mongoConnectionString.txt", (err => {
+          if (err) console.log(err);
+          else {
+            console.log("\nDeleted file: example_file.txt");
+          }
+        }));
         return await mongoose.connect(connectionString);
       }
       
-      mongoReplicaSet = await MongoMemoryReplSet.create({ replSet: { count: 2 } });
+      let mongoReplicaSet = await MongoMemoryReplSet.create({ replSet: { count: 2 } });
       let mongoDBURL = await mongoReplicaSet.getUri();
       fs.writeFileSync('mongoConnectionString.txt', mongoDBURL); 
-     return await mongoose.connect(mongoDBURL);
+      await mongoose.connect(mongoDBURL);
+      return mongoReplicaSet;
     }catch(err){
       console.log(err);
     }
 }
 
-async function stopDatabase() {
-  await mongoReplicaSet.stop();
-}
-
 module.exports = {
-  startDatabase,
-  stopDatabase,
+  startReplicaSet,
 };

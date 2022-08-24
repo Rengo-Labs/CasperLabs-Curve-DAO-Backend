@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "test": "mocha tests/*.test.js --timeout 100000",
+    "test": "mocha tests/index.test.js --timeout 100000",
     "start-mock-server" : "ts-node tests/mock-server/index",
     "start": "ts-node ./bin/www",
     "deploy:erc20Crv": "ts-node Scripts/ERC20-CRV/deploy/erc20CrvContract.ts",
