@@ -672,105 +672,105 @@ describe('GraphQL Mutations for pool', () => {
         assert.equal(exchange.transaction, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
     })
 
-    // it('handleTokenExchangeUnderlying should return true', async () => {
-    //     const {handleTokenExchangeUnderlying : {result}} = await TokenExchangeUnderlying("123", "123", "123", "123", "123", "123", "0", "123", "1","123");
-    //     assert.equal(result, true);
-    //     let exchange = await Exchange.findOne({ id: '01-01' });
-    //     assert.equal(exchange.id, '01-01');
-    //     assert.equal(exchange.pool, '1000');
-    //     assert.equal(exchange.buyer, '1000');
-    //     assert.equal(exchange.receiver, '604800');
-    //     assert.equal(exchange.tokenSold, '01-01');
-    //     assert.equal(exchange.tokenBought, '1000');
-    //     assert.equal(exchange.amountSold, '1000');
-    //     assert.equal(exchange.amountBought, '1000');
-    //     assert.equal(exchange.timestamp, '604800');
-    //     assert.equal(exchange.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-    //     assert.equal(exchange.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-    // })
+    it('handleTokenExchangeUnderlying should return true', async () => {
+        const {handleTokenExchangeUnderlying : {result}} = await TokenExchangeUnderlying("01", "399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c", "399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c", "604800", "11", "buyer", "1", "100", "1","100");
+        assert.equal(result, true);
+        let exchange = await Exchange.findOne({ id: 'e-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11' });
+        assert.equal(exchange.id, 'e-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11');
+        assert.equal(exchange.pool, '1000');
+        assert.equal(exchange.buyer, 'buyer');
+        assert.equal(exchange.receiver, 'buyer');
+        assert.equal(exchange.tokenSold, '4');
+        assert.equal(exchange.tokenBought, '4');
+        assert.equal(exchange.amountSold, '100');
+        assert.equal(exchange.amountBought, '100');
+        assert.equal(exchange.timestamp, '604800');
+        assert.equal(exchange.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        assert.equal(exchange.transaction, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    })
 
-    // it('handleNewAdmin should return true', async () => {
-    //     const {handleNewAdmin : {result}} = await NewAdmin("123", "123", "123", "123", "123","123");
-    //     assert.equal(result, true);
-    //     let transfer = await TransferOwnershipEvent.findOne({ id: '01-01' });
-    //     assert.equal(transfer.id, '01-01');
-    //     assert.equal(transfer.pool, '1000');
-    //     assert.equal(transfer.newAdmin, '1000');
-    //     assert.equal(transfer.timestamp, '604800');
-    //     assert.equal(transfer.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-    //     assert.equal(transfer.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-    // })
+    it('handleNewAdmin should return true', async () => {
+        const {handleNewAdmin : {result}} = await NewAdmin("01", "399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c", "399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c", "604800", "11","admin");
+        assert.equal(result, true);
+        let transfer = await TransferOwnershipEvent.findOne({ id: 'to-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11' });
+        assert.equal(transfer.id, 'to-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11');
+        assert.equal(transfer.pool, '01');
+        assert.equal(transfer.newAdmin, 'admin');
+        assert.equal(transfer.timestamp, '604800');
+        assert.equal(transfer.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        assert.equal(transfer.transaction, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    })
     
-    // it('handleNewFee should return true', async () => {
-    //     const {handleNewFee : {result}} = await NewFee("123", "123", "123", "123", "123","123","123")
-    //     assert.equal(result, true);
-    //     let admin = await AdminFeeChangeLog.findOne({ id: '01-01' });
-    //     assert.equal(admin.id, '01-01');
-    //     assert.equal(admin.pool, '1000');
-    //     assert.equal(admin.value, '1000');
-    //     assert.equal(admin.timestamp, '604800');
-    //     assert.equal(admin.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-    //     assert.equal(admin.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    it('handleNewFee should return true', async () => {
+        const {handleNewFee : {result}} = await NewFee("01", "399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c", "399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c", "604800", "11","100","50")
+        assert.equal(result, true);
+        let admin = await AdminFeeChangeLog.findOne({ id: 'af-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11' });
+        assert.equal(admin.id, 'af-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11');
+        assert.equal(admin.pool, '01');
+        assert.equal(admin.value, '50');
+        assert.equal(admin.timestamp, '604800');
+        assert.equal(admin.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        assert.equal(admin.transaction, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
 
-    //     let fee = await FeeChangeLog.findOne({ id: '01-01' });
-    //     assert.equal(fee.id, '01-01');
-    //     assert.equal(fee.pool, '1000');
-    //     assert.equal(fee.value, '1000');
-    //     assert.equal(fee.timestamp, '604800');
-    //     assert.equal(fee.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-    //     assert.equal(fee.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-    // })
+        let fee = await FeeChangeLog.findOne({ id: 'f-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11' });
+        assert.equal(fee.id, 'f-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11');
+        assert.equal(fee.pool, '01');
+        assert.equal(fee.value, '100');
+        assert.equal(fee.timestamp, '604800');
+        assert.equal(fee.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        assert.equal(fee.transaction, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    })
 
-    // it('handleNewParameters should return true', async () => {
-    //     const {handleNewParameters : {result}} = await NewParameters("123", "123", "123", "123", "123","123","123","123");
-    //     assert.equal(result, true);
-    //     let admin = await AdminFeeChangeLog.findOne({ id: '01-01' });
-    //     assert.equal(admin.id, '01-01');
-    //     assert.equal(admin.pool, '1000');
-    //     assert.equal(admin.value, '1000');
-    //     assert.equal(admin.timestamp, '604800');
-    //     assert.equal(admin.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-    //     assert.equal(admin.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    it('handleNewParameters should return true', async () => {
+        const {handleNewParameters : {result}} = await NewParameters("01", "100", "399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c", "399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c", "604800","11","100","50");
+        assert.equal(result, true);
+        let admin = await AdminFeeChangeLog.findOne({ id: 'af-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11' });
+        assert.equal(admin.id, 'af-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11');
+        assert.equal(admin.pool, '01');
+        assert.equal(admin.value, '50');
+        assert.equal(admin.timestamp, '604800');
+        assert.equal(admin.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        assert.equal(admin.transaction, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
 
-    //     let amp = await AmplificationCoeffChangelog.findOne({ id: '01-01' });
-    //     assert.equal(amp.id, '01-01');
-    //     assert.equal(amp.pool, '1000');
-    //     assert.equal(amp.value, '1000');
-    //     assert.equal(amp.timestamp, '604800');
-    //     assert.equal(amp.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-    //     assert.equal(amp.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        let amp = await AmplificationCoeffChangelog.findOne({ id: 'a-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11' });
+        assert.equal(amp.id, 'a-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11');
+        assert.equal(amp.pool, '01');
+        assert.equal(amp.value, '100');
+        assert.equal(amp.timestamp, '604800');
+        assert.equal(amp.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        assert.equal(amp.transaction, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
 
-    //     let fee = await FeeChangeLog.findOne({ id: '01-01' });
-    //     assert.equal(fee.id, '01-01');
-    //     assert.equal(fee.pool, '1000');
-    //     assert.equal(fee.value, '1000');
-    //     assert.equal(fee.timestamp, '604800');
-    //     assert.equal(fee.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-    //     assert.equal(fee.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-    // })
-    // it('handleRampA should return true', async () => {
-    //     const {handleRampA : {result}} = await RampA("123", "123", "123", "123", "123","123");
-    //     assert.equal(result, true);
-    //     let amp = await AmplificationCoeffChangelog.findOne({ id: '01-01' });
-    //     assert.equal(amp.id, '01-01');
-    //     assert.equal(amp.pool, '1000');
-    //     assert.equal(amp.value, '1000');
-    //     assert.equal(amp.timestamp, '604800');
-    //     assert.equal(amp.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-    //     assert.equal(amp.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-    // })
+        let fee = await FeeChangeLog.findOne({ id: 'f-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11' });
+        assert.equal(fee.id, 'f-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11');
+        assert.equal(fee.pool, '01');
+        assert.equal(fee.value, '100');
+        assert.equal(fee.timestamp, '604800');
+        assert.equal(fee.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        assert.equal(fee.transaction, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    })
+    it('handleRampA should return true', async () => {
+        const {handleRampA : {result}} = await RampA("01", "100", "399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c", "399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c", "604800","11");
+        assert.equal(result, true);
+        let amp = await AmplificationCoeffChangelog.findOne({ id: 'a-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11' });
+        assert.equal(amp.id, 'a-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11');
+        assert.equal(amp.pool, '01');
+        assert.equal(amp.value, '100');
+        assert.equal(amp.timestamp, '604800');
+        assert.equal(amp.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        assert.equal(amp.transaction, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    })
 
-    // it('handleStopRampA should return true', async () => {
-    //     const {handleStopRampA : {result}} = await  StopRampA("123", "123", "123", "123", "123","123");
-    //     assert.equal(result, true);
-    //     let amp = await AmplificationCoeffChangelog.findOne({ id: '01-01' });
-    //     assert.equal(amp.id, '01-01');
-    //     assert.equal(amp.pool, '1000');
-    //     assert.equal(amp.value, '1000');
-    //     assert.equal(amp.timestamp, '604800');
-    //     assert.equal(amp.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-    //     assert.equal(amp.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-    // })
+    it('handleStopRampA should return true', async () => {
+        const {handleStopRampA : {result}} = await  StopRampA("01", "100", "399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c", "399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c", "604800","11");
+        assert.equal(result, true);
+        let amp = await AmplificationCoeffChangelog.findOne({ id: 'a-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11' });
+        assert.equal(amp.id, 'a-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11');
+        assert.equal(amp.pool, '01');
+        assert.equal(amp.value, '100');
+        assert.equal(amp.timestamp, '604800');
+        assert.equal(amp.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        assert.equal(amp.transaction, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    })
 
 });
 
