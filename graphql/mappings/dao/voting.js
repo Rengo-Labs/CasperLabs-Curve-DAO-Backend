@@ -20,19 +20,19 @@ async function getOrRegisterVotingApp(address,session) {
   if (app == null) {
     let codename = "codename";
     
-       let minBalance =  await votingEscrow.minBalance(address);
-      let minAcceptQuorumPct =  await votingEscrow.minAcceptQuorumPct(address);
-       let minTime =  await votingEscrow.minTime(address);
-       let supportRequiredPct =  await votingEscrow.supportRequiredPct(address);
-       let voteTime =  await votingEscrow.voteTime(address);
-       let token =  await votingEscrow.token(address);
+      //  let minBalance =  await votingEscrow.minBalance(address);
+      // let minAcceptQuorumPct =  await votingEscrow.minAcceptQuorumPct(address);
+      //  let minTime =  await votingEscrow.minTime(address);
+      //  let supportRequiredPct =  await votingEscrow.supportRequiredPct(address);
+      //  let voteTime =  await votingEscrow.voteTime(address);
+      //  let token =  await votingEscrow.token(address);
 
-    //let minBalance = "1000000000";
-    //let minAcceptQuorumPct = "1000000000";
-    //let minTime = "1000000000";
-    // let supportRequiredPct = "1000000000";
-    // let voteTime = "1000000000";
-    // let token = "123";
+    let minBalance = "1000000000";
+    let minAcceptQuorumPct = "1000000000";
+    let minTime = "1000000000";
+    let supportRequiredPct = "1000000000";
+    let voteTime = "1000000000";
+    let token = "123";
 
      app = new VotingApp({
       id: address,

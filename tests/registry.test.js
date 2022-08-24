@@ -78,22 +78,22 @@ async function PoolRemoved(poolId, transactionHash, block, timestamp) {
 
 describe('GraphQL Mutations for registry', () => {     
     it('handlePoolAdded should return true', async () => {
-        const {handlePoolAdded : {result}} = await PoolAdded('poolid', 'txhash', 'block', '604800');
+        const {handlePoolAdded : {result}} = await PoolAdded('01', '3b4c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '3b4c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '604800');
         assert.equal(result, true);
-       let pool = await Pool.findOne({ id: 'poolid' });
-       assert.equal(pool.id, 'poolid');
+       let pool = await Pool.findOne({ id: '01' });
+       assert.equal(pool.id, '01');
        assert.equal(pool.addedAt, '604800');
-       assert.equal(pool.addedAtBlock, 'block');
-       assert.equal(pool.addedAtTransaction, 'txhash');
+       assert.equal(pool.addedAtBlock, '3b4c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+       assert.equal(pool.addedAtTransaction, '3b4c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
     })
 
     it('handlePoolRemoved should return true', async () => {
-        const {handlePoolRemoved : {result}} = await PoolRemoved('poolid', 'txhash', 'block', '604800');
+        const {handlePoolRemoved : {result}} = await PoolRemoved('01', '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '604800');
         assert.equal(result, true);
-        let pool = await Pool.findOne({ id: 'poolid' });
-        assert.equal(pool.id, 'poolid');
+        let pool = await Pool.findOne({ id: '01' });
+        assert.equal(pool.id, '01');
         assert.equal(pool.removedAt, '604800');
-        assert.equal(pool.removedAtBlock, 'block');
-        assert.equal(pool.removedAtTransaction, 'txhash');
+        assert.equal(pool.removedAtBlock, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        assert.equal(pool.removedAtTransaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
     })
 });

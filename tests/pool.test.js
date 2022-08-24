@@ -1,5 +1,18 @@
 const chai = require('chai');
 const assert = chai.assert;
+const Pool = require("../models/pool");
+const AddLiquidityEvent = require("../models/addLiquidityEvent");
+const RemoveLiquidityEvent = require("../models/removeLiquidityEvent");
+const RemoveLiquidityOneEvent = require("../models/removeLiquidityOneEvent");
+const Exchange = require("../models/exchange");
+const Coin = require("../models/coin");
+const Token = require("../models/token");
+const AmplificationCoeffChangelog = require("../models/amplificationCoeffChangelog");
+const AdminFeeChangeLog = require("../models/adminFeeChangeLog");
+const FeeChangeLog = require("../models/feeChangeLog");
+const TransferOwnershipEvent = require("../models/transferOwnershipEvent");
+const UnderlyingCoin = require("../models/underlyingCoin");
+const mongoose  = require('mongoose');
 
 require("dotenv").config();
 var { request } = require("graphql-request");
@@ -572,61 +585,192 @@ async function AddLiquidity(
     return response;
   }
 
+  before(async function(){
+    await mongoose.connect(process.env.DATABASE_URL_TEST);
+    // connecting to the database
+    console.log("Connected to the MongoDB server\n\n");
+  });
+
 
 describe('GraphQL Mutations for pool', () => {     
 
   it('handleAddLiquidity should return true', async () => {
-    const {handleAddLiquidity : {result}} = await AddLiquidity("123","123","123","123","123","123","123","123","123","123","123","123");
+    const {handleAddLiquidity : {result}} = await AddLiquidity("1000","100","1000","1000","399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c","604800","22","12","399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c","11","399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c","50");
     assert.equal(result, true);
+    let ale = await AddLiquidityEvent.findOne({ id: 'al-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11' });
+    assert.equal(ale.id, 'al-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11');
+    assert.equal(ale.pool, '1000');
+    assert.equal(ale.provider, '12');
+    assert.equal(ale.tokenAmounts, '1000');
+    assert.equal(ale.fees, '100');
+    assert.equal(ale.invariant, '1000');
+    assert.equal(ale.tokenSupply, '1000');
+    assert.equal(ale.timestamp, '604800');
+    assert.equal(ale.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    assert.equal(ale.transaction, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
 })
 
     it('handleRemoveLiquidity should return true', async () => {
-        const {handleRemoveLiquidity : {result}} = await RemoveLiquidity("123","123","123","123","123","123","123","123","123","123","123");
+        const {handleRemoveLiquidity : {result}} = await RemoveLiquidity("100","100","1000","399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c","604800","22","12","399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c","11","399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c","50");
         assert.equal(result, true);
+        let rle = await RemoveLiquidityEvent.findOne({ id: 'rl-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11' });
+        assert.equal(rle.id, 'rl-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11');
+        assert.equal(rle.pool, '1000');
+        assert.equal(rle.provider, '12');
+        assert.equal(rle.tokenAmounts, '100');
+        assert.equal(rle.fees, '100');
+        assert.equal(rle.tokenSupply, '1000');
+        assert.equal(rle.timestamp, '604800');
+        assert.equal(rle.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        assert.equal(rle.transaction, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
     })
 
     it('handleRemoveLiquidityImbalance should return true', async () => {
-        const {handleRemoveLiquidityImbalance : {result}} = await RemoveLiquidityImbalance("123","123","123","123","123","123","123","123","123","123","123","123");
+        const {handleRemoveLiquidityImbalance : {result}} = await RemoveLiquidityImbalance("100","100","100","1000","399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c","604800","22","12","399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c","11","399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c","50");
         assert.equal(result, true);
+        let rle = await RemoveLiquidityEvent.findOne({ id: 'rli-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11' });
+        assert.equal(rle.id, 'rli-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11');
+        assert.equal(rle.pool, '1000');
+        assert.equal(rle.provider, '12');
+        assert.equal(rle.tokenAmounts, '100');
+        assert.equal(rle.fees, '100');
+        assert.equal(rle.invariant, '100');
+        assert.equal(rle.tokenSupply, '1000');
+        assert.equal(rle.timestamp, '604800');
+        assert.equal(rle.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        assert.equal(rle.transaction, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
     })
     
     it('handleRemoveLiquidityOne should return true', async () => {
-        const {handleRemoveLiquidityOne : {result}} = await RemoveLiquidityOne("123","123","123","123","123","123","123","123","123","123");
+        const {handleRemoveLiquidityOne : {result}} = await RemoveLiquidityOne("100","100","399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c","604800","22","12","399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c","11","399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c","50");
         assert.equal(result, true);
+        let rloe = await RemoveLiquidityOneEvent.findOne({ id: 'rlo-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11' });
+        assert.equal(rloe.id, 'rlo-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11');
+        assert.equal(rloe.pool, '1000');
+        assert.equal(rloe.provider, '12');
+        assert.equal(rloe.tokenAmount, '100');
+        assert.equal(rloe.coinAmount, '100');
+        assert.equal(rloe.timestamp, '604800');
+        assert.equal(rloe.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        assert.equal(rloe.transaction, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
     })
 
     it('handleTokenExchange should return true', async () => {
-        const {handleTokenExchange : {result}} = await TokenExchange("123", "123", "123", "123", "123", "123", "0", "123", "1","123")
+        const {handleTokenExchange : {result}} = await TokenExchange("01", "399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c", "399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c", "604800", "11", "buyer", "1", "100", "1","100")
         assert.equal(result, true);
-    })
-    it('handleTokenExchangeUnderlying should return true', async () => {
-        const {handleTokenExchangeUnderlying : {result}} = await TokenExchangeUnderlying("123", "123", "123", "123", "123", "123", "0", "123", "1","123");
-        assert.equal(result, true);
+        let exchange = await Exchange.findOne({ id: 'e-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11' });
+        assert.equal(exchange.id, 'e-399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-11');
+        assert.equal(exchange.pool, '1000');
+        assert.equal(exchange.buyer, 'buyer');
+        assert.equal(exchange.receiver, 'buyer');
+        assert.equal(exchange.tokenSold, '4');
+        assert.equal(exchange.tokenBought, '4');
+        assert.equal(exchange.amountSold, '100');
+        assert.equal(exchange.amountBought, '100');
+        assert.equal(exchange.timestamp, '604800');
+        assert.equal(exchange.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        assert.equal(exchange.transaction, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
     })
 
-    it('handleNewAdmin should return true', async () => {
-        const {handleNewAdmin : {result}} = await NewAdmin("123", "123", "123", "123", "123","123");
-        assert.equal(result, true);
-    })
+    // it('handleTokenExchangeUnderlying should return true', async () => {
+    //     const {handleTokenExchangeUnderlying : {result}} = await TokenExchangeUnderlying("123", "123", "123", "123", "123", "123", "0", "123", "1","123");
+    //     assert.equal(result, true);
+    //     let exchange = await Exchange.findOne({ id: '01-01' });
+    //     assert.equal(exchange.id, '01-01');
+    //     assert.equal(exchange.pool, '1000');
+    //     assert.equal(exchange.buyer, '1000');
+    //     assert.equal(exchange.receiver, '604800');
+    //     assert.equal(exchange.tokenSold, '01-01');
+    //     assert.equal(exchange.tokenBought, '1000');
+    //     assert.equal(exchange.amountSold, '1000');
+    //     assert.equal(exchange.amountBought, '1000');
+    //     assert.equal(exchange.timestamp, '604800');
+    //     assert.equal(exchange.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    //     assert.equal(exchange.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    // })
+
+    // it('handleNewAdmin should return true', async () => {
+    //     const {handleNewAdmin : {result}} = await NewAdmin("123", "123", "123", "123", "123","123");
+    //     assert.equal(result, true);
+    //     let transfer = await TransferOwnershipEvent.findOne({ id: '01-01' });
+    //     assert.equal(transfer.id, '01-01');
+    //     assert.equal(transfer.pool, '1000');
+    //     assert.equal(transfer.newAdmin, '1000');
+    //     assert.equal(transfer.timestamp, '604800');
+    //     assert.equal(transfer.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    //     assert.equal(transfer.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    // })
     
-    it('handleNewFee should return true', async () => {
-        const {handleNewFee : {result}} = await NewFee("123", "123", "123", "123", "123","123","123")
-        assert.equal(result, true);
-    })
+    // it('handleNewFee should return true', async () => {
+    //     const {handleNewFee : {result}} = await NewFee("123", "123", "123", "123", "123","123","123")
+    //     assert.equal(result, true);
+    //     let admin = await AdminFeeChangeLog.findOne({ id: '01-01' });
+    //     assert.equal(admin.id, '01-01');
+    //     assert.equal(admin.pool, '1000');
+    //     assert.equal(admin.value, '1000');
+    //     assert.equal(admin.timestamp, '604800');
+    //     assert.equal(admin.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    //     assert.equal(admin.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
 
-    it('handleNewParameters should return true', async () => {
-        const {handleNewParameters : {result}} = await NewParameters("123", "123", "123", "123", "123","123","123","123");
-        assert.equal(result, true);
-    })
-    it('handleRampA should return true', async () => {
-        const {handleRampA : {result}} = await RampA("123", "123", "123", "123", "123","123");
-        assert.equal(result, true);
-    })
+    //     let fee = await FeeChangeLog.findOne({ id: '01-01' });
+    //     assert.equal(fee.id, '01-01');
+    //     assert.equal(fee.pool, '1000');
+    //     assert.equal(fee.value, '1000');
+    //     assert.equal(fee.timestamp, '604800');
+    //     assert.equal(fee.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    //     assert.equal(fee.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    // })
 
-    it('handleStopRampA should return true', async () => {
-        const {handleStopRampA : {result}} = await  StopRampA("123", "123", "123", "123", "123","123");
-        assert.equal(result, true);
-    })
+    // it('handleNewParameters should return true', async () => {
+    //     const {handleNewParameters : {result}} = await NewParameters("123", "123", "123", "123", "123","123","123","123");
+    //     assert.equal(result, true);
+    //     let admin = await AdminFeeChangeLog.findOne({ id: '01-01' });
+    //     assert.equal(admin.id, '01-01');
+    //     assert.equal(admin.pool, '1000');
+    //     assert.equal(admin.value, '1000');
+    //     assert.equal(admin.timestamp, '604800');
+    //     assert.equal(admin.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    //     assert.equal(admin.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+
+    //     let amp = await AmplificationCoeffChangelog.findOne({ id: '01-01' });
+    //     assert.equal(amp.id, '01-01');
+    //     assert.equal(amp.pool, '1000');
+    //     assert.equal(amp.value, '1000');
+    //     assert.equal(amp.timestamp, '604800');
+    //     assert.equal(amp.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    //     assert.equal(amp.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+
+    //     let fee = await FeeChangeLog.findOne({ id: '01-01' });
+    //     assert.equal(fee.id, '01-01');
+    //     assert.equal(fee.pool, '1000');
+    //     assert.equal(fee.value, '1000');
+    //     assert.equal(fee.timestamp, '604800');
+    //     assert.equal(fee.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    //     assert.equal(fee.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    // })
+    // it('handleRampA should return true', async () => {
+    //     const {handleRampA : {result}} = await RampA("123", "123", "123", "123", "123","123");
+    //     assert.equal(result, true);
+    //     let amp = await AmplificationCoeffChangelog.findOne({ id: '01-01' });
+    //     assert.equal(amp.id, '01-01');
+    //     assert.equal(amp.pool, '1000');
+    //     assert.equal(amp.value, '1000');
+    //     assert.equal(amp.timestamp, '604800');
+    //     assert.equal(amp.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    //     assert.equal(amp.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    // })
+
+    // it('handleStopRampA should return true', async () => {
+    //     const {handleStopRampA : {result}} = await  StopRampA("123", "123", "123", "123", "123","123");
+    //     assert.equal(result, true);
+    //     let amp = await AmplificationCoeffChangelog.findOne({ id: '01-01' });
+    //     assert.equal(amp.id, '01-01');
+    //     assert.equal(amp.pool, '1000');
+    //     assert.equal(amp.value, '1000');
+    //     assert.equal(amp.timestamp, '604800');
+    //     assert.equal(amp.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    //     assert.equal(amp.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    // })
 
 });
 

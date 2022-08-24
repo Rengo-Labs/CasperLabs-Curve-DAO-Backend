@@ -3,6 +3,10 @@ const assert = chai.assert;
 
 require("dotenv").config();
 var { request } = require("graphql-request");
+const mongoose  = require('mongoose');
+const GaugeDeposit = require("../models/gaugeDeposit");
+const GaugeLiquidity = require("../models/gaugeLiquidity");
+const GaugeWithdraw = require("../models/gaugeWithdraw");
 
 async function UpdateLiquidityLimit(
     user,
@@ -130,19 +134,44 @@ async function Withdraw(provider, id, value, transactionHash, logIndex) {
     return response;
   }
 
+  before(async function(){
+    await mongoose.connect(process.env.DATABASE_URL_TEST);
+    // connecting to the database
+    console.log("Connected to the MongoDB server\n\n");
+  });
+
 describe('GraphQL Mutations for Gauge', () => {     
     it('handleUpdateLiquidityLimit should return true', async () => {
-        const {handleUpdateLiquidityLimit : {result}} = await UpdateLiquidityLimit('user', 'id', '1000', '10000','2000','20000','txhash', 'block', '604800');
+        const {handleUpdateLiquidityLimit : {result}} = await UpdateLiquidityLimit('user', '01', '1000', '1000','2000','2000','388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '604800');
         assert.equal(result, true);
+        let gauge = await GaugeLiquidity.findOne({ id: 'user-01' });
+        assert.equal(gauge.id, 'user-01');
+        assert.equal(gauge.originalBalance, '1000');
+        assert.equal(gauge.originalSupply, '1000');
+        assert.equal(gauge.workingBalance, '2000');
+        assert.equal(gauge.workingSupply, '2000');
+        assert.equal(gauge.timestamp, '604800');
+        assert.equal(gauge.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        assert.equal(gauge.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
     })
 
     it('handleDeposit should return true', async () => {
-        const {handleDeposit : {result}} = await Deposit('provider', 'id', 'value', 'txHash', 'logIndex');
+        const {handleDeposit : {result}} = await Deposit('provider', '01', '1000', '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '22');
         assert.equal(result, true);
+        let deposit = await GaugeDeposit.findOne({ id: '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-22' });
+        assert.equal(deposit.id, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-22');
+        assert.equal(deposit.gauge, '01');
+        assert.equal(deposit.provider, 'provider');
+        assert.equal(deposit.value, '1000');
     })
 
     it('handleWithdraw should return true', async () => {
-        const {handleWithdraw : {result}} = await Withdraw('provider', 'id', 'value', 'txHash', 'logIndex');
+        const {handleWithdraw : {result}} = await Withdraw('provider', '01', '1000', '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '21');
         assert.equal(result, true);
+        let withdraw = await GaugeWithdraw.findOne({ id: '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-21' });
+        assert.equal(withdraw.id, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-21');
+        assert.equal(withdraw.gauge, '01');
+        assert.equal(withdraw.provider, 'provider');
+        assert.equal(withdraw.value, '1000');
     })
 });
