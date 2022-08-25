@@ -3,12 +3,15 @@ const { GraphQLSchema, GraphQLObjectType } = require("graphql");
 
 // Import queries
 const { responses, response, 
-  gaugeVotes, 
+  gaugeVotesByTime,
+  gaugeVotesByUser, 
   votingEscrows, 
-  daoPowers, 
+  daoPowersByBlock,
+  daoPowersByTimestamp, 
   votingPower, 
   gauges, 
-  userBalances 
+  userBalancesByUnlockTime,
+  userBalancesByWeight,
 } = require("./queries");
 
 // Import mutations
@@ -78,12 +81,15 @@ const QueryType = new GraphQLObjectType({
   fields: {
     responses,
     response,
-    gaugeVotes,
+    gaugeVotesByTime,
+    gaugeVotesByUser, 
     votingEscrows, 
-    daoPowers,
+    daoPowersByBlock,
+    daoPowersByTimestamp, 
     votingPower, 
     gauges, 
-    userBalances
+    userBalancesByUnlockTime,
+    userBalancesByWeight,
   },
 });
 
