@@ -53,19 +53,21 @@ async function NewProxyApp(
 
 module.exports = describe('GraphQL Mutations for Kernel', () => {     
     it('handleNewProxyApp should return true', async () => {
-        const {handleNewProxyApp : {result}} = await NewProxyApp('03', '5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d1', 'context', '5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d5','5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d5','604800');
+        const {handleNewProxyApp : {result}} = await NewProxyApp('0x2436adbbb3230545df6846695013211d36736f647c91b302b9591e5e2d013485', '5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d1', 'context', '5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d5','5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d5','604800');
+        debugger;
         assert.equal(result, true);
-        let contract = await Contract.findOne({ id: '03' });
-        assert.equal(contract.id, '03');
-        assert.equal(contract.added, '604800');
-        assert.equal(contract.addedAtBlock, '5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d5');
-        assert.equal(contract.addedAtTransaction, '5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d5');
-        assert.equal(contract.modified, '604800');
-        assert.equal(contract.modifiedAtBlock, '5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d5');
-        assert.equal(contract.modifiedAtTransaction, '5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d5');
+        let contract1 = await Contract.findOne({ id: 'Ownership' });
         
-        let contractVersion = await ContractVersion.findOne({id: '01-2'});
-        assert.equal(contractVersion.id, '01-2');
+          assert.equal(contract1.id, 'Ownership');
+          assert.equal(contract1.added, '604800');
+          assert.equal(contract1.addedAtBlock, '5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d5');
+          assert.equal(contract1.addedAtTransaction, '5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d5');
+          assert.equal(contract1.modified, '604800');
+          assert.equal(contract1.modifiedAtBlock, '5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d5');
+          assert.equal(contract1.modifiedAtTransaction, '5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d5');
+          
+          let contractVersion = await ContractVersion.findOne({id: 'Ownership-1'});
+        assert.equal(contractVersion.id, 'Ownership-1');
         assert.equal(contractVersion.address, '5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d1');
         assert.equal(contractVersion.added, '604800');
         assert.equal(contractVersion.addedAtBlock, '5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d5');

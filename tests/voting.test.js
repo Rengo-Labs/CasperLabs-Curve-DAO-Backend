@@ -328,7 +328,7 @@ async function ExecuteVote(address, voteId, timestamp, block, transactionHash) {
         let voting = await VotingApp.findOne({ id: '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c' });
           assert.equal(voting.id, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
           assert.equal(voting.address, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-          assert.equal(voting.voteCount, '7');
+          assert.equal(voting.voteCount, '1');
      })
 
     it('handleExecuteVote should return true', async () => {
