@@ -19,12 +19,12 @@ const {
   CHAIN_NAME,
   VOTING_ESCROW_MASTER_KEY_PAIR_PATH,
   VOTING_ESCROW_PAYMENT_AMOUNT,
-  T,
-  ADDRESS,
-  IDX,
-  VALUE,
-  UNLOCK_TIME,
-  BLOCK,
+  VOTING_ESCROW_T,
+  VOTING_ESCROW_ADDRESS,
+  VOTING_ESCROW_IDX,
+  VOTING_ESCROW_VALUE,
+  VOTING_ESCROW_UNLOCK_TIME,
+  VOTING_ESCROW_BLOCK,
   VOTINGESCROW_CONTRACT_HASH
 } = process.env;
 
@@ -59,7 +59,7 @@ const test = async () => {
   // //commitTransferOwnership
   // const commitTransferOwnershipDeployHash = await votingEscrow.commitTransferOwnership(
   //   KEYS!,
-  //   //ADDRESS!,
+  //   //VOTING_ESCROW_ADDRESS!,
   //   KEYS.publicKey,
   //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
@@ -81,7 +81,7 @@ const test = async () => {
   // //getLastUserSlopeJsClient
   // const getLastUserSlopeJsClientDeployHash = await votingEscrow.getLastUserSlopeJsClient(
   //   KEYS!,
-  //   //ADDRESS!,
+  //   //VOTING_ESCROW_ADDRESS!,
   //   KEYS.publicKey,
   //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
@@ -93,9 +93,9 @@ const test = async () => {
   // //userPointHistoryTsJsclient
   // const userPointHistoryTsJsclientDeployHash = await votingEscrow.userPointHistoryTsJsclient(
   //   KEYS!,
-  //   //ADDRESS!,
+  //   //VOTING_ESCROW_ADDRESS!,
   //   KEYS.publicKey,
-  //   IDX!,
+  //   VOTING_ESCROW_IDX!,
   //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
   // console.log("... userPointHistoryTsJsclient deploy hash: ", userPointHistoryTsJsclientDeployHash);
@@ -106,7 +106,7 @@ const test = async () => {
   // //lockedEndJsClient
   // const lockedEndJsClientDeployHash = await votingEscrow.lockedEndJsClient(
   //   KEYS!,
-  //   //ADDRESS!,
+  //   //VOTING_ESCROW_ADDRESS!,
   //   KEYS.publicKey,
   //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
@@ -128,8 +128,8 @@ const test = async () => {
   // //depositFor
   // const depositForDeployHash = await votingEscrow.depositFor(
   //   KEYS,
-  //   ADDRESS!,
-  //   VALUE!,
+  //   VOTING_ESCROW_ADDRESS!,
+  //   VOTING_ESCROW_VALUE!,
   //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
   // console.log("... depositFor deploy hash: ", depositForDeployHash);
@@ -140,8 +140,8 @@ const test = async () => {
   //createlock
   // const createlockDeployHash = await votingEscrow.createlock(
   //   KEYS!,
-  //   VALUE!,
-  //   UNLOCK_TIME!,
+  //   VOTING_ESCROW_VALUE!,
+  //   VOTING_ESCROW_UNLOCK_TIME!,
   //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
   // console.log("... createlock deploy hash: ", createlockDeployHash);
@@ -152,7 +152,7 @@ const test = async () => {
 //   //increaseAmount
 //   const increaseAmountDeployHash = await votingEscrow.increaseAmount(
 //     KEYS,
-//     VALUE!,
+//     VOTING_ESCROW_VALUE!,
 //     VOTING_ESCROW_PAYMENT_AMOUNT!
 //   );
 //   console.log("... increaseAmount deploy hash: ", increaseAmountDeployHash);
@@ -163,7 +163,7 @@ const test = async () => {
 //   //increaseUnlockTime
 //   const increaseUnlockTimeDeployHash = await votingEscrow.increaseUnlockTime(
 //     KEYS,
-//     UNLOCK_TIME!,
+//     VOTING_ESCROW_UNLOCK_TIME!,
 //     VOTING_ESCROW_PAYMENT_AMOUNT!
 //   );
 //   console.log("... increaseUnlockTime deploy hash: ", increaseUnlockTimeDeployHash);
@@ -186,9 +186,9 @@ const test = async () => {
 //   //balanceOfJsClient
   // const balanceOfJsClientDeployHash = await votingEscrow.balanceOfJsClient(
   //   KEYS,
-  //   //ADDRESS!,
+  //   //VOTING_ESCROW_ADDRESS!,
   //   KEYS.publicKey,
-  //   T!,
+  //   VOTING_ESCROW_T!,
   //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
   // console.log("... balanceOfJsClient deploy hash: ", balanceOfJsClientDeployHash);
@@ -200,9 +200,9 @@ const test = async () => {
 //  //balanceOfAtJsClient
 //  const balanceOfAtJsClientDeployHash = await votingEscrow.balanceOfAtJsClient(
 //    KEYS,
-//    //ADDRESS!,
+//    //VOTING_ESCROW_ADDRESS!,
 //    KEYS.publicKey,
-//    BLOCK!,
+//    VOTING_ESCROW_BLOCK!,
 //    VOTING_ESCROW_PAYMENT_AMOUNT!
 //   );
 //   console.log("... balanceOfAtJsClient deploy hash: ", balanceOfAtJsClientDeployHash);
@@ -214,7 +214,7 @@ const test = async () => {
 //   //totalSupplyJsClient
   const totalSupplyJsClientDeployHash = await votingEscrow.totalSupplyJsClient(
     KEYS,
-    T!,
+    VOTING_ESCROW_T!,
     VOTING_ESCROW_PAYMENT_AMOUNT!
   );
   console.log("... totalSupplyJsClient deploy hash: ", totalSupplyJsClientDeployHash);
@@ -226,7 +226,7 @@ const test = async () => {
 //   //totalSupplyAtJsClient
   // const totalSupplyAtJsClientDeployHash = await votingEscrow.totalSupplyAtJsClient(
   //   KEYS,
-  //   BLOCK!,
+  //   VOTING_ESCROW_BLOCK!,
   //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
   // console.log("... totalSupplyAtJsClient deploy hash: ", totalSupplyAtJsClientDeployHash);
@@ -238,7 +238,7 @@ const test = async () => {
 //   //changeController
   // const changeControllerDeployHash = await votingEscrow.changeController(
   //   KEYS,
-  //   //NEW_CONTROLLER!,
+  //   //VOTING_ESCROW_NEW_CONTROLLER!,
   //   KEYS.publicKey,
   //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );

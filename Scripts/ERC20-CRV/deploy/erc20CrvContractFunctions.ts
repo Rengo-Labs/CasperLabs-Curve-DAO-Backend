@@ -21,13 +21,13 @@ const {
   
   ERC20CRV_MASTER_KEY_PAIR_PATH,
   ERC20CRV_PAYMENT_AMOUNT,
-  VALUE,
+  ERC20CRV_VALUE,
   ERC20CRV_CONTRACT_HASH,
-  SPENDER,
-  AMOUNT,
-  START,
-  END,
-  RECIPIENT,
+  ERC20CRV_SPENDER,
+  ERC20CRV_AMOUNT,
+  ERC20CRV_START,
+  ERC20CRV_END,
+  ERC20CRV_RECIPIENT,
 
 } = process.env;
 
@@ -74,7 +74,7 @@ const test = async () => {
  //burn
  const burnDeployHash = await erc20Crv.burn(
   KEYS!,
-  VALUE!,
+  ERC20CRV_VALUE!,
   ERC20CRV_PAYMENT_AMOUNT!
  );
  console.log("... burn deploy hash: ", burnDeployHash);
@@ -126,8 +126,8 @@ const test = async () => {
  //mintableInTimeframeJsClient
  const mintableInTimeframeJsClientDeployHash = await erc20Crv.mintableInTimeframeJsClient(
   KEYS!,
-  START!,
-  END!,
+  ERC20CRV_START!,
+  ERC20CRV_END!,
   ERC20CRV_PAYMENT_AMOUNT!
  );
  console.log("... mintableInTimeframeJsClient deploy hash: ", mintableInTimeframeJsClientDeployHash);
@@ -149,7 +149,7 @@ const test = async () => {
  const mintJsClientDeployHash = await erc20Crv.mintJsClient(
   KEYS!,
   KEYS.publicKey,
-  AMOUNT!,
+  ERC20CRV_AMOUNT!,
   ERC20CRV_PAYMENT_AMOUNT!
  );
  console.log("... mintJsClient deploy hash: ", mintJsClientDeployHash);
@@ -161,8 +161,8 @@ const test = async () => {
  const transferFromDeployHash = await erc20Crv.transferFrom(
   KEYS!,
   KEYS.publicKey,
-  RECIPIENT!,
-  AMOUNT!,
+  ERC20CRV_RECIPIENT!,
+  ERC20CRV_AMOUNT!,
   ERC20CRV_PAYMENT_AMOUNT!
  );
  console.log("... transferFrom deploy hash: ", transferFromDeployHash);
@@ -173,8 +173,8 @@ const test = async () => {
  //approve
  const approveDeployHash = await erc20Crv.approve(
   KEYS!,
-  SPENDER!,
-  AMOUNT!,
+  ERC20CRV_SPENDER!,
+  ERC20CRV_AMOUNT!,
   ERC20CRV_PAYMENT_AMOUNT!
  );
  console.log("... approve deploy hash: ", approveDeployHash);
@@ -185,8 +185,8 @@ const test = async () => {
  //transfer
  const transferDeployHash = await erc20Crv.transfer(
   KEYS!,
-  RECIPIENT!,
-  AMOUNT!,
+  ERC20CRV_RECIPIENT!,
+  ERC20CRV_AMOUNT!,
   ERC20CRV_PAYMENT_AMOUNT!
  );
  console.log("... transfer deploy hash: ", transferDeployHash);

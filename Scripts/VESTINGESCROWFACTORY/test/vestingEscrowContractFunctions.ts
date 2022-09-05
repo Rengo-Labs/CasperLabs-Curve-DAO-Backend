@@ -22,13 +22,13 @@ const {
   VESTING_ESCROW_FACTORY_MASTER_KEY_PAIR_PATH,
   VESTING_ESCROW_FACTORY_PAYMENT_AMOUNT,
   VESTINGESCROWFACTORY_CONTRACT_HASH,
-  TOKEN,
-  AMOUNT,
-  VESTING_DURATION,
-  VESTING_START,
-  RECIPIENT,
-  START_TIME,
-  END_TIME,
+  VESTING_ESCROW_FACTORY_TOKEN,
+  VESTING_ESCROW_FACTORY_AMOUNT,
+  VESTING_ESCROW_FACTORY_VESTING_DURATION,
+  VESTING_ESCROW_FACTORY_VESTING_START,
+  VESTING_ESCROW_FACTORY_RECIPIENT,
+  VESTING_ESCROW_FACTORY_START_TIME,
+  VESTING_ESCROW_FACTORY_END_TIME,
 } = process.env;
 
 
@@ -124,12 +124,12 @@ const test = async () => {
   //deployVestingContract
  const deployVestingContractDeployHash = await vestingEscrowFactory.deployVestingContract(
   KEYS!,
-  TOKEN!,
+  VESTING_ESCROW_FACTORY_TOKEN!,
   KEYS.publicKey,
-  AMOUNT!,
+  VESTING_ESCROW_FACTORY_AMOUNT!,
   true,
-  VESTING_DURATION!,
-  VESTING_START!,
+  VESTING_ESCROW_FACTORY_VESTING_DURATION!,
+  VESTING_ESCROW_FACTORY_VESTING_START!,
   VESTING_ESCROW_FACTORY_PAYMENT_AMOUNT!
  );
  console.log("... deployVestingContract deploy hash: ", deployVestingContractDeployHash);
@@ -145,11 +145,11 @@ const test = async () => {
  const initializeDeployHash = await vestingEscrowFactory.initialize(
   KEYS!,
   KEYS.publicKey,
-  TOKEN!,
-  RECIPIENT!,
-  AMOUNT!,
-  START_TIME!,
-  END_TIME!,
+  VESTING_ESCROW_FACTORY_TOKEN!,
+  VESTING_ESCROW_FACTORY_RECIPIENT!,
+  VESTING_ESCROW_FACTORY_AMOUNT!,
+  VESTING_ESCROW_FACTORY_START_TIME!,
+  VESTING_ESCROW_FACTORY_END_TIME!,
   true,
   VESTING_ESCROW_FACTORY_PAYMENT_AMOUNT!
  );
@@ -161,7 +161,7 @@ const test = async () => {
  //toggleDisable
  const toggleDisableDeployHash = await vestingEscrowFactory.toggleDisable(
   KEYS!,
-  RECIPIENT!,
+  VESTING_ESCROW_FACTORY_RECIPIENT!,
   VESTING_ESCROW_FACTORY_PAYMENT_AMOUNT!
  );
  console.log("... toggleDisable deploy hash: ", toggleDisableDeployHash);
@@ -182,7 +182,7 @@ const test = async () => {
   //vestedOf
  const vestedOfDeployHash = await vestingEscrowFactory.vestedOf(
   KEYS!,
-  RECIPIENT!,
+  VESTING_ESCROW_FACTORY_RECIPIENT!,
   VESTING_ESCROW_FACTORY_PAYMENT_AMOUNT!
  );
  console.log("... vestedOf deploy hash: ", vestedOfDeployHash);
@@ -193,7 +193,7 @@ const test = async () => {
   //balanceOf
  const balanceOfDeployHash = await vestingEscrowFactory.balanceOf(
   KEYS!,
-  RECIPIENT!,
+  VESTING_ESCROW_FACTORY_RECIPIENT!,
   VESTING_ESCROW_FACTORY_PAYMENT_AMOUNT!
  );
  console.log("... balanceOf deploy hash: ", balanceOfDeployHash);
@@ -224,7 +224,7 @@ const test = async () => {
  //lockedOf
  const lockedOfDeployHash = await vestingEscrowFactory.lockedOf(
   KEYS!,
-  RECIPIENT!,
+  VESTING_ESCROW_FACTORY_RECIPIENT!,
   VESTING_ESCROW_FACTORY_PAYMENT_AMOUNT!
  );
  console.log("... lockedOf deploy hash: ", lockedOfDeployHash);

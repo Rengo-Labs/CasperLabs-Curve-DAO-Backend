@@ -21,17 +21,17 @@ const {
   
   LIQUIDITY_GAUGE_V3_MASTER_KEY_PAIR_PATH,
   LIQUIDITY_GAUGE_V3_PAYMENT_AMOUNT,
-  ADDRESS,
-  VALUE,
+  LIQUIDITY_GAUGE_V3_ADDRESS,
+  LIQUIDITY_GAUGE_V3_VALUE,
   LIQUIDITYGAUGEV3_CONTRACT_HASH,
-  TOKEN,
-  RECEIVER,
-  TO,
-  FROM,
-  SPENDER,
-  AMOUNT,
-  REWARD_CONTRACT,
-  CLAIM_SIG,
+  LIQUIDITY_GAUGE_V3_TOKEN,
+  LIQUIDITY_GAUGE_V3_RECEIVER,
+  LIQUIDITY_GAUGE_V3_TO,
+  LIQUIDITY_GAUGE_V3_FROM,
+  LIQUIDITY_GAUGE_V3_SPENDER,
+  LIQUIDITY_GAUGE_V3_AMOUNT,
+  LIQUIDITY_GAUGE_V3_REWARD_CONTRACT,
+  LIQUIDITY_GAUGE_V3_CLAIM_SIG,
 } = process.env;
 
 
@@ -119,7 +119,7 @@ const test = async () => {
  const claimedRewardDeployHash = await liquidityGaugeV3.claimedReward(
   KEYS!,
   KEYS.publicKey,
-  TOKEN!,
+  LIQUIDITY_GAUGE_V3_TOKEN!,
   LIQUIDITY_GAUGE_V3_PAYMENT_AMOUNT!
  );
  console.log("... claimedReward deploy hash: ", claimedRewardDeployHash);
@@ -131,7 +131,7 @@ const test = async () => {
  const claimableRewardDeployHash = await liquidityGaugeV3.claimableReward(
   KEYS!,
   KEYS.publicKey,
-  TOKEN!,
+  LIQUIDITY_GAUGE_V3_TOKEN!,
   LIQUIDITY_GAUGE_V3_PAYMENT_AMOUNT!
  );
  console.log("... claimableReward deploy hash: ", claimableRewardDeployHash);
@@ -143,7 +143,7 @@ const test = async () => {
  const claimableRewardWriteDeployHash = await liquidityGaugeV3.claimableRewardWrite(
   KEYS!,
   KEYS.publicKey,
-  TOKEN!,
+  LIQUIDITY_GAUGE_V3_TOKEN!,
   LIQUIDITY_GAUGE_V3_PAYMENT_AMOUNT!
  );
  console.log("... claimableRewardWrite deploy hash: ", claimableRewardWriteDeployHash);
@@ -154,7 +154,7 @@ const test = async () => {
  //setRewardsReceiver
  const setRewardsReceiverDeployHash = await liquidityGaugeV3.setRewardsReceiver(
   KEYS!,
-  RECEIVER!,
+  LIQUIDITY_GAUGE_V3_RECEIVER!,
   LIQUIDITY_GAUGE_V3_PAYMENT_AMOUNT!
  );
  console.log("... setRewardsReceiver deploy hash: ", setRewardsReceiverDeployHash);
@@ -165,7 +165,7 @@ const test = async () => {
   //kick
  const kickDeployHash = await liquidityGaugeV3.kick(
   KEYS!,
-  //ADDRESS!,
+  //LIQUIDITY_GAUGE_V3_ADDRESS!,
   KEYS.publicKey,
   LIQUIDITY_GAUGE_V3_PAYMENT_AMOUNT!
  );
@@ -177,8 +177,8 @@ const test = async () => {
  //deposit
  const depositDeployHash = await liquidityGaugeV3.deposit(
   KEYS!,
-  VALUE!,
-  //ADDRESS!,
+  LIQUIDITY_GAUGE_V3_VALUE!,
+  //LIQUIDITY_GAUGE_V3_ADDRESS!,
   KEYS.publicKey,
   true,
   LIQUIDITY_GAUGE_V3_PAYMENT_AMOUNT!
@@ -191,7 +191,7 @@ const test = async () => {
   //withdraw
  const withdrawDeployHash = await liquidityGaugeV3.withdraw(
   KEYS!,
-  VALUE!,
+  LIQUIDITY_GAUGE_V3_VALUE!,
   true,
   LIQUIDITY_GAUGE_V3_PAYMENT_AMOUNT!
  );
@@ -203,8 +203,8 @@ const test = async () => {
  //transfer
  const transferDeployHash = await liquidityGaugeV3.transfer(
   KEYS!,
-  TO!,
-  VALUE!,
+  LIQUIDITY_GAUGE_V3_TO!,
+  LIQUIDITY_GAUGE_V3_VALUE!,
   LIQUIDITY_GAUGE_V3_PAYMENT_AMOUNT!
  );
  console.log("... transfer deploy hash: ", transferDeployHash);
@@ -215,9 +215,9 @@ const test = async () => {
  //transferFrom
  const transferFromDeployHash = await liquidityGaugeV3.transferFrom(
   KEYS!,
-  FROM!,
-  TO!,
-  VALUE!,
+  LIQUIDITY_GAUGE_V3_FROM!,
+  LIQUIDITY_GAUGE_V3_TO!,
+  LIQUIDITY_GAUGE_V3_VALUE!,
   LIQUIDITY_GAUGE_V3_PAYMENT_AMOUNT!
  );
  console.log("... transferFrom deploy hash: ", transferFromDeployHash);
@@ -228,8 +228,8 @@ const test = async () => {
  //approve
  const approveDeployHash = await liquidityGaugeV3.approve(
   KEYS!,
-  SPENDER!,
-  AMOUNT!,
+  LIQUIDITY_GAUGE_V3_SPENDER!,
+  LIQUIDITY_GAUGE_V3_AMOUNT!,
   LIQUIDITY_GAUGE_V3_PAYMENT_AMOUNT!
  );
  console.log("... approve deploy hash: ", approveDeployHash);
@@ -240,8 +240,8 @@ const test = async () => {
  //increaseAllowance
  const increaseAllowanceDeployHash = await liquidityGaugeV3.increaseAllowance(
   KEYS!,
-  SPENDER!,
-  AMOUNT!,
+  LIQUIDITY_GAUGE_V3_SPENDER!,
+  LIQUIDITY_GAUGE_V3_AMOUNT!,
   LIQUIDITY_GAUGE_V3_PAYMENT_AMOUNT!
  );
  console.log("... increaseAllowance deploy hash: ", increaseAllowanceDeployHash);
@@ -252,8 +252,8 @@ const test = async () => {
  //decreaseAllowance
  const decreaseAllowanceDeployHash = await liquidityGaugeV3.decreaseAllowance(
   KEYS!,
-  SPENDER!,
-  AMOUNT!,
+  LIQUIDITY_GAUGE_V3_SPENDER!,
+  LIQUIDITY_GAUGE_V3_AMOUNT!,
   LIQUIDITY_GAUGE_V3_PAYMENT_AMOUNT!
  );
  console.log("... decreaseAllowance deploy hash: ", decreaseAllowanceDeployHash);
@@ -264,8 +264,8 @@ const test = async () => {
  //setRewards
  const setRewardsDeployHash = await liquidityGaugeV3.setRewards(
   KEYS!,
-  REWARD_CONTRACT!,
-  CLAIM_SIG!,
+  LIQUIDITY_GAUGE_V3_REWARD_CONTRACT!,
+  LIQUIDITY_GAUGE_V3_CLAIM_SIG!,
   [''],
   LIQUIDITY_GAUGE_V3_PAYMENT_AMOUNT!
  );
@@ -288,7 +288,7 @@ const test = async () => {
  //comitTransferOwnership
  const comitTransferOwnershipDeployHash = await liquidityGaugeV3.comitTransferOwnership(
   KEYS!,
-  //ADDRESS!,
+  //LIQUIDITY_GAUGE_V3_ADDRESS!,
   KEYS.publicKey,
   LIQUIDITY_GAUGE_V3_PAYMENT_AMOUNT!
  );

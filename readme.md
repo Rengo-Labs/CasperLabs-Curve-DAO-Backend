@@ -37,7 +37,16 @@ casper-client keygen keys
 ```
 #### Paste the keys
 
-Paste the keys folder created by the above command to Scripts/LIQUIDITYTRANSFORMER and Scripts/WISETOKEN folders.
+Paste the keys folder created by the above command to 
+Scripts/ERC20-CRV,
+Scripts/LIQUIDITYGAUGEREWARD,
+Scripts/LIQUIDITYGAUGEV3,
+Scripts/VESTINGESCROWFACTORY,
+Scripts/GAUGECONTROLLER,
+Scripts/MINTER,
+Scripts/VOTINGESCROW,
+Scripts/CURVE-REWARDS
+folders.
 
 #### Fund the key
 
@@ -61,6 +70,8 @@ Use the script file in package.json to perform the deployments
     "deploy:minterFunctions": "ts-node Scripts/MINTER/deploy/minterContractFunctions.ts",
     "deploy:votingEscrow": "ts-node Scripts/VOTINGESCROW/deploy/votingEscrowContract.ts",
     "deploy:votingEscrowFunctions": "ts-node Scripts/VOTINGESCROW/deploy/votingEscrowContractFunctions.ts",
+    "deploy:curveRewards": "ts-node Scripts/CURVE-REWARDS/deploy/curveRewardsContract.ts",
+    "deploy:curveRewardsFunctions": "ts-node Scripts/CURVE-REWARDS/deploy/curveRewardsContractFunctions.ts"
   },
 
 Use the following commands to perform deployments
@@ -89,3 +100,6 @@ npm run deploy:minterFunctions
 
 npm run test:votingEscrow
 npm run test:votingEscrowFunctions
+
+npm run test:curveRewards
+npm run test:curveRewardsFunctions

@@ -21,10 +21,10 @@ const {
   
   LIQUIDITY_GAUGE_REWARD_MASTER_KEY_PAIR_PATH,
   LIQUIDITY_GAUGE_REWARD_PAYMENT_AMOUNT,
-  ADDRESS,
-  VALUE,
+  LIQUIDITY_GAUGE_REWARD_ADDRESS,
+  LIQUIDITY_GAUGE_REWARD_VALUE,
   LIQUIDITYGAUGEREWARD_CONTRACT_HASH,
-  CAN_DEPOSIT,
+  LIQUIDITY_GAUGE_REWARD_CAN_DEPOSIT,
 } = process.env;
 
 
@@ -60,7 +60,7 @@ const test = async () => {
   //userCheckpointJsClient
   const userCheckpointJsClientDeployHash = await liquidityGaugeReward.userCheckpointJsClient(
     KEYS!,
-    //ADDRESS!,
+    //LIQUIDITY_GAUGE_REWARD_ADDRESS!,
     KEYS.publicKey,
     LIQUIDITY_GAUGE_REWARD_PAYMENT_AMOUNT!
   );
@@ -72,7 +72,7 @@ const test = async () => {
   //claimableTokensJsClient
   const claimableTokensJsClientDeployHash = await liquidityGaugeReward.claimableTokensJsClient(
     KEYS!,
-    //ADDRESS!,
+    //LIQUIDITY_GAUGE_REWARD_ADDRESS!,
     KEYS.publicKey,
     LIQUIDITY_GAUGE_REWARD_PAYMENT_AMOUNT!
   );
@@ -84,7 +84,7 @@ const test = async () => {
   //claimableRewardJsClient
   const claimableRewardJsClientDeployHash = await liquidityGaugeReward.claimableRewardJsClient(
     KEYS!,
-    //ADDRESS!,
+    //LIQUIDITY_GAUGE_REWARD_ADDRESS!,
     KEYS.publicKey,
     LIQUIDITY_GAUGE_REWARD_PAYMENT_AMOUNT!
   );
@@ -96,7 +96,7 @@ const test = async () => {
  //kick
  const kickDeployHash = await liquidityGaugeReward.kick(
   KEYS!,
-  //ADDRESS!,
+  //LIQUIDITY_GAUGE_REWARD_ADDRESS!,
   KEYS.publicKey,
   LIQUIDITY_GAUGE_REWARD_PAYMENT_AMOUNT!
  );
@@ -108,9 +108,9 @@ const test = async () => {
  //setApproveDeposit
  const setApproveDepositDeployHash = await liquidityGaugeReward.setApproveDeposit(
   KEYS!,
-  //ADDRESS!,
+  //LIQUIDITY_GAUGE_REWARD_ADDRESS!,
   KEYS.publicKey,
-  //CAN_DEPOSIT!, //issue
+  //LIQUIDITY_GAUGE_REWARD_CAN_DEPOSIT!, //issue
   true,
   LIQUIDITY_GAUGE_REWARD_PAYMENT_AMOUNT!
  );
@@ -122,8 +122,8 @@ const test = async () => {
  //deposit
  const depositDeployHash = await liquidityGaugeReward.deposit(
   KEYS!,
-  VALUE!,
-  //ADDRESS!,
+  LIQUIDITY_GAUGE_REWARD_VALUE!,
+  //LIQUIDITY_GAUGE_REWARD_ADDRESS!,
   KEYS.publicKey,
   LIQUIDITY_GAUGE_REWARD_PAYMENT_AMOUNT!
  );
@@ -135,7 +135,7 @@ const test = async () => {
  //withdraw
  const withdrawDeployHash = await liquidityGaugeReward.withdraw(
   KEYS!,
-  VALUE!,
+  LIQUIDITY_GAUGE_REWARD_VALUE!,
   true,
   LIQUIDITY_GAUGE_REWARD_PAYMENT_AMOUNT!
  );
@@ -147,7 +147,7 @@ const test = async () => {
  //claimRewards
  const claimRewardsDeployHash = await liquidityGaugeReward.claimRewards(
   KEYS!,
-  //ADDRESS!,
+  //LIQUIDITY_GAUGE_REWARD_ADDRESS!,
   KEYS.publicKey,
   LIQUIDITY_GAUGE_REWARD_PAYMENT_AMOUNT!
  );
@@ -179,7 +179,7 @@ const test = async () => {
  //comitTransferOwnership
  const comitTransferOwnershipDeployHash = await liquidityGaugeReward.comitTransferOwnership(
   KEYS!,
-  //ADDRESS!,
+  //LIQUIDITY_GAUGE_REWARD_ADDRESS!,
   KEYS.publicKey,
   LIQUIDITY_GAUGE_REWARD_PAYMENT_AMOUNT!
  );

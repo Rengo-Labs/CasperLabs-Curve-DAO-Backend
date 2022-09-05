@@ -20,7 +20,9 @@
     "deploy:minter": "ts-node Scripts/MINTER/deploy/minterContract.ts",
     "deploy:minterFunctions": "ts-node Scripts/MINTER/deploy/minterContractFunctions.ts",
     "deploy:votingEscrow": "ts-node Scripts/VOTINGESCROW/deploy/votingEscrowContract.ts",
-    "deploy:votingEscrowFunctions": "ts-node Scripts/VOTINGESCROW/deploy/votingEscrowContractFunctions.ts"
+    "deploy:votingEscrowFunctions": "ts-node Scripts/VOTINGESCROW/deploy/votingEscrowContractFunctions.ts",
+    "deploy:curveRewards": "ts-node Scripts/CURVE-REWARDS/deploy/curveRewardsContract.ts",
+    "deploy:curveRewardsFunctions": "ts-node Scripts/CURVE-REWARDS/deploy/curveRewardsContractFunctions.ts"
   },
   "dependencies": {
     "axios": "^0.24.0",
