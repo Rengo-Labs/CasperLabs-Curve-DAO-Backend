@@ -17,7 +17,12 @@ const {
   VOTING_ESCROW_SYMBOL,
   VOTING_ESCROW_VERSION,
   VOTING_ESCROW_TOKEN_ADDR,
-  VOTING_ESCROW_CONTRACT_NAME
+  VOTING_ESCROW_CONTRACT_NAME,
+
+  VOTING_ESCROW_PACKAGE_HASH,
+  VOTING_ESCROW_PROXY_WASM_PATH,
+  VOTING_ESCROW_T,
+  VOTING_ESCROW_TIME
 } = process.env;
 
 const KEYS = Keys.Ed25519.parseKeyFiles(
@@ -71,3 +76,126 @@ const deploy = async () => {
 };
 
 deploy();
+
+const getLastUserSlopeSessionCode = async () => {
+  const votingEscrow = new VOTINGESCROWClient(
+    NODE_ADDRESS!,
+    CHAIN_NAME!,
+    EVENT_STREAM_ADDRESS!
+  );
+
+  const getLastUserSlopeSessionCodeDeployHash = await votingEscrow.getLastUserSlopeSessionCode(
+    KEYS,
+    "get_last_user_slope",
+    VOTING_ESCROW_PACKAGE_HASH!,
+    KEYS.publicKey!,
+    VOTING_ESCROW_INSTALL_PAYMENT_AMOUNT!,
+    VOTING_ESCROW_PROXY_WASM_PATH!
+  );
+
+  console.log(`... getLastUserSlopeSessionCode Function deployHash: ${getLastUserSlopeSessionCodeDeployHash}`);
+
+  await getDeploy(NODE_ADDRESS!, getLastUserSlopeSessionCodeDeployHash);
+
+  console.log(`... getLastUserSlopeSessionCode Function called successfully through sessionCode.`);
+
+};
+//getLastUserSlopeSessionCode();
+
+const balanceOfSessionCode = async () => {
+  const votingEscrow = new VOTINGESCROWClient(
+    NODE_ADDRESS!,
+    CHAIN_NAME!,
+    EVENT_STREAM_ADDRESS!
+  );
+
+  const balanceOfSessionCodeDeployHash = await votingEscrow.balanceOfSessionCode(
+    KEYS,
+    "balance_of",
+    VOTING_ESCROW_PACKAGE_HASH!,
+    KEYS.publicKey!,
+    VOTING_ESCROW_T!,
+    VOTING_ESCROW_INSTALL_PAYMENT_AMOUNT!,
+    VOTING_ESCROW_PROXY_WASM_PATH!
+  );
+
+  console.log(`... balanceOfSessionCode Function deployHash: ${balanceOfSessionCodeDeployHash}`);
+
+  await getDeploy(NODE_ADDRESS!, balanceOfSessionCodeDeployHash);
+
+  console.log(`... balanceOfSessionCode Function called successfully through sessionCode.`);
+
+};
+
+const balanceOfATSessionCode = async () => {
+  const votingEscrow = new VOTINGESCROWClient(
+    NODE_ADDRESS!,
+    CHAIN_NAME!,
+    EVENT_STREAM_ADDRESS!
+  );
+
+  const balanceOfAtSessionCodeDeployHash = await votingEscrow.balanceOfAtSessionCode(
+    KEYS,
+    "balance_of",
+    VOTING_ESCROW_PACKAGE_HASH!,
+    KEYS.publicKey!,
+    VOTING_ESCROW_TIME!,
+    VOTING_ESCROW_INSTALL_PAYMENT_AMOUNT!,
+    VOTING_ESCROW_PROXY_WASM_PATH!
+  );
+
+  console.log(`... balanceOfAtSessionCode Function deployHash: ${balanceOfAtSessionCodeDeployHash}`);
+
+  await getDeploy(NODE_ADDRESS!, balanceOfAtSessionCodeDeployHash);
+
+  console.log(`... balanceOfAtSessionCode Function called successfully through sessionCode.`);
+
+};
+
+const totalSupplySessionCode = async () => {
+  const votingEscrow = new VOTINGESCROWClient(
+    NODE_ADDRESS!,
+    CHAIN_NAME!,
+    EVENT_STREAM_ADDRESS!
+  );
+
+  const totalSupplySessionCodeDeployHash = await votingEscrow.totalSupplySessionCode(
+    KEYS,
+    "total_supply",
+    VOTING_ESCROW_PACKAGE_HASH!,
+    VOTING_ESCROW_T!,
+    VOTING_ESCROW_INSTALL_PAYMENT_AMOUNT!,
+    VOTING_ESCROW_PROXY_WASM_PATH!
+  );
+
+  console.log(`... totalSupplySessionCode Function deployHash: ${totalSupplySessionCodeDeployHash}`);
+
+  await getDeploy(NODE_ADDRESS!, totalSupplySessionCodeDeployHash);
+
+  console.log(`... totalSupplySessionCode Function called successfully through sessionCode.`);
+
+};
+
+const totalSupplyAtSessionCode = async () => {
+  const votingEscrow = new VOTINGESCROWClient(
+    NODE_ADDRESS!,
+    CHAIN_NAME!,
+    EVENT_STREAM_ADDRESS!
+  );
+
+  const totalSupplyAtSessionCodeDeployHash = await votingEscrow.totalSupplyAtSessionCode(
+    KEYS,
+    "total_supply_at",
+    VOTING_ESCROW_PACKAGE_HASH!,
+    VOTING_ESCROW_TIME!,
+    VOTING_ESCROW_INSTALL_PAYMENT_AMOUNT!,
+    VOTING_ESCROW_PROXY_WASM_PATH!
+  );
+
+  console.log(`... totalSupplyAtSessionCode Function deployHash: ${totalSupplyAtSessionCodeDeployHash}`);
+
+  await getDeploy(NODE_ADDRESS!, totalSupplyAtSessionCodeDeployHash);
+
+  console.log(`... totalSupplyAtSessionCode Function called successfully through sessionCode.`);
+
+};

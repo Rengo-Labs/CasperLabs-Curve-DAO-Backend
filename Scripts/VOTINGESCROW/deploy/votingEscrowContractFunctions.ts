@@ -51,6 +51,14 @@ const test = async () => {
 
   await votingEscrow.setContractHash(VOTINGESCROW_CONTRACT_HASH!);
 
+  //  // // //userPointHistoryTs
+   const userPointHistoryTs = await votingEscrow.userPointHistoryTs(VOTING_ESCROW_ADDRESS!,VOTING_ESCROW_IDX!);
+   console.log(`... Contract userPointHistoryTs: ${userPointHistoryTs}`);
+
+     //  // // //lockedEnd
+     const lockedEnd = await votingEscrow.lockedEnd(VOTING_ESCROW_ADDRESS!);
+     console.log(`... Contract lockedEnd: ${userPointHistoryTs}`);
+
   // console.log('key result');
   
   //  const unlockTime = await votingEscrow.unlockTime();

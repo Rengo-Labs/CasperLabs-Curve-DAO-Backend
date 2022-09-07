@@ -130,100 +130,40 @@ class VESTINGESCROWFACTORYClient {
 
   //VESTING ESCROW FACTORY FUNCTIONS
 
-  public async packageHash(
-    keys: Keys.AsymmetricKey,
-    paymentAmount: string
-  ) {
-    const runtimeArgs = RuntimeArgs.fromMap({
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "package-hash",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
+  public async packageHash() {
+    const unlockTime = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["self_contract_package_hash"]
+    );
+    return unlockTime.value();
   }
 
-  public async adminVef(
-    keys: Keys.AsymmetricKey,
-    paymentAmount: string
-  ) {
-    const runtimeArgs = RuntimeArgs.fromMap({
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "admin-vef",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
+  public async adminVef() {
+    const unlockTime = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["admin"]
+    );
+    return unlockTime.value();
   }
 
-  public async target(
-    keys: Keys.AsymmetricKey,
-    paymentAmount: string
-  ) {
-    const runtimeArgs = RuntimeArgs.fromMap({
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "target",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
+  public async target() {
+    const unlockTime = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["target"]
+    );
+    return unlockTime.value();
   }
 
-  public async futureAdminVef(
-    keys: Keys.AsymmetricKey,
-    paymentAmount: string
-  ) {
-    const runtimeArgs = RuntimeArgs.fromMap({
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "future_admin_vef",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
+  public async futureAdminVef() {
+    const unlockTime = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["future_admin"]
+    );
+    return unlockTime.value();
   }
 
   public async applyTransferOwnershipVef(

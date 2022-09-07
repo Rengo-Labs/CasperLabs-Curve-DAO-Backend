@@ -60,45 +60,21 @@ const test = async () => {
   await vestingEscrowFactory.setContractHash(VESTINGESCROWFACTORY_CONTRACT_HASH!);
 
 
-  //packageHash
- const packageHashDeployHash = await vestingEscrowFactory.packageHash(
-  KEYS!,
-  VESTING_ESCROW_FACTORY_PAYMENT_AMOUNT!
- );
- console.log("... packageHash deploy hash: ", packageHashDeployHash);
+ //  // // //packageHash
+ const packageHash = await vestingEscrowFactory.packageHash();
+ console.log(`... Contract packageHash: ${packageHash}`);
 
- await getDeploy(NODE_ADDRESS!, packageHashDeployHash);
- console.log("... packageHash function called successfully.");
+  //  // // //adminVef
+  const adminVef = await vestingEscrowFactory.adminVef();
+  console.log(`... Contract adminVef: ${adminVef}`);
 
- //adminVef
- const adminVefDeployHash = await vestingEscrowFactory.adminVef(
-  KEYS!,
-  VESTING_ESCROW_FACTORY_PAYMENT_AMOUNT!
- );
- console.log("... adminVef deploy hash: ", adminVefDeployHash);
+  //  // // //target
+  const target = await vestingEscrowFactory.target();
+  console.log(`... Contract target: ${target}`);
 
- await getDeploy(NODE_ADDRESS!, adminVefDeployHash);
- console.log("... adminVef function called successfully.");
-
- //target
- const targetDeployHash = await vestingEscrowFactory.target(
-  KEYS!,
-  VESTING_ESCROW_FACTORY_PAYMENT_AMOUNT!
- );
- console.log("... target deploy hash: ", targetDeployHash);
-
- await getDeploy(NODE_ADDRESS!, targetDeployHash);
- console.log("... target function called successfully.");
-
- //futureAdminVef
- const futureAdminVefDeployHash = await vestingEscrowFactory.futureAdminVef(
-  KEYS!,
-  VESTING_ESCROW_FACTORY_PAYMENT_AMOUNT!
- );
- console.log("... futureAdminVef deploy hash: ", futureAdminVefDeployHash);
-
- await getDeploy(NODE_ADDRESS!, futureAdminVefDeployHash);
- console.log("... futureAdminVef function called successfully.");
+   //  // // //futureAdminVef
+   const futureAdminVef = await vestingEscrowFactory.futureAdminVef();
+   console.log(`... Contract futureAdminVef: ${futureAdminVef}`);
 
  //applyTransferOwnershipVef
  const applyTransferOwnershipVefDeployHash = await vestingEscrowFactory.applyTransferOwnershipVef(

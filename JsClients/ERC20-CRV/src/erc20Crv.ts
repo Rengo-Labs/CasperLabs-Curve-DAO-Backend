@@ -94,6 +94,171 @@ class ERC20CRVClient {
     }
   }
 
+  public async startEpochTimeWritesessioncode(
+    keys: Keys.AsymmetricKey,
+    entrypointName:string,
+    packageHash: string,
+    paymentAmount: string,
+    wasmPath: string
+  ) {
+    const _packageHash = new CLByteArray(
+			Uint8Array.from(Buffer.from(packageHash, "hex"))
+		);
+    const runtimeArgs = RuntimeArgs.fromMap({
+      entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+    });
+
+    const deployHash = await installWasmFile({
+      chainName: this.chainName,
+      paymentAmount,
+      nodeAddress: this.nodeAddress,
+      keys,
+      pathToContract: wasmPath,
+      runtimeArgs,
+    });
+
+    if (deployHash !== null) {
+      return deployHash;
+    } else {
+      throw Error("Problem with installation");
+    }
+  }
+
+  public async futureEpochTimeWritesessioncode(
+    keys: Keys.AsymmetricKey,
+    entrypointName:string,
+    packageHash: string,
+    paymentAmount: string,
+    wasmPath: string
+  ) {
+    const _packageHash = new CLByteArray(
+			Uint8Array.from(Buffer.from(packageHash, "hex"))
+		);
+    const runtimeArgs = RuntimeArgs.fromMap({
+      entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+    });
+
+    const deployHash = await installWasmFile({
+      chainName: this.chainName,
+      paymentAmount,
+      nodeAddress: this.nodeAddress,
+      keys,
+      pathToContract: wasmPath,
+      runtimeArgs,
+    });
+
+    if (deployHash !== null) {
+      return deployHash;
+    } else {
+      throw Error("Problem with installation");
+    }
+  }
+
+  public async availableSupplysessioncode(
+    keys: Keys.AsymmetricKey,
+    entrypointName:string,
+    packageHash: string,
+    paymentAmount: string,
+    wasmPath: string
+  ) {
+    const _packageHash = new CLByteArray(
+			Uint8Array.from(Buffer.from(packageHash, "hex"))
+		);
+    const runtimeArgs = RuntimeArgs.fromMap({
+      entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+    });
+
+    const deployHash = await installWasmFile({
+      chainName: this.chainName,
+      paymentAmount,
+      nodeAddress: this.nodeAddress,
+      keys,
+      pathToContract: wasmPath,
+      runtimeArgs,
+    });
+
+    if (deployHash !== null) {
+      return deployHash;
+    } else {
+      throw Error("Problem with installation");
+    }
+  }
+
+  public async mintableInTimeframesessioncode(
+    keys: Keys.AsymmetricKey,
+    entrypointName:string,
+    packageHash: string,
+    start:string,
+    end:string,
+    paymentAmount: string,
+    wasmPath: string
+  ) {
+    const _packageHash = new CLByteArray(
+			Uint8Array.from(Buffer.from(packageHash, "hex"))
+		);
+    const runtimeArgs = RuntimeArgs.fromMap({
+      entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+      start: CLValueBuilder.u256(start),
+      end: CLValueBuilder.u256(end),
+    });
+
+    const deployHash = await installWasmFile({
+      chainName: this.chainName,
+      paymentAmount,
+      nodeAddress: this.nodeAddress,
+      keys,
+      pathToContract: wasmPath,
+      runtimeArgs,
+    });
+
+    if (deployHash !== null) {
+      return deployHash;
+    } else {
+      throw Error("Problem with installation");
+    }
+  }
+
+  public async mintsessioncode(
+    keys: Keys.AsymmetricKey,
+    entrypointName:string,
+    packageHash: string,
+    to:RecipientType,
+    amount:string,
+    paymentAmount: string,
+    wasmPath: string
+  ) {
+    const _packageHash = new CLByteArray(
+			Uint8Array.from(Buffer.from(packageHash, "hex"))
+		);
+    const runtimeArgs = RuntimeArgs.fromMap({
+      entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+      to: utils.createRecipientAddress(to),
+      amount: CLValueBuilder.u256(amount),
+    });
+
+    const deployHash = await installWasmFile({
+      chainName: this.chainName,
+      paymentAmount,
+      nodeAddress: this.nodeAddress,
+      keys,
+      pathToContract: wasmPath,
+      runtimeArgs,
+    });
+
+    if (deployHash !== null) {
+      return deployHash;
+    } else {
+      throw Error("Problem with installation");
+    }
+  }
+
+
+
   public async setContractHash(hash: string) {
     const stateRootHash = await utils.getStateRootHash(this.nodeAddress);
     const contractData = await utils.getContractData(
@@ -224,105 +389,105 @@ class ERC20CRVClient {
     }
   }
 
-  public async startEpochTimeWriteJsClient(
-    keys: Keys.AsymmetricKey,
-    paymentAmount: string
-  ) {
-    const runtimeArgs = RuntimeArgs.fromMap({
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "start_epoch_time_write_js_client",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
+  // public async startEpochTimeWriteJsClient(
+  //   keys: Keys.AsymmetricKey,
+  //   paymentAmount: string
+  // ) {
+  //   const runtimeArgs = RuntimeArgs.fromMap({
+  //   });
+  //   const deployHash = await contractCall({
+  //     chainName: this.chainName,
+  //     contractHash: this.contractHash,
+  //     entryPoint: "start_epoch_time_write_js_client",
+  //     keys,
+  //     nodeAddress: this.nodeAddress,
+  //     paymentAmount,
+  //     runtimeArgs,
+  //   });
 
-    if (deployHash !== null) {
+  //   if (deployHash !== null) {
       
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
+  //     return deployHash;
+  //   } else {
+  //     throw Error("Invalid Deploy");
+  //   }
+  // }
 
-  public async futureEpochTimeWriteJsClient(
-    keys: Keys.AsymmetricKey,
-    paymentAmount: string
-  ) {
-    const runtimeArgs = RuntimeArgs.fromMap({
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "future_epoch_time_write_js_client",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
+  // public async futureEpochTimeWriteJsClient(
+  //   keys: Keys.AsymmetricKey,
+  //   paymentAmount: string
+  // ) {
+  //   const runtimeArgs = RuntimeArgs.fromMap({
+  //   });
+  //   const deployHash = await contractCall({
+  //     chainName: this.chainName,
+  //     contractHash: this.contractHash,
+  //     entryPoint: "future_epoch_time_write_js_client",
+  //     keys,
+  //     nodeAddress: this.nodeAddress,
+  //     paymentAmount,
+  //     runtimeArgs,
+  //   });
 
-    if (deployHash !== null) {
+  //   if (deployHash !== null) {
       
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
+  //     return deployHash;
+  //   } else {
+  //     throw Error("Invalid Deploy");
+  //   }
+  // }
 
-  public async availableSupplyJsClient(
-    keys: Keys.AsymmetricKey,
-    paymentAmount: string
-  ) {
-    const runtimeArgs = RuntimeArgs.fromMap({
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "available_supply_js_client",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
+  // public async availableSupplyJsClient(
+  //   keys: Keys.AsymmetricKey,
+  //   paymentAmount: string
+  // ) {
+  //   const runtimeArgs = RuntimeArgs.fromMap({
+  //   });
+  //   const deployHash = await contractCall({
+  //     chainName: this.chainName,
+  //     contractHash: this.contractHash,
+  //     entryPoint: "available_supply_js_client",
+  //     keys,
+  //     nodeAddress: this.nodeAddress,
+  //     paymentAmount,
+  //     runtimeArgs,
+  //   });
 
-    if (deployHash !== null) {
+  //   if (deployHash !== null) {
       
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
+  //     return deployHash;
+  //   } else {
+  //     throw Error("Invalid Deploy");
+  //   }
+  // }
 
-  public async mintableInTimeframeJsClient(
-    keys: Keys.AsymmetricKey,
-    start: string,
-    end:string,
-    paymentAmount: string
-  ) {
-    const runtimeArgs = RuntimeArgs.fromMap({
-      start: CLValueBuilder.u256(start),
-      end: CLValueBuilder.u256(end),
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "mintable_in_timeframe_js_client",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
+  // public async mintableInTimeframeJsClient(
+  //   keys: Keys.AsymmetricKey,
+  //   start: string,
+  //   end:string,
+  //   paymentAmount: string
+  // ) {
+  //   const runtimeArgs = RuntimeArgs.fromMap({
+  //     start: CLValueBuilder.u256(start),
+  //     end: CLValueBuilder.u256(end),
+  //   });
+  //   const deployHash = await contractCall({
+  //     chainName: this.chainName,
+  //     contractHash: this.contractHash,
+  //     entryPoint: "mintable_in_timeframe_js_client",
+  //     keys,
+  //     nodeAddress: this.nodeAddress,
+  //     paymentAmount,
+  //     runtimeArgs,
+  //   });
 
-    if (deployHash !== null) {
+  //   if (deployHash !== null) {
       
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
+  //     return deployHash;
+  //   } else {
+  //     throw Error("Invalid Deploy");
+  //   }
+  // }
 
   public async updateMiningParameters(
     keys: Keys.AsymmetricKey,

@@ -42,6 +42,8 @@ class VOTINGESCROWClient {
     supportRequiredPct: string;
     voteTime: string;
     token: string;
+    userPointHistory:string;
+    lockedEnd: string;
   };
 
   private isListening = false;
@@ -68,7 +70,9 @@ class VOTINGESCROWClient {
       minTime: "null",
       supportRequiredPct: "null",
       voteTime: "null",
-      token: "null"
+      token: "null",
+      userPointHistory: "null",
+      lockedEnd:"null",
     }; 
   }
 
@@ -109,6 +113,176 @@ class VOTINGESCROWClient {
     }
   }
 
+  public async getLastUserSlopeSessionCode(
+    keys: Keys.AsymmetricKey,
+    entrypointName:string,
+    packageHash: string,
+    addr:RecipientType,
+    paymentAmount: string,
+    wasmPath: string
+  ) {
+    const _packageHash = new CLByteArray(
+			Uint8Array.from(Buffer.from(packageHash, "hex"))
+		);
+    const runtimeArgs = RuntimeArgs.fromMap({
+      entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+      addr: utils.createRecipientAddress(addr),
+    });
+
+    const deployHash = await installWasmFile({
+      chainName: this.chainName,
+      paymentAmount,
+      nodeAddress: this.nodeAddress,
+      keys,
+      pathToContract: wasmPath,
+      runtimeArgs,
+    });
+
+    if (deployHash !== null) {
+      return deployHash;
+    } else {
+      throw Error("Problem with installation");
+    }
+  }
+
+  public async balanceOfSessionCode(
+    keys: Keys.AsymmetricKey,
+    entrypointName:string,
+    packageHash: string,
+    addr:RecipientType,
+    t:string,
+    paymentAmount: string,
+    wasmPath: string
+  ) {
+    const _packageHash = new CLByteArray(
+			Uint8Array.from(Buffer.from(packageHash, "hex"))
+		);
+    const runtimeArgs = RuntimeArgs.fromMap({
+      entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+      addr: utils.createRecipientAddress(addr),
+      t: new CLOption(Some(CLValueBuilder.u256(t)))
+    });
+
+    const deployHash = await installWasmFile({
+      chainName: this.chainName,
+      paymentAmount,
+      nodeAddress: this.nodeAddress,
+      keys,
+      pathToContract: wasmPath,
+      runtimeArgs,
+    });
+
+    if (deployHash !== null) {
+      return deployHash;
+    } else {
+      throw Error("Problem with installation");
+    }
+  }
+
+  public async balanceOfAtSessionCode(
+    keys: Keys.AsymmetricKey,
+    entrypointName:string,
+    packageHash: string,
+    addr:RecipientType,
+    time:string,
+    paymentAmount: string,
+    wasmPath: string
+  ) {
+    const _packageHash = new CLByteArray(
+			Uint8Array.from(Buffer.from(packageHash, "hex"))
+		);
+    const runtimeArgs = RuntimeArgs.fromMap({
+      entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+      addr: utils.createRecipientAddress(addr),
+      time: CLValueBuilder.u256(time)
+    });
+
+    const deployHash = await installWasmFile({
+      chainName: this.chainName,
+      paymentAmount,
+      nodeAddress: this.nodeAddress,
+      keys,
+      pathToContract: wasmPath,
+      runtimeArgs,
+    });
+
+    if (deployHash !== null) {
+      return deployHash;
+    } else {
+      throw Error("Problem with installation");
+    }
+  }
+
+  public async totalSupplySessionCode(
+    keys: Keys.AsymmetricKey,
+    entrypointName:string,
+    packageHash: string,
+    t:string,
+    paymentAmount: string,
+    wasmPath: string
+  ) {
+    const _packageHash = new CLByteArray(
+			Uint8Array.from(Buffer.from(packageHash, "hex"))
+		);
+    const runtimeArgs = RuntimeArgs.fromMap({
+      entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+      t: new CLOption(Some(CLValueBuilder.u256(t)))
+    });
+
+    const deployHash = await installWasmFile({
+      chainName: this.chainName,
+      paymentAmount,
+      nodeAddress: this.nodeAddress,
+      keys,
+      pathToContract: wasmPath,
+      runtimeArgs,
+    });
+
+    if (deployHash !== null) {
+      return deployHash;
+    } else {
+      throw Error("Problem with installation");
+    }
+  }
+
+  public async totalSupplyAtSessionCode(
+    keys: Keys.AsymmetricKey,
+    entrypointName:string,
+    packageHash: string,
+    time:string,
+    paymentAmount: string,
+    wasmPath: string
+  ) {
+    const _packageHash = new CLByteArray(
+			Uint8Array.from(Buffer.from(packageHash, "hex"))
+		);
+    const runtimeArgs = RuntimeArgs.fromMap({
+      entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+      time: CLValueBuilder.u256(time)
+    });
+
+    const deployHash = await installWasmFile({
+      chainName: this.chainName,
+      paymentAmount,
+      nodeAddress: this.nodeAddress,
+      keys,
+      pathToContract: wasmPath,
+      runtimeArgs,
+    });
+
+    if (deployHash !== null) {
+      return deployHash;
+    } else {
+      throw Error("Problem with installation");
+    }
+  }
+
+
   public async setContractHash(hash: string) {
     const stateRootHash = await utils.getStateRootHash(this.nodeAddress);
     const contractData = await utils.getContractData(
@@ -133,6 +307,8 @@ class VOTINGESCROWClient {
       'supportRequiredPct',
       'voteTime',
       'token',
+      'userPointHistory',
+      'lockedEnd',
       `${this.contractName}_package_hash`,
       `${this.contractName}_package_hash_wrapped`,
       `${this.contractName}_contract_hash`,
@@ -150,107 +326,45 @@ class VOTINGESCROWClient {
 
   //Backend Functions
 
-  public async minBalance(account: string) {
-		try {
-		
-		const result = await utils.contractDictionaryGetter(
-			this.nodeAddress,
-			account,
-			this.namedKeys.minBalance
-		);
-		const maybeValue = result.value().unwrap();
-		return maybeValue.value().toString();
+  public async userPointHistoryTs(addr:string, idx: string ) {
+     try {
+      const keyOwner=new CLKey(new CLAccountHash(Uint8Array.from(Buffer.from(addr, "hex"))));
+      const keyId = CLValueBuilder.u256(idx);
+      const finalBytes = concat([CLValueParsers.toBytes(keyOwner).unwrap(), CLValueParsers.toBytes(keyId).unwrap()]);
+      const blaked = blake.blake2b(finalBytes, undefined, 32);
+      const encodedBytes = Buffer.from(blaked).toString("hex");
 
-		} catch (error) {
-		return "0";
-		}
-		
-	}
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        encodedBytes,
+        this.namedKeys.userPointHistory
+      );
 
-  public async minAcceptQuorumPct(account: string) {
-		try {
-		
-		const result = await utils.contractDictionaryGetter(
-			this.nodeAddress,
-			account,
-			this.namedKeys.minAcceptQuorumPct
-		);
-		const maybeValue = result.value().unwrap();
-		return maybeValue.value().toString();
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+    } catch (error) {
+      return "0";
+    }
 
-		} catch (error) {
-		return "0";
-		}
-		
-	}
+  }
 
-  public async minTime(account: string) {
-		try {
-		
-		const result = await utils.contractDictionaryGetter(
-			this.nodeAddress,
-			account,
-			this.namedKeys.minTime
-		);
-		const maybeValue = result.value().unwrap();
-		return maybeValue.value().toString();
+  public async lockedEnd(addr: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        addr,
+        this.namedKeys.lockedEnd
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
 
-		} catch (error) {
-		return "0";
-		}
-		
-	}
+    } catch (error) {
+      return "0";
+    }
+    
+  }
 
-  public async supportRequiredPct(account: string) {
-		try {
-		
-		const result = await utils.contractDictionaryGetter(
-			this.nodeAddress,
-			account,
-			this.namedKeys.supportRequiredPct
-		);
-		const maybeValue = result.value().unwrap();
-		return maybeValue.value().toString();
-
-		} catch (error) {
-		return "0";
-		}
-		
-	}
-
-  public async voteTime(account: string) {
-		try {
-		
-		const result = await utils.contractDictionaryGetter(
-			this.nodeAddress,
-			account,
-			this.namedKeys.voteTime
-		);
-		const maybeValue = result.value().unwrap();
-		return maybeValue.value().toString();
-
-		} catch (error) {
-		return "0";
-		}
-		
-	}
-
-  public async token(account: string) {
-		try {
-		
-		const result = await utils.contractDictionaryGetter(
-			this.nodeAddress,
-			account,
-			this.namedKeys.token
-		);
-		const maybeValue = result.value().unwrap();
-		return maybeValue.value().toString();
-
-		} catch (error) {
-		return "0";
-		}
-		
-	}
 
   //VOTING_ESCROW FUNCTIONS
 

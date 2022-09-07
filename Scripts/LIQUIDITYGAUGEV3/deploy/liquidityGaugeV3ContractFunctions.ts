@@ -62,16 +62,13 @@ const test = async () => {
 
   await liquidityGaugeV3.setContractHash(LIQUIDITYGAUGEV3_CONTRACT_HASH!);
 
- 
-  //decimals
- const decimalsDeployHash = await liquidityGaugeV3.decimals(
-  KEYS!,
-  LIQUIDITY_GAUGE_V3_PAYMENT_AMOUNT!
- );
- console.log("... decimals deploy hash: ", decimalsDeployHash);
+   // // //decimals
+   const decimals = await liquidityGaugeV3.decimals();
+   console.log(`... Contract decimals: ${decimals}`);
 
- await getDeploy(NODE_ADDRESS!, decimalsDeployHash);
- console.log("... decimals function called successfully.");
+   // // //integrate_checkpoint
+   const integrateCheckpoint = await liquidityGaugeV3.integrateCheckpoint();
+   console.log(`... Contract integrateCheckpoint: ${integrateCheckpoint}`);
 
  //userCheckpoint
  const userCheckpointDeployHash = await liquidityGaugeV3.userCheckpoint(
