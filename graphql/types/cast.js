@@ -17,7 +17,7 @@ const castType = new GraphQLObjectType({
       vote:{type: voteType},
       voter:{type: voterType},
       supports:{type:GraphQLBoolean},
-      stake:{type:GraphQLString},
+      voterStake:{type:GraphQLString},
       createdAt:{type:GraphQLString},
     })
 });
