@@ -7,6 +7,9 @@ const { responseType } = require("../../types/response");
 const Proposal = require("../../../models/proposal");
 const ProposalVote = require("../../../models/proposalVote");
 const VotingApp = require("../../../models/votingApp");
+const Vote = require("../../../models/vote");
+const Voter = require("../../../models/voter");
+const Cast = require("../../../models/cast");
 const { getOrRegisterAccount } = require("../../services/accounts");
 let votingEscrow = require("../../../JsClients/VOTINGESCROW/votingEscrowFunctionsForBackend/functions.ts");
 const eventsData = require("../../../models/eventsData");
@@ -265,11 +268,17 @@ const handleStartVote = {
     session.startTransaction();
 
     try {
-      let app = await getOrRegisterVotingApp(args.address,session);
-      let creator = await getOrRegisterAccount(args.creator, session);
-
-      //   let proposalData = await votingContract.getVote(args.address,args.voteId);
-      let proposalData = {
+      const voteEntityId = buildVoteEntityId(args.address, args.voteId);
+    
+      const vote = new Vote({
+        id : voteEntityId
+      });
+    
+      //Integrate the votingContract here to fetch voteData.
+      // const voting = VotingContract.bind(event.address)
+      // const voteData = voting.getVote(event.params.voteId)
+    
+      let voteData = {
         value2: "2",
         value3: "3",
         value4: "4",
@@ -279,73 +288,26 @@ const handleStartVote = {
         value8: "8",
         value9: "9",
       };
-      let proposal = new Proposal({
-        id: args.address + "-" + args.voteId,
-        number: args.voteId,
-        app: app.id,
-        creator: creator.id,
-        expireDate: (
-          (new bigdecimal.BigDecimal(proposalData.value2)).add(new bigdecimal.BigDecimal(app.voteTime))
-        ).toString(),
-        // Proposal parameters
-        executionScript: proposalData.value9,
-        minimumQuorum: proposalData.value5,
-        requiredSupport: proposalData.value4,
-        snapshotBlock: proposalData.value3,
-        votingPower: proposalData.value8,
-        // Parse proposal metadata
-        metadata: args.metadata,
-        voteCount: "0",
-        positiveVoteCount: proposalData.value6,
-        negativeVoteCount: proposalData.value7,
-
-        totalStaked: args.creatorVotingPower,
-        stakedSupport: args.creatorVotingPower,
-        currentQuorum: (
-          (new bigdecimal.BigDecimal(args.creatorVotingPower)).divide(new bigdecimal.BigDecimal(proposalData.value8),18,halfUp)
-        ).toString(),
-        currentSupport: (
-          (new bigdecimal.BigDecimal(args.creatorVotingPower)).divide(new bigdecimal.BigDecimal(proposalData.value8),18,halfUp)
-        ).toString(),
-        created: args.timestamp,
-        createdAtBlock: args.block,
-        createdAtTransaction: args.transactionHash,
-      });
-
-      await Proposal.create([proposal],{session});
-      // TODO: enable again when IPFS supported on Subgraph Studio
-      // if (event.params.metadata.startsWith('ipfs:')) {
-      //   let hash = event.params.metadata.slice(5) // because string.replace() is not supported on current AS version
-      //   let content = ipfs.cat(hash)
-      //
-      //   if (content != null) {
-      //     let jsonFile = json.try_fromBytes(content as Bytes)
-      //
-      //     if (jsonFile.isOk) {
-      //       let value = jsonFile.value
-      //
-      //       if (value != null) {
-      //         let metadata = value.toObject()
-      //
-      //         if (metadata.isSet('text')) {
-      //           let text = metadata.get('text')
-      //
-      //           if (text != null) {
-      //             proposal.text = text.toString()
-      //           }
-      //         }
-      //       }
-      //     } else {
-      //       log.warning('Failed to parse JSON metadata, hash: {}, raw_data: {}', [hash, content.toHexString()])
-      //     }
-      //   } else {
-      //     log.warning('Metadata failed to load from IPFS, hash: {}', [hash])
-      //   }
-      // }
-
-      // Voting app
-      app.proposalCount = ((new bigdecimal.BigDecimal(app.proposalCount)).add(new bigdecimal.BigDecimal("1"))).toString();
-      await app.save({session});
+    
+      vote.appAddress = args.address;
+      vote.creator = args.creator;
+      vote.originalCreator = args.transactionFrom;
+      vote.metadata = args.metadata;
+      vote.voteNum = args.voteId;
+      vote.startDate = voteData.value2;
+      vote.snapshotBlock = voteData.value3;
+      vote.supportRequiredPct = voteData.value4;
+      vote.minAcceptQuorum = voteData.value5;
+      vote.yea = voteData.value6;
+      vote.nay = voteData.value7;
+      vote.votingPower = voteData.value8;
+      vote.script = voteData.value9.toHex()
+      // vote.orgAddress = voting.kernel()
+      vote.orgAddress = 'kernel address'
+      vote.executedAt = new bigdecimal.BigDecimal("0");
+      vote.executed = false
+    
+      vote.save({session})
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
         // create new response
@@ -392,64 +354,23 @@ const handleCastVote = {
     session.startTransaction();
 
     try {
-      let proposal = await Proposal.findOne({
-        id: args.address + "-" + args.voteId.toString(),
-      });
+      await updateVoteState(args.address, args.voteId)
 
-      if (proposal != null) {
-        let voter = await getOrRegisterAccount(args.voter, session);
-
-        let vote = new ProposalVote({
-          id: args.transactionHash + "-" + args.logIndex,
-          proposal: proposal.id,
-          stake: args.stake,
-          supports: args.supports,
-          voter: voter.id,
-          created: args.timestamp,
-          createdAtBlock: args.block,
-          createdAtTransaction: args.transactionHash,
-        });
-        await ProposalVote.create([vote],{session});
-        console.log(vote);
-
-        // Update proposal counters
-        proposal.voteCount = (
-          (new bigdecimal.BigDecimal(proposal.voteCount)).add(new bigdecimal.BigDecimal("1"))
-        ).toString();
-        proposal.totalStaked = (
-          (new bigdecimal.BigDecimal(proposal.totalStaked)).add(new bigdecimal.BigDecimal(vote.stake))
-        ).toString();
-        proposal.currentQuorum = (
-          (new bigdecimal.BigDecimal(proposal.totalStaked)).divide(new bigdecimal.BigDecimal(proposal.votingPower))
-        ).toString();
-
-        if (vote.supports) {
-          proposal.positiveVoteCount = (
-            (new bigdecimal.BigDecimal(proposal.positiveVoteCount)).add(new bigdecimal.BigDecimal("1"))
-          ).toString();
-          proposal.stakedSupport = (
-            (new bigdecimal.BigDecimal(proposal.stakedSupport)).add(new bigdecimal.BigDecimal(vote.stake))
-          ).toString();
-          proposal.currentSupport = (
-            (new bigdecimal.BigDecimal(proposal.stakedSupport)).divide(new bigdecimal.BigDecimal(proposal.votingPower),18,halfUp)
-          ).toString();
-        } else {
-          proposal.negativeVoteCount = (
-            (new bigdecimal.BigDecimal(proposal.negativeVoteCount)).add(new bigdecimal.BigDecimal("1"))
-          ).toString();
-        }
-
-        proposal.updated = args.timestamp;
-        proposal.updatedAtBlock = args.block;
-        proposal.updatedAtTransaction = args.transactionHash;
-
-        await proposal.save({session});
-
-        // Update voting app counters
-        let app = await getOrRegisterVotingApp(args.address,session);
-        app.voteCount = ((new bigdecimal.BigDecimal(app.voteCount)).add(new bigdecimal.BigDecimal("1"))).toString();
-        await app.save({session});
-      }
+      const voter = await loadOrCreateVoter(args.address, args.voter)
+      voter.save({session})
+    
+      const castVote = await loadOrCreateCastVote(
+        args.address,
+        args.voteId,
+        args.voter
+      )
+    
+      castVote.voter = voter.id
+      castVote.stake = args.stake
+      castVote.supports = args.supports
+      castVote.createdAt = args.timestamp
+    
+      castVote.save({session})
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
         // create new response
@@ -492,16 +413,13 @@ const handleExecuteVote = {
     session.startTransaction();
 
     try {
-      let proposal = await Proposal.findOne({
-        id: args.address + "-" + args.voteId.toString(),
-      });
+      await updateVoteState(args.address, args.voteId)
 
-      if (proposal != null) {
-        proposal.executed = args.timestamp;
-        proposal.executedAtBlock = args.block;
-        proposal.executedAtTransaction = args.transactionHash;
-        await proposal.save({session});
-      }
+      const voteEntityId = buildVoteEntityId(args.address, args.voteId)
+      const vote = await Vote.findOne({id : voteEntityId});
+      vote.executed = true
+      vote.executedAt = args.timestamp
+      vote.save({session})
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
         // create new response
@@ -526,6 +444,66 @@ const handleExecuteVote = {
     }
   },
 };
+
+function buildVoteEntityId(appAddress, voteNum){
+  return (
+    'appAddress:' + appAddress.toHexString() + '-vote:' + voteNum.toHexString()
+  )
+}
+
+async function updateVoteState(votingAddress, voteId){
+  // Integrate the voting contract to get the voteData
+  // const votingApp = VotingContract.bind(votingAddress)
+  // const voteData = votingApp.getVote(voteId)
+
+  let voteData = {
+    value6: "6",
+    value7: "7",
+  };
+
+  const voteEntityId = buildVoteEntityId(votingAddress, voteId);
+  const vote = await vote.findOne({id : voteEntityId});
+  vote.yea = voteData.value6
+  vote.nay = voteData.value7
+
+  vote.save({session})
+}
+
+async function loadOrCreateVoter(
+  votingAddress,
+  voterAddress
+){
+  const voterId = buildVoterId(votingAddress, voterAddress)
+  let voter = await Voter.findOne({id : voterId});
+
+  if (voter === null) {
+    voter = new Voter({id : voterId});
+    voter.address = voterAddress
+  }
+  return voter;
+}
+
+function buildVoterId(voting, voter){
+  return voting.toHexString() + '-voter-' + voter.toHexString()
+}
+
+async function loadOrCreateCastVote(
+  votingAddress,
+  voteId,
+  voterAddress
+){
+  const castVoteId = buildCastEntityId(voteId, voterAddress)
+  let castVote = await Cast.findOne({id : castVoteId});
+  if (castVote === null) {
+    castVote = new Cast({id : castVoteId});
+    castVote.vote = buildVoteEntityId(votingAddress, voteId)
+  }
+  return castVote;
+}
+
+function buildCastEntityId(voteId, voter){
+  return voteId.toHexString() + '-voter:' + voter.toHexString()
+}
 
 module.exports = {
   handleMinimumBalanceSet,
