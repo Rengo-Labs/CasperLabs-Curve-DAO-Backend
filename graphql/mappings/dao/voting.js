@@ -301,7 +301,7 @@ const handleStartVote = {
       vote.yea = voteData.value6;
       vote.nay = voteData.value7;
       vote.votingPower = voteData.value8;
-      vote.script = voteData.value9.toHex()
+      vote.script = voteData.value9.toString()
       // vote.orgAddress = voting.kernel()
       vote.orgAddress = 'kernel address'
       vote.executedAt = new bigdecimal.BigDecimal("0");
@@ -447,7 +447,7 @@ const handleExecuteVote = {
 
 function buildVoteEntityId(appAddress, voteNum){
   return (
-    'appAddress:' + appAddress.toHexString() + '-vote:' + voteNum.toHexString()
+    'appAddress:' + appAddress.toString() + '-vote:' + voteNum.toString()
   )
 }
 
@@ -484,7 +484,7 @@ async function loadOrCreateVoter(
 }
 
 function buildVoterId(voting, voter){
-  return voting.toHexString() + '-voter-' + voter.toHexString()
+  return voting.toString() + '-voter-' + voter.toString()
 }
 
 async function loadOrCreateCastVote(
@@ -502,7 +502,7 @@ async function loadOrCreateCastVote(
 }
 
 function buildCastEntityId(voteId, voter){
-  return voteId.toHexString() + '-voter:' + voter.toHexString()
+  return voteId.toString() + '-voter:' + voter.toString()
 }
 
 module.exports = {
