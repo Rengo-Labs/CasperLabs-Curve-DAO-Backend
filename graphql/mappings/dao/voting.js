@@ -3,19 +3,18 @@ const { GraphQLString } = require("graphql");
 const mongoose = require("mongoose");
 const Response = require("../../../models/response");
 const { responseType } = require("../../types/response");
-
-const Proposal = require("../../../models/proposal");
-const ProposalVote = require("../../../models/proposalVote");
 const VotingApp = require("../../../models/votingApp");
 const Vote = require("../../../models/vote");
 const Voter = require("../../../models/voter");
 const Cast = require("../../../models/cast");
-const { getOrRegisterAccount } = require("../../services/accounts");
-let votingEscrow = require("../../../JsClients/VOTINGESCROW/votingEscrowFunctionsForBackend/functions.ts");
-const eventsData = require("../../../models/eventsData");
-
 var bigdecimal = require("bigdecimal");
-var halfUp = bigdecimal.RoundingMode.HALF_UP();
+
+
+const transactionOptions = {
+  readPreference: "primary",
+  readConcern: { level: "local" },
+  writeConcern: { w: "majority" },
+};
 
 async function getOrRegisterVotingApp(address,session) {
   let app = await VotingApp.findOne({ id: address });
@@ -64,21 +63,8 @@ const handleMinimumBalanceSet = {
     minBalance: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
-
     const session = await mongoose.startSession();
-    //starting the transaction
-    session.startTransaction();
-
     try {
-      let app = await getOrRegisterVotingApp(args.address,session);
-      app.minimumBalance = args.minBalance;
-      await app.save({session});
-
-       // updating mutation status
-      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-      //  eventDataResult.status="completed"
-      //  await eventDataResult.save({ session });
-
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
         // create new response
@@ -86,21 +72,28 @@ const handleMinimumBalanceSet = {
           id: "1",
           result: true,
         });
-        await response.save({session});
       }
 
-      //committing the transaction 
-      await session.commitTransaction();
-
-      // Ending the session
+      await session.withTransaction(async () => {
+        let app = await getOrRegisterVotingApp(args.address,session);
+        app.minimumBalance = args.minBalance;
+        await app.save({session});
+  
+        // updating mutation status
+        //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+        //  eventDataResult.status="completed"
+        //  await eventDataResult.save({ session });
+  
+        await response.save({session});
+  
+      }, transactionOptions);
 
       return response;
     } catch (error) {
-
-      // Rollback any changes made in the database
-      await session.abortTransaction();
-
       throw new Error(error);
+    } finally {
+      // Ending the session
+      await session.endSession();
     }
   },
 };
@@ -114,18 +107,7 @@ const handleMinimumTimeSet = {
   async resolve(parent, args, context) {
 
     const session = await mongoose.startSession();
-    //starting the transaction
-    session.startTransaction();
-
     try {
-      let app = await getOrRegisterVotingApp(args.address,session);
-      app.minTime = args.minTime;
-      await app.save({session});
-
-       // updating mutation status
-      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-      //  eventDataResult.status="completed"
-      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -134,21 +116,27 @@ const handleMinimumTimeSet = {
           id: "1",
           result: true,
         });
-        await response.save({session});
       }
 
-      //committing the transaction 
-      await session.commitTransaction();
-
-      // Ending the session
+      await session.withTransaction(async () => {
+        let app = await getOrRegisterVotingApp(args.address,session);
+        app.minTime = args.minTime;
+        await app.save({session});
+  
+         // updating mutation status
+        //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+        //  eventDataResult.status="completed"
+        //  await eventDataResult.save({ session });
+        await response.save({session});
+  
+      }, transactionOptions);
 
       return response;
     } catch (error) {
-
-      // Rollback any changes made in the database
-      await session.abortTransaction();
-
       throw new Error(error);
+    } finally {
+      // Ending the session
+      await session.endSession();
     }
   },
 };
@@ -163,10 +151,18 @@ const handleChangeMinQuorum = {
   async resolve(parent, args, context) {
 
     const session = await mongoose.startSession();
-    //starting the transaction
-    session.startTransaction();
 
     try {
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+          result: true,
+        });
+      }
+
+      await session.withTransaction(async () => {
       let app = await getOrRegisterVotingApp(args.address,session);
       app.minAcceptQuorumPct = args.minAcceptQuorumPct;
       await app.save({session});
@@ -176,27 +172,15 @@ const handleChangeMinQuorum = {
       //  eventDataResult.status="completed"
       //  await eventDataResult.save({ session });
 
-      let response = await Response.findOne({ id: "1" });
-      if (response === null) {
-        // create new response
-        response = new Response({
-          id: "1",
-          result: true,
-        });
-        await response.save({session});
-      }
-
-      //committing the transaction 
-      await session.commitTransaction();
-
-      // Ending the session
+      await response.save({session});
+      }, transactionOptions);
 
       return response;
     } catch (error) {
-      // Rollback any changes made in the database
-      await session.abortTransaction();
-
       throw new Error(error);
+    } finally {
+      // Ending the session
+      await session.endSession();
     }
   },
 };
@@ -211,18 +195,8 @@ const handleChangeSupportRequired = {
   async resolve(parent, args, context) {
 
     const session = await mongoose.startSession();
-    //starting the transaction
-    session.startTransaction();
 
     try {
-      let app = await getOrRegisterVotingApp(args.address,session);
-      app.supportRequiredPct = args.supportRequiredPct;
-      await app.save({session});
-
-       // updating mutation status
-      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-      //  eventDataResult.status="completed"
-      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -231,20 +205,27 @@ const handleChangeSupportRequired = {
           id: "1",
           result: true,
         });
-        await response.save({session});
       }
 
-      //committing the transaction 
-      await session.commitTransaction();
-
-      // Ending the session
+      await session.withTransaction(async () => {
+        let app = await getOrRegisterVotingApp(args.address,session);
+        app.supportRequiredPct = args.supportRequiredPct;
+        await app.save({session});
+  
+         // updating mutation status
+        //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+        //  eventDataResult.status="completed"
+        //  await eventDataResult.save({ session });
+  
+        await response.save({session});
+      }, transactionOptions);
 
       return response;
     } catch (error) {
-      // Rollback any changes made in the database
-      await session.abortTransaction();
-
       throw new Error(error);
+    } finally {
+      // Ending the session
+      await session.endSession();
     }
   },
 };
@@ -257,57 +238,12 @@ const handleStartVote = {
     creator: { type: GraphQLString },
     voteId: { type: GraphQLString },
     metadata: { type: GraphQLString },
-    creatorVotingPower: { type: GraphQLString },
-    timestamp: { type: GraphQLString },
-    block: { type: GraphQLString },
-    transactionHash: { type: GraphQLString },
+    transactionFrom: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
     const session = await mongoose.startSession();
-    //starting the transaction
-    session.startTransaction();
-
+   
     try {
-      const voteEntityId = buildVoteEntityId(args.address, args.voteId);
-    
-      const vote = new Vote({
-        id : voteEntityId
-      });
-    
-      //Integrate the votingContract here to fetch voteData.
-      // const voting = VotingContract.bind(event.address)
-      // const voteData = voting.getVote(event.params.voteId)
-    
-      let voteData = {
-        value2: "2",
-        value3: "3",
-        value4: "4",
-        value5: "5",
-        value6: "6",
-        value7: "7",
-        value8: "8",
-        value9: "9",
-      };
-    
-      vote.appAddress = args.address;
-      vote.creator = args.creator;
-      vote.originalCreator = args.transactionFrom;
-      vote.metadata = args.metadata;
-      vote.voteNum = args.voteId;
-      vote.startDate = voteData.value2;
-      vote.snapshotBlock = voteData.value3;
-      vote.supportRequiredPct = voteData.value4;
-      vote.minAcceptQuorum = voteData.value5;
-      vote.yea = voteData.value6;
-      vote.nay = voteData.value7;
-      vote.votingPower = voteData.value8;
-      vote.script = voteData.value9.toString()
-      // vote.orgAddress = voting.kernel()
-      vote.orgAddress = 'kernel address'
-      vote.executedAt = new bigdecimal.BigDecimal("0");
-      vote.executed = false
-    
-      vote.save({session})
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
         // create new response
@@ -315,21 +251,59 @@ const handleStartVote = {
           id: "1",
           result: true,
         });
-        await response.save({session});
       }
+      await session.withTransaction(async () => {
+        const voteEntityId = buildVoteEntityId(args.address, args.voteId);
       
-      //committing the transaction 
-      await session.commitTransaction();
+        const vote = new Vote({
+          id : voteEntityId
+        });
+      
+        //Integrate the votingContract here to fetch voteData.
+        // const voting = VotingContract.bind(event.address)
+        // const voteData = voting.getVote(event.params.voteId)
+      
+        let voteData = {
+          value2: "2",
+          value3: "3",
+          value4: "4",
+          value5: "5",
+          value6: "6",
+          value7: "7",
+          value8: "8",
+          value9: "9",
+        };
+      
+        vote.appAddress = args.address;
+        vote.creator = args.creator;
+        vote.originalCreator = args.transactionFrom;
+        vote.metadata = args.metadata;
+        vote.voteNum = args.voteId;
+        vote.startDate = voteData.value2;
+        vote.snapshotBlock = voteData.value3;
+        vote.supportRequiredPct = voteData.value4;
+        vote.minAcceptQuorum = voteData.value5;
+        vote.yea = voteData.value6;
+        vote.nay = voteData.value7;
+        vote.votingPower = voteData.value8;
+        vote.script = voteData.value9.toString()
+        // vote.orgAddress = voting.kernel()
+        vote.orgAddress = 'kernel address'
+        vote.executedAt = new bigdecimal.BigDecimal("0");
+        vote.executed = false
+      
+        await vote.save({session})
 
-      // Ending the session
-      session.endSession();
-
+        
+        await response.save({session});
+      }, transactionOptions);
       return response;
+  
     } catch (error) {
-      // Rollback any changes made in the database
-      await session.abortTransaction();
-
       throw new Error(error);
+    } finally {
+      // Ending the session
+      await session.endSession();
     }
   },
 };
@@ -344,20 +318,24 @@ const handleCastVote = {
     stake: { type: GraphQLString },
     supports: { type: GraphQLString },
     timestamp: { type: GraphQLString },
-    block: { type: GraphQLString },
-    transactionHash: { type: GraphQLString },
-    logIndex: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
     const session = await mongoose.startSession();
-    //starting the transaction
-    session.startTransaction();
 
     try {
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+          result: true,
+        });
+      }
+      await session.withTransaction(async () => {
       await updateVoteState(args.address, args.voteId)
 
       const voter = await loadOrCreateVoter(args.address, args.voter)
-      voter.save({session})
+      await voter.save({session})
     
       const castVote = await loadOrCreateCastVote(
         args.address,
@@ -370,29 +348,18 @@ const handleCastVote = {
       castVote.supports = args.supports
       castVote.createdAt = args.timestamp
     
-      castVote.save({session})
-      let response = await Response.findOne({ id: "1" });
-      if (response === null) {
-        // create new response
-        response = new Response({
-          id: "1",
-          result: true,
-        });
-        await response.save({session});
-      }
+      await castVote.save({session})
 
-      //committing the transaction 
-      await session.commitTransaction();
-
-      // Ending the session
-      session.endSession();
-
-      return response;
+     
+      await response.save({session});
+      
+    }, transactionOptions);
+    return response;
     } catch (error) {
-      // Rollback any changes made in the database
-      await session.abortTransaction();
-
       throw new Error(error);
+    } finally {
+      // Ending the session
+      await session.endSession();
     }
   },
 };
@@ -404,22 +371,12 @@ const handleExecuteVote = {
     address: { type: GraphQLString },
     voteId: { type: GraphQLString },
     timestamp: { type: GraphQLString },
-    block: { type: GraphQLString },
-    transactionHash: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
     const session = await mongoose.startSession();
-    //starting the transaction
-    session.startTransaction();
 
     try {
-      await updateVoteState(args.address, args.voteId)
 
-      const voteEntityId = buildVoteEntityId(args.address, args.voteId)
-      const vote = await Vote.findOne({id : voteEntityId});
-      vote.executed = true
-      vote.executedAt = args.timestamp
-      vote.save({session})
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
         // create new response
@@ -427,20 +384,25 @@ const handleExecuteVote = {
           id: "1",
           result: true,
         });
-        await response.save({session});
       }
+      await session.withTransaction(async () => {
+        await updateVoteState(args.address, args.voteId)
+  
+        const voteEntityId = buildVoteEntityId(args.address, args.voteId)
+        const vote = await Vote.findOne({id : voteEntityId});
+        vote.executed = true
+        vote.executedAt = args.timestamp
+        await vote.save({session})
 
-      //committing the transaction 
-      await session.commitTransaction();
-
-      // Ending the session
-      session.endSession();      
+        
+        await response.save({session});
+      }, transactionOptions);
       return response;
     } catch (error) {
-      // Rollback any changes made in the database
-      await session.abortTransaction();
-
       throw new Error(error);
+    } finally {
+      // Ending the session
+      await session.endSession();
     }
   },
 };
@@ -466,7 +428,7 @@ async function updateVoteState(votingAddress, voteId){
   vote.yea = voteData.value6
   vote.nay = voteData.value7
 
-  vote.save({session})
+  await vote.save({session})
 }
 
 async function loadOrCreateVoter(
