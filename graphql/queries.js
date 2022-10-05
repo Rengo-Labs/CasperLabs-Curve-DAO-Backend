@@ -46,15 +46,43 @@ const response = {
   },
 };
 
-const castsByVoter =  {
+const castsByDefaultAccount =  {
   type: GraphQLList(castType),
   description: "Retrieves casts by voter",
   args: {
-    voter: {type : GraphQLString},
   },
   async resolve(parent, args, context) {
     try {
-      let casts = await cast.find({voter : args.voter}).populate('voter').populate('vote');
+      //contract.default_account will be replaced with default account value of contract
+      let voterRecord = await voter
+      .findOne({address : 'contract.default_account'});
+      
+      let casts = await cast
+      .find({voter : voterRecord._id})
+      .populate('voter')
+      .populate('vote');
+      return casts;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+};
+
+const castsByVoterAccount =  {
+  type: GraphQLList(castType),
+  description: "Retrieves casts by voter",
+  args: {
+    voterAccount : {type : GraphQLString}
+  },
+  async resolve(parent, args, context) {
+    try {
+      let voterRecord = await voter
+      .findOne({address : args.voterAccount});
+
+      let casts = await cast
+      .find({voter : voterRecord._id})
+      .populate('voter')
+      .populate('vote');
       return casts;
     } catch (error) {
       throw new Error(error);
@@ -70,7 +98,14 @@ const castsByVoteId =  {
   },
   async resolve(parent, args, context) {
     try {
-      let casts = await cast.find({vote : args.voteId}).populate('voter').populate('vote');
+      let voteRecord = await vote
+      .findOne({id : args.voteId});
+
+      let casts = await cast
+      .find({vote : voteRecord._id})
+      .sort({voterStake : -1})
+      .populate('voter')
+      .populate('vote');
       return casts;
     } catch (error) {
       throw new Error(error);
@@ -84,12 +119,12 @@ const votesByAppAddress =  {
   description: "Retrieves votes by app address",
   args: {
     appAddresses: {type : GraphQLList(GraphQLString)},
-    orderBy : {type : GraphQLString},
-    orderDirection : {type : GraphQLString}
   },
   async resolve(parent, args, context) {
     try {
-      let votes = await vote.find({appAddress : {$in : args.appAddresses}}).sort({[args.orderBy] : args.orderDirection == 'asc' ? 1 : -1}).populate('castVotes');
+      let votes = await vote
+      .find({appAddress : {$in : args.appAddresses}})
+      .sort({startDate : -1});
       return votes;
     } catch (error) {
       throw new Error(error);
@@ -102,13 +137,15 @@ const votesByAppAddressAndCreator =  {
   description: "Retrieves votes by app address and creator",
   args: {
     appAddresses: {type : GraphQLList(GraphQLString)},
-    creator : {type : GraphQLString},
   },
   async resolve(parent, args, context) {
     try {
-      debugger;
-      let v = await vote.find();
-      let votes = await vote.find({appAddress : {$in : args.appAddresses}, creator : args.creator}).populate('castVotes');
+      //contract.default_account will be replaced with default account value of contract
+      let votes = await vote
+      .find({
+        appAddress : {$in : args.appAddresses}, 
+        creator : "contract.default_account"
+      });
       return votes;
     } catch (error) {
       throw new Error(error);
@@ -120,15 +157,18 @@ const votesByVoteIdAndCreator =  {
   type: GraphQLList(voteType),
   description: "Retrieves votes by vote id and creator",
   args: {
-    id: {type : GraphQLString},
+    voteId: {type : GraphQLString},
     creator : {type : GraphQLString},
-    orderBy : {type : GraphQLString},
-    orderDirection : {type : GraphQLString},
-    first : {type : GraphQLString}
   },
   async resolve(parent, args, context) {
     try {
-      let votes = await vote.find({_id : args.id, creator : args.creator}).limit(args.first).sort({[args.orderBy] : args.orderDirection == 'asc' ? 1 : -1}).populate('castVotes');
+      let votes = await vote
+      .find({
+        id : args.voteId,
+        creator : args.creator
+        })
+      .sort({startDate : 'desc'})
+      .limit(1);
       return votes;
     } catch (error) {
       throw new Error(error);
@@ -140,13 +180,13 @@ const votesByVoteId =  {
   type: GraphQLList(voteType),
   description: "Retrieves votes by vote id",
   args: {
-    id: {type : GraphQLString},
-    orderBy : {type : GraphQLString},
-    orderDirection : {type : GraphQLString},
+    voteId: {type : GraphQLString},
   },
   async resolve(parent, args, context) {
     try {
-      let votes = await vote.find({_id : args.id}).sort({[args.orderBy] : args.orderDirection == 'asc' ? 1 : -1}).populate('castVotes');
+      let votes = await vote
+      .find({id : args.voteId})
+      .sort({startDate : -1});
       return votes;
     } catch (error) {
       throw new Error(error);
@@ -159,7 +199,8 @@ const votesByVoteId =  {
 module.exports = {
   responses,
   response,
-  castsByVoter,
+  castsByDefaultAccount,
+  castsByVoterAccount,
   castsByVoteId,
   votesByAppAddress,
   votesByAppAddressAndCreator,
