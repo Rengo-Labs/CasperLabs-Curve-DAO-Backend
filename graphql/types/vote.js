@@ -28,6 +28,10 @@ const voteType = new GraphQLObjectType({
       votingPower:{type:GraphQLString},
       script:{type:GraphQLString},
       voteNum:{type:GraphQLString},
+      creatorVotingPower:{type:GraphQLString},
+      transactionHash:{type:GraphQLString},
+      castCount:{type:GraphQLString},
+      voteCountSeq:{type:GraphQLString},
       castVotes:{type : GraphQLList(GraphQLString)}
     })
 });

@@ -18,7 +18,7 @@ const castSchema = new Schema({
         type:Boolean
     },
 
-    stake: {
+    voterStake: {
         type:String
     },
 

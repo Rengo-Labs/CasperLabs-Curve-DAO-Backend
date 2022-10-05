@@ -68,6 +68,22 @@ const voteSchema = new Schema({
     voteNum: {
         type:String
     },
+
+    creatorVotingPower: {
+        type:String
+    },
+
+    transactionHash: {
+        type:String
+    },
+
+    castCount: {
+        type:String
+    },
+
+    voteCountSeq: {
+        type:String
+    },
     
     castVotes: [{
         type: Schema.Types.ObjectId, ref: 'cast' 
