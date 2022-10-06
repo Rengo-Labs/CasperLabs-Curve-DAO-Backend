@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { GraphQLString } = require("graphql");
+const { GraphQLString, GraphQLBoolean } = require("graphql");
 const mongoose = require("mongoose");
 const Response = require("../../../models/response");
 const { responseType } = require("../../types/response");
@@ -205,6 +205,7 @@ const handleStartVote = {
     // eventObjectId: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    
     const session = await mongoose.startSession();
    
     try {
@@ -285,11 +286,12 @@ const handleCastVote = {
     voteId: { type: GraphQLString },
     voter: { type: GraphQLString },
     stake: { type: GraphQLString },
-    supports: { type: GraphQLString },
+    supports: { type: GraphQLBoolean },
     timestamp: { type: GraphQLString },
     // eventObjectId: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    
     const session = await mongoose.startSession();
 
     try {
@@ -306,22 +308,46 @@ const handleCastVote = {
       }
       response.result = true;
 
-      const vote = await updateVoteState(args.address, args.voteId);
-      const voter = await loadOrCreateVoter(args.address, args.voter);
-      const castVote = await loadOrCreateCastVote(
-        args.address,
-        args.voteId,
-        args.voter
-      );
+      // Integrate the voting contract to get the voteData
+      // const votingApp = VotingContract.bind(votingAddress)
+      // const voteData = votingApp.getVote(voteId)
 
-      castVote.voter = voter.id
-      castVote.stake = args.stake
-      castVote.supports = args.supports
-      castVote.createdAt = args.timestamp
+      //Below is supposed data
+      let voteData = {
+        value6: "6",
+        value7: "7",
+      };
+
+      const voteEntityId = buildVoteEntityId(args.address, args.voteId);
+      const vote = await Vote.findOne({id : voteEntityId});
+      if(!vote){
+        console.log("vote not found.");
+      }
+      vote.yea = voteData.value6
+      vote.nay = voteData.value7
+
+      const voterId = buildVoterId(args.address, args.voter)
+      let voter = await Voter.findOne({id : voterId});
+
+      if (voter === null) {
+        voter = new Voter({id : voterId});
+        voter.address = args.voter
+      }
+
+      const castVoteId = buildCastEntityId(args.voteId, args.voter);
+      let castVote = await Cast.findOne({id : castVoteId});
+      if (castVote === null) {
+        castVote = new Cast({id : castVoteId});
+      }
+      castVote.stake = args.stake;
+      castVote.supports = args.supports;
+      castVote.createdAt = args.timestamp;
 
       await session.withTransaction(async () => {
-      await vote.save({session});
-      await voter.save({session})
+      let voteCreated = await vote.save({session});
+      let voterCreated = await voter.save({session});
+      castVote.vote = voteCreated._id;
+      castVote.voter = voterCreated._id;
       await castVote.save({session})
       //  await eventDataResult.save({ session });
       await response.save({session});
@@ -346,6 +372,7 @@ const handleExecuteVote = {
     // eventObjectId: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    
     const session = await mongoose.startSession();
     try {
       // updating mutation status
@@ -363,6 +390,9 @@ const handleExecuteVote = {
 
       const voteEntityId = buildVoteEntityId(args.address, args.voteId)
       const vote = await Vote.findOne({id : voteEntityId});
+      if(!vote){
+        console.log("vote not found.");
+      }
 
       // Integrate the voting contract to get the voteData
       // const votingApp = VotingContract.bind(votingAddress)
@@ -438,55 +468,8 @@ function buildVoteEntityId(appAddress, voteNum){
   )
 }
 
-async function updateVoteState(votingAddress, voteId){
-  // Integrate the voting contract to get the voteData
-  // const votingApp = VotingContract.bind(votingAddress)
-  // const voteData = votingApp.getVote(voteId)
-
-  //Below is supposed data
-  let voteData = {
-    value6: "6",
-    value7: "7",
-  };
-
-  const voteEntityId = buildVoteEntityId(votingAddress, voteId);
-  const vote = await vote.findOne({id : voteEntityId});
-  vote.yea = voteData.value6
-  vote.nay = voteData.value7
-  return vote;
-  
-}
-
-async function loadOrCreateVoter(
-  votingAddress,
-  voterAddress
-){
-  const voterId = buildVoterId(votingAddress, voterAddress)
-  let voter = await Voter.findOne({id : voterId});
-
-  if (voter === null) {
-    voter = new Voter({id : voterId});
-    voter.address = voterAddress
-  }
-  return voter;
-}
-
 function buildVoterId(voting, voter){
   return voting.toString() + '-voter-' + voter.toString()
-}
-
-async function loadOrCreateCastVote(
-  votingAddress,
-  voteId,
-  voterAddress
-){
-  const castVoteId = buildCastEntityId(voteId, voterAddress)
-  let castVote = await Cast.findOne({id : castVoteId});
-  if (castVote === null) {
-    castVote = new Cast({id : castVoteId});
-    castVote.vote = buildVoteEntityId(votingAddress, voteId)
-  }
-  return castVote;
 }
 
 function buildCastEntityId(voteId, voter){
