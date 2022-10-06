@@ -46,29 +46,7 @@ const response = {
   },
 };
 
-const castsByDefaultAccount =  {
-  type: GraphQLList(castType),
-  description: "Retrieves casts by voter",
-  args: {
-  },
-  async resolve(parent, args, context) {
-    try {
-      //contract.default_account will be replaced with default account value of contract
-      let voterRecord = await voter
-      .findOne({address : 'contract.default_account'});
-      
-      let casts = await cast
-      .find({voter : voterRecord._id})
-      .populate('voter')
-      .populate('vote');
-      return casts;
-    } catch (error) {
-      throw new Error(error);
-    }
-  },
-};
-
-const castsByVoterAccount =  {
+const castsByVoter =  {
   type: GraphQLList(castType),
   description: "Retrieves casts by voter",
   args: {
@@ -76,14 +54,17 @@ const castsByVoterAccount =  {
   },
   async resolve(parent, args, context) {
     try {
+      
       let voterRecord = await voter
       .findOne({address : args.voterAccount});
 
-      let casts = await cast
+      if(voterRecord)
+      return await cast
       .find({voter : voterRecord._id})
       .populate('voter')
       .populate('vote');
-      return casts;
+      
+      else return [];
     } catch (error) {
       throw new Error(error);
     }
@@ -98,15 +79,18 @@ const castsByVoteId =  {
   },
   async resolve(parent, args, context) {
     try {
+      
       let voteRecord = await vote
       .findOne({id : args.voteId});
 
-      let casts = await cast
+      if(voteRecord)
+      return await cast
       .find({vote : voteRecord._id})
       .sort({voterStake : -1})
       .populate('voter')
       .populate('vote');
-      return casts;
+
+      else return [];
     } catch (error) {
       throw new Error(error);
     }
@@ -137,14 +121,15 @@ const votesByAppAddressAndCreator =  {
   description: "Retrieves votes by app address and creator",
   args: {
     appAddresses: {type : GraphQLList(GraphQLString)},
+    creator: {type : GraphQLString},
   },
   async resolve(parent, args, context) {
     try {
-      //contract.default_account will be replaced with default account value of contract
+
       let votes = await vote
       .find({
         appAddress : {$in : args.appAddresses}, 
-        creator : "contract.default_account"
+        creator : args.creator
       });
       return votes;
     } catch (error) {
@@ -199,8 +184,7 @@ const votesByVoteId =  {
 module.exports = {
   responses,
   response,
-  castsByDefaultAccount,
-  castsByVoterAccount,
+  castsByVoter,
   castsByVoteId,
   votesByAppAddress,
   votesByAppAddressAndCreator,
