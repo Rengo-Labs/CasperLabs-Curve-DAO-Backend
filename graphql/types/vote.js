@@ -32,7 +32,7 @@ const voteType = new GraphQLObjectType({
       transactionHash:{type:GraphQLString},
       castCount:{type:GraphQLString},
       voteCountSeq:{type:GraphQLString},
-      castVotes:{type : GraphQLList(GraphQLString)}
+      // castVotes:{type : GraphQLList(GraphQLString)}
     })
 });
   

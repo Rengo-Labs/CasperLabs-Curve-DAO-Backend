@@ -3,7 +3,9 @@ var Schema = mongoose.Schema;
 
 const voteSchema = new Schema({
     id: {
-        type:String
+        type:String,
+        unique : true,
+        required : true
     },
     orgAddress: {
         type:String
@@ -85,9 +87,9 @@ const voteSchema = new Schema({
         type:String
     },
     
-    castVotes: [{
-        type: Schema.Types.ObjectId, ref: 'cast' 
-    }]
+    // castVotes: [{
+    //     type: Schema.Types.ObjectId, ref: 'cast' 
+    // }]
 });
 
 var vote = mongoose.model("vote", voteSchema);

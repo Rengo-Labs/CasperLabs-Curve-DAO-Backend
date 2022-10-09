@@ -13,7 +13,7 @@ const voterType = new GraphQLObjectType({
       _id: {type: GraphQLID },
       id: {type: GraphQLString },
       address:{type:GraphQLString},
-      castVotes:{type : GraphQLList(GraphQLString)}
+      // castVotes:{type : GraphQLList(GraphQLString)}
     })
 });
   
