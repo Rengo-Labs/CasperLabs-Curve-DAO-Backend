@@ -7,6 +7,7 @@ const VotingApp = require("../../../models/votingApp");
 const Vote = require("../../../models/vote");
 const Voter = require("../../../models/voter");
 const Cast = require("../../../models/cast");
+const eventsData = require("../../../models/eventsData");
 var bigdecimal = require("bigdecimal");
 
 
@@ -22,14 +23,14 @@ const handleMinimumBalanceSet = {
   args: {
     address: { type: GraphQLString },
     minBalance: { type: GraphQLString },
-    // eventObjectId: { type: GraphQLString },
+    eventObjectId: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
     const session = await mongoose.startSession();
     try {
       // updating mutation status
-      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-      //  eventDataResult.status="completed"
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -45,7 +46,7 @@ const handleMinimumBalanceSet = {
 
       await session.withTransaction(async () => {
         await app.save({session});
-        //  await eventDataResult.save({ session });
+        await eventDataResult.save({ session });
         await response.save({session});
       }, transactionOptions);
 
@@ -65,15 +66,15 @@ const handleMinimumTimeSet = {
   args: {
     address: { type: GraphQLString },
     minTime: { type: GraphQLString },
-    // eventObjectId: { type: GraphQLString },
+    eventObjectId: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
 
     const session = await mongoose.startSession();
     try {
       // updating mutation status
-      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-      //  eventDataResult.status="completed"
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -89,7 +90,7 @@ const handleMinimumTimeSet = {
 
       await session.withTransaction(async () => {
         await app.save({session});
-        //  await eventDataResult.save({ session });
+        await eventDataResult.save({ session });
         await response.save({session});
       }, transactionOptions);
 
@@ -109,7 +110,7 @@ const handleChangeMinQuorum = {
   args: {
     address: { type: GraphQLString },
     minAcceptQuorumPct: { type: GraphQLString },
-    // eventObjectId: { type: GraphQLString },
+    eventObjectId: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
 
@@ -117,8 +118,8 @@ const handleChangeMinQuorum = {
 
     try {
       // updating mutation status
-      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-      //  eventDataResult.status="completed"
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -134,7 +135,7 @@ const handleChangeMinQuorum = {
 
       await session.withTransaction(async () => {
       await app.save({session});
-      //  await eventDataResult.save({ session });
+      await eventDataResult.save({ session });
       await response.save({session});
       }, transactionOptions);
 
@@ -154,7 +155,7 @@ const handleChangeSupportRequired = {
   args: {
     address: { type: GraphQLString },
     supportRequiredPct: { type: GraphQLString },
-    // eventObjectId: { type: GraphQLString },
+    eventObjectId: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
 
@@ -162,8 +163,8 @@ const handleChangeSupportRequired = {
 
     try {
       // updating mutation status
-      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-      //  eventDataResult.status="completed"
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -179,7 +180,7 @@ const handleChangeSupportRequired = {
 
       await session.withTransaction(async () => {
         await app.save({session});
-        //  await eventDataResult.save({ session });
+        await eventDataResult.save({ session });
         await response.save({session});
       }, transactionOptions);
 
@@ -202,7 +203,7 @@ const handleStartVote = {
     voteId: { type: GraphQLString },
     metadata: { type: GraphQLString },
     transactionFrom: { type: GraphQLString },
-    // eventObjectId: { type: GraphQLString },
+    eventObjectId: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
     
@@ -210,8 +211,8 @@ const handleStartVote = {
    
     try {
       // updating mutation status
-      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-      //  eventDataResult.status="completed"
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -263,7 +264,7 @@ const handleStartVote = {
 
       await session.withTransaction(async () => {
         await vote.save({session})
-        //  await eventDataResult.save({ session });
+         await eventDataResult.save({ session });
         await response.save({session});
       }, transactionOptions);
 
@@ -288,7 +289,7 @@ const handleCastVote = {
     stake: { type: GraphQLString },
     supports: { type: GraphQLBoolean },
     timestamp: { type: GraphQLString },
-    // eventObjectId: { type: GraphQLString },
+    eventObjectId: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
     
@@ -296,8 +297,8 @@ const handleCastVote = {
 
     try {
       // updating mutation status
-      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-      //  eventDataResult.status="completed"
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed"
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -349,7 +350,7 @@ const handleCastVote = {
       castVote.vote = voteCreated._id;
       castVote.voter = voterCreated._id;
       await castVote.save({session})
-      //  await eventDataResult.save({ session });
+       await eventDataResult.save({ session });
       await response.save({session});
     }, transactionOptions);
     return response;
@@ -369,15 +370,15 @@ const handleExecuteVote = {
     address: { type: GraphQLString },
     voteId: { type: GraphQLString },
     timestamp: { type: GraphQLString },
-    // eventObjectId: { type: GraphQLString },
+    eventObjectId: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
     
     const session = await mongoose.startSession();
     try {
       // updating mutation status
-      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-      //  eventDataResult.status="completed"
+       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+       eventDataResult.status="completed";
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -411,7 +412,7 @@ const handleExecuteVote = {
 
       await session.withTransaction(async () => {
         await vote.save({session})
-        //  await eventDataResult.save({ session });
+        await eventDataResult.save({ session });
         await response.save({session});
       }, transactionOptions);
       return response;
