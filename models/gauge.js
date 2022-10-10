@@ -30,9 +30,6 @@ const gaugeSchema = new Schema({
     weightVotes:[{
         type:String
     }],
-    originalBalance : {type : String}
-  
-  
 });
 
 var gauge = mongoose.model("gauge", gaugeSchema);

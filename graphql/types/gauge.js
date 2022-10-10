@@ -20,7 +20,6 @@ const gaugeType = new GraphQLObjectType({
       createdAtTransaction: {type: GraphQLString},
       weights: {type: GraphQLList(GraphQLString)},
       weightVotes: {type: GraphQLList(GraphQLString)},
-      originalBalance: {type: GraphQLString },
     })
 });
   
