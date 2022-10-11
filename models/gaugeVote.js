@@ -18,6 +18,9 @@ const gaugeVoteSchema = new Schema({
     weight:{
         type:String
     },
+    gaugeWeights : [{
+        type : mongoose.Schema.Types.ObjectId, ref: 'gaugeWeight'
+    }],
     total_weight : {type:String},
     veCRV : {type:String},
     totalveCRV : {type:String}

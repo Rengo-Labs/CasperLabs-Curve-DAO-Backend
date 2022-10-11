@@ -19,6 +19,9 @@ const { GraphQLString } = require("graphql");
 // let LpToken= require('../JsClients/Registry/test/installed.ts')
 
 const { GAUGE_TOTAL_WEIGHT_PRECISION } = require("../../constants");
+const GaugeVote = require("../../../models/gaugeVote");
+const { getveCRV, gettotalveCRV } = require("../../../JsClients/VOTING/votingFunctionsForBackend/functions");
+
 
 let WEEK = "604800";
 
@@ -406,7 +409,7 @@ const handleVoteForGauge = {
         // await gaugeController.setContractHash(address);
         let nextWeek = nextPeriod(args.time, WEEK);
 
-        let newData = new GaugeWeight({
+        let gaugeWeight = new GaugeWeight({
           id: gauge.id + "-" + nextWeek.toString(),
           gauge: gauge.id,
           time: nextWeek,
@@ -415,9 +418,9 @@ const handleVoteForGauge = {
           // ),
           weight: "1000000000"
         });
-        await GaugeWeight.create(newData);
+        gaugeWeight = await GaugeWeight.create(gaugeWeight);
 
-        let data = new GaugeTotalWeight({
+        let gaugeTotalWeight = new GaugeTotalWeight({
           id: nextWeek.toString(),
           time: nextWeek,
           // weight: BigInt(
@@ -426,11 +429,11 @@ const handleVoteForGauge = {
           // ),
           weight: "1000000000"
         });
-        await GaugeTotalWeight.create(data);
+        gaugeTotalWeight = await GaugeTotalWeight.create(gaugeTotalWeight);
 
         let user = await getOrRegisterAccount(args.user);
 
-        let voteData = new GaugeWeightVote({
+        let gaugeWeightVote = new GaugeWeightVote({
           id: gauge.id + "-" + user.id + "-" + args.time.toString(),
           gauge: gauge.id,
           user: user.id,
@@ -438,7 +441,25 @@ const handleVoteForGauge = {
           weight: BigInt(args.weight),
         //weight:"1000000000"
         });
-        await GaugeWeightVote.create(voteData);
+        await GaugeWeightVote.create(gaugeWeightVote);
+
+        //here we fetch values from blockchain using voting contract backend functions
+        let veCRV = getveCRV();
+        let totalveCRV = gettotalveCRV();
+
+        let gaugeVote = new GaugeVote({
+          id: gauge.id + "-" + user.id + "-" + args.time.toString(),
+          gauge: gauge.id,
+          user: user.id,
+          time: args.time,
+          weight: BigInt(args.weight),
+          total_weight : gaugeTotalWeight.weight,
+          veCRV : veCRV,
+          totalveCRV : totalveCRV,
+          gaugeWeights : [gaugeWeight._id]
+        });
+
+        await GaugeVote.create(gaugeVote);
       }
         let response = await Response.findOne({ id: "1" });
         if (response === null) {
