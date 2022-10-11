@@ -11,12 +11,9 @@ const userBalanceType = new GraphQLObjectType({
     fields: () => ({
       _id: {type: GraphQLID },
       id: {type: GraphQLString },
-      startTx:{type:GraphQLString},
       user: {type: GraphQLString },
       CRVLocked:{type:GraphQLString},
-      lock_start: {type: GraphQLString },
       unlock_time:{type:GraphQLString},
-      weight:{type:GraphQLString},
     })
 });
   
