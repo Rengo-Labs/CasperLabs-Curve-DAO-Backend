@@ -20,7 +20,10 @@ const gaugeVoteSchema = new Schema({
     },
     total_weight : {type:String},
     veCRV : {type:String},
-    totalveCRV : {type:String}
+    totalveCRV : {type:String},
+    gaugeWeights : [{
+      type : mongoose.Schema.Types.ObjectId, ref: 'gaugeWeight'
+  }],
 });
 
 var gaugeVote = mongoose.model("gaugeVote", gaugeVoteSchema);
