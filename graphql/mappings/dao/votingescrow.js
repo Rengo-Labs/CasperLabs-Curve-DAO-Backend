@@ -54,26 +54,53 @@ const handleVotingDeposit = {
       let power = await votingEscrow.balanceOf(args.provider, "epoch_time");
       let totalPower = await votingEscrow.totalSupply();
 
-      let daopower = new DaoPower({
+      let daopower = await DaoPower.findOne({id : `${args.block}-${args.timestamp}`});
+      if(!daopower){
+        daopower = new DaoPower({
           id : `${args.block}-${args.timestamp}`,
           block : args.block,
           timestamp : args.timestamp,
           totalPower : totalPower
       })
+      }
+      else{
+        daopower.id = `${args.block}-${args.timestamp}`;
+        daopower.block =args.block;
+        daopower.timestamp = args.timestamp;
+        daopower.totalPower = totalPower;
+      }
 
-      let votingpower = new VotingPower({
-        id : args.provider,
-        power : power
-      })
 
-      let userbalance = await new UserBalance({
+      let votingpower = await VotingPower.findOne({id : args.provider});
+
+      if(!votingpower)
+        votingpower = new VotingPower({
+          id : args.provider,
+          power : power
+        })
+      
+      else
+        votingpower.power = power;
+      
+      let userbalance = await UserBalance.findOne({id : args.provider});
+
+      if(!userbalance)
+       userbalance = new UserBalance({
         id : args.provider,
         user : args.provider,
         unlock_time : args.locktime,
         CRVLocked : args.value
       });
 
-      let votingescrow = new VotingEscrow({
+      else{
+        userbalance.unlock_time = args.locktime;
+        userbalance.CRVLocked = args.value;
+      }
+
+      let votingescrow = await VotingEscrow.findOne({id : args.provider});
+       
+      if(!votingpower)
+       votingescrow = new VotingEscrow({
         id : args.provider,
         provider : args.provider,
         value : args.value,
@@ -82,6 +109,14 @@ const handleVotingDeposit = {
         timestamp : args.timestamp,
         totalPower : totalPower
       });
+
+      else{
+        votingescrow.value = args.value;
+        votingescrow.locktime = args.locktime;
+        votingescrow.type = args.type;
+        votingescrow.timestamp = args.timestamp;
+        votingescrow.totalPower = totalPower;
+      }
 
       await session.withTransaction(async () => {
         await daopower.save({session});
@@ -134,31 +169,63 @@ const handleVotingWithdraw = {
       let power = await votingEscrow.balanceOf(args.provider, "epoch_time");
       let totalPower = await votingEscrow.totalSupply();
 
-      let daopower = new DaoPower({
+      let daopower = await DaoPower.findOne({id : `${args.block}-${args.timestamp}`});
+      if(!daopower){
+        daopower = new DaoPower({
           id : `${args.block}-${args.timestamp}`,
           block : args.block,
           timestamp : args.timestamp,
           totalPower : totalPower
       })
+      }
+      else{
+        daopower.id = `${args.block}-${args.timestamp}`;
+        daopower.block =args.block;
+        daopower.timestamp = args.timestamp;
+        daopower.totalPower = totalPower;
+      }
 
-      let votingpower = new VotingPower({
-        id : args.provider,
-        power : power
-      })
 
-      let userbalance = await new UserBalance({
+      let votingpower = await VotingPower.findOne({id : args.provider});
+
+      if(!votingpower)
+        votingpower = new VotingPower({
+          id : args.provider,
+          power : power
+        })
+      
+      else
+        votingpower.power = power;
+      
+      let userbalance = await UserBalance.findOne({id : args.provider});
+
+      if(!userbalance)
+       userbalance = new UserBalance({
         id : args.provider,
         user : args.provider,
         CRVLocked : args.value
       });
 
-      let votingescrow = new VotingEscrow({
+      else
+        userbalance.CRVLocked = args.value;
+      
+
+      let votingescrow = await VotingEscrow.findOne({id : args.provider});
+       
+      if(!votingpower)
+       votingescrow = new VotingEscrow({
         id : args.provider,
         provider : args.provider,
         value : args.value,
         timestamp : args.timestamp,
         totalPower : totalPower
       });
+
+      else{
+        votingescrow.value = args.value;
+        votingescrow.timestamp = args.timestamp;
+        votingescrow.totalPower = totalPower;
+      }
 
       await session.withTransaction(async () => {
         await daopower.save({session});
