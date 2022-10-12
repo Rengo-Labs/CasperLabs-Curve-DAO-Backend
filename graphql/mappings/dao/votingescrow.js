@@ -12,7 +12,6 @@ let eventsData = require("../../../models/eventsData");
 const Response = require("../../../models/response");
 const { responseType } = require("../../types/response");
 let votingEscrow = require("../../../JsClients/VOTINGESCROW/votingEscrowFunctionsForBackend/functions.ts");
-const daoPower = require("../../../models/daopower");
 
 const transactionOptions = {
   readPreference: "primary",
@@ -33,7 +32,6 @@ const handleVotingDeposit = {
     eventObjectId: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
-
      // updating mutation status
      let eventDataResult = await eventsData.findOne({
       _id: args.eventObjectId,
@@ -99,7 +97,7 @@ const handleVotingDeposit = {
 
       let votingescrow = await VotingEscrow.findOne({id : args.provider});
        
-      if(!votingpower)
+      if(!votingescrow)
        votingescrow = new VotingEscrow({
         id : args.provider,
         provider : args.provider,
@@ -212,7 +210,7 @@ const handleVotingWithdraw = {
 
       let votingescrow = await VotingEscrow.findOne({id : args.provider});
        
-      if(!votingpower)
+      if(!votingescrow)
        votingescrow = new VotingEscrow({
         id : args.provider,
         provider : args.provider,

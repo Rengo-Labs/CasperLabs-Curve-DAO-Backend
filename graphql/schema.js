@@ -74,6 +74,11 @@ const {
   handleVoteForGauge
 } = require('../graphql/mappings/dao/gauge-controller');
 
+const {
+  handleVotingDeposit,
+  handleVotingWithdraw
+  } = require("../graphql/mappings/dao/votingescrow");
+
 // Define QueryType
 const QueryType = new GraphQLObjectType({
   name: "QueryType",
@@ -129,7 +134,9 @@ const MutationType = new GraphQLObjectType({
     handleNewGauge,
     handleNewGaugeWeight,
     handleNewTypeWeight,
-    handleVoteForGauge
+    handleVoteForGauge,
+    handleVotingDeposit,
+    handleVotingWithdraw,
   },
 });
 
