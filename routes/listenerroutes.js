@@ -175,7 +175,7 @@ tokenAmounts: tokenAmounts,
 fees: fees,
 invariant: invariant,
 tokenSupply: tokenSupply,
-block: block,
+block: block_hash,
 timestamp: timestamp,
 poolId: poolId,
 providerId: providerId,
@@ -258,7 +258,7 @@ console.log("handleAddLiquidity Mutation called.")
 tokenAmounts: tokenAmounts,
 fees: fees,
 tokenSupply: tokenSupply,
-block: block,
+block: block_hash,
 timestamp: timestamp,
 poolId: poolId,
 providerId: providerId,
@@ -347,7 +347,7 @@ tokenAmounts: tokenAmounts,
 fees: fees,
 invariant: invariant,
 tokenSupply: tokenSupply,
-block: block,
+block: block_hash,
 timestamp: timestamp,
 poolId: poolId,
 providerId: providerId,
@@ -424,7 +424,7 @@ console.log("handleRemoveLiquidityImbalance Mutation called.")
 {
 tokenAmount: tokenAmount,
 coinAmount: coinAmount,
-block: block,
+block: block_hash,
 timestamp: timestamp,
 poolId: poolId,
 providerId: providerId,
@@ -503,7 +503,7 @@ console.log("handleRemoveLiquidityOne Mutation called.")
 {
   poolId: poolId,
   transactionHash: transactionHash,
-  block: block,
+  block: block_hash,
   timestamp: timestamp,
   logIndex: logIndex,
   buyer: buyer,
@@ -582,7 +582,7 @@ console.log("handleTokenExchange Mutation called.")
 {
   poolId: poolId,
   transactionHash: transactionHash,
-  block: block,
+  block: block_hash,
   timestamp: timestamp,
   logIndex: logIndex,
   buyer: buyer,
@@ -640,7 +640,7 @@ return true;
 {
   poolId: poolId,
   transactionHash: transactionHash,
-  block: block,
+  block: block_hash,
   timestamp: timestamp,
   logIndex: logIndex,
   admin: admin,
@@ -699,7 +699,7 @@ return true;
 {
   poolId: poolId,
   transactionHash: transactionHash,
-  block: block,
+  block: block_hash,
   timestamp: timestamp,
   logIndex: logIndex,
   fee: fee,
@@ -765,7 +765,7 @@ return true;
   poolId: poolId,
   A: A,
   transactionHash: transactionHash,
-  block: block,
+  block: block_hash,
   timestamp: timestamp,
   logIndex: logIndex,
   fee: fee,
@@ -820,7 +820,7 @@ return true;
   poolId: poolId,
   new_A: new_A,
   transactionHash: transactionHash,
-  block: block,
+  block: block_hash,
   timestamp: timestamp,
   logIndex: logIndex,
 }
@@ -873,7 +873,7 @@ return true;
   poolId: poolId,
   A: A,
   transactionHash: transactionHash,
-  block: block,
+  block: block_hash,
   timestamp: timestamp,
   logIndex: logIndex,
 }
@@ -921,7 +921,7 @@ return true;
 {
 addressProviderContractHash: addressProviderContractHash,
 id: id,
-block: block,
+block: block_hash,
 timestamp: timestamp,
 transactionHash: transactionHash,
 }
@@ -969,7 +969,7 @@ return true;
 {
 addressProviderContractHash: addressProviderContractHash,
 id: id,
-block: block,
+block: block_hash,
 timestamp: timestamp,
 transactionHash: transactionHash,
 }
@@ -1002,7 +1002,7 @@ return true;
 {
  poolId: poolId,
  transactionHash: transactionHash,
- block: block,
+ block: block_hash,
  timestamp: timestamp,
 }
 );
@@ -1034,7 +1034,7 @@ return true;
 {
  poolId: poolId,
  transactionHash: transactionHash,
- block: block,
+ block: block_hash,
  timestamp: timestamp,
 }
 );
@@ -1072,7 +1072,7 @@ return true;
  proxy: proxy,
  context: context,
  transactionHash: transactionHash,
- block: block,
+ block: block_hash,
  timestamp: timestamp,
 }
 );
@@ -1142,7 +1142,7 @@ return true;
     working_balance: working_balance,
     working_supply: working_supply,
     transactionHash: transactionHash,
-    block: block,
+    block: block_hash,
     timestamp: timestamp,
   }
 );
@@ -1679,7 +1679,83 @@ return true;
 );
 console.log("handleVoteForGauge Mutation called.")
 return true;
-    }                        
+    } else if(eventName == "Deposit") {
+      console.log(eventName + " Event result: ");
+      console.log(newData[0][0].data + " = " + newData[0][1].data);
+      console.log(newData[1][0].data + " = " + newData[1][1].data);
+      console.log(newData[2][0].data + " = " + newData[2][1].data);
+      console.log(newData[3][0].data + " = " + newData[3][1].data);
+      console.log(newData[4][0].data + " = " + newData[4][1].data);
+      console.log(newData[5][0].data + " = " + newData[5][1].data);
+      console.log(newData[6][0].data + " = " + newData[6][1].data);
+
+      var provider = splitdata(newData[0][1].data);      
+      var value = parseInt(newData[1][1].data);
+      var locktime = parseInt(newData[2][1].data);
+      var _type = splitdata(newData[3][1].data);
+      var ts = parseInt(newData[4][1].data);
+
+      console.log("provider: ", provider);
+      console.log("value: ", value);
+      console.log("locktime: ", locktime);
+      console.log("_type: ", _type);
+      console.log("ts: ", ts);
+
+      await request(
+        process.env.GRAPHQL,
+        `mutation handleVotingDeposit( $provider: String!,$value: String!,$locktime: String!,$type: String!,$timestamp: String!, block: String!, eventObjectId: String!){
+           handleVotingDeposit( provider: $provider,value: $value,locktime: $locktime,type: $type,timestamp: $timestamp, block: $block, eventObjectId: $eventObjectId) {
+          result
+      }
+                
+      }`,
+{
+ provider: provider,
+ value: value,
+ locktime: locktime,
+ type: _type,
+ timestamp: ts,
+ block: block_hash,
+ eventObjectId: eventResult._id,
+}
+);
+console.log("handleVotingWithdraw Mutation called.")
+return true;
+    } else if(eventName == "Withdraw") {
+      console.log(eventName + " Event result: ");
+      console.log(newData[0][0].data + " = " + newData[0][1].data);
+      console.log(newData[1][0].data + " = " + newData[1][1].data);
+      console.log(newData[2][0].data + " = " + newData[2][1].data);
+      console.log(newData[3][0].data + " = " + newData[3][1].data);
+      console.log(newData[4][0].data + " = " + newData[4][1].data);
+
+      var provider = splitdata(newData[0][1].data);      
+      var value = parseInt(newData[1][1].data);
+      var ts = parseInt(newData[2][1].data);
+
+      console.log("provider: ", provider);
+      console.log("value: ", value);
+      console.log("ts: ", ts);
+
+      await request(
+        process.env.GRAPHQL,
+        `mutation handleVotingWithdraw( $provider: String!,$value: String!,$timestamp: String!, block: String!, eventObjectId: String!){
+           handleVotingWithdraw( provider: $provider,value: $value,timestamp: $timestamp, block: $block, eventObjectId: $eventObjectId) {
+          result
+      }
+                
+      }`,
+{
+ provider: provider,
+ value: value,
+ timestamp: ts,
+ block: block_hash,
+ eventObjectId: eventResult._id,
+}
+);
+console.log("handleVotingWithdraw Mutation called.")
+return true;
+    }                             
   } catch (error) {
     console.log("error (try-catch) : " + error);
     return res.status(500).json({
@@ -1722,7 +1798,7 @@ router
 
 router.route("/geteventsdata").post(async function (req, res, next) {
   const {eventResult, deployHash, timestamp, blockhash, eventname, eventdata} = req.body;
- await geteventsdata(eventResult, deployHash, timestamp, blockhash, eventname, eventdata);
+  await geteventsdata(eventResult, deployHash, timestamp, blockhash, eventname, eventdata);
 });
 
 module.exports = {router, geteventsdata};
