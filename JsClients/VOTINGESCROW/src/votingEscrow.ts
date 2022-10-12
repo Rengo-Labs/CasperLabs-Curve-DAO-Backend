@@ -29,7 +29,7 @@ class VOTINGESCROWClient {
   private contractHash: string= "votingescrow";
   private contractPackageHash: string= "votingescrow";
   private namedKeys: {
-    balances:string
+    balanceOf:string
     metadata: string;
     nonces: string;
     allowances: string;
@@ -58,7 +58,7 @@ class VOTINGESCROWClient {
   ) 
   {
     this.namedKeys= {
-      balances:"null",
+      balanceOf:"null",
       metadata: "null",
       nonces: "null",
       allowances: "null",
@@ -181,6 +181,23 @@ class VOTINGESCROWClient {
     }
   }
 
+  public async balanceOf(account: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        account,
+        this.namedKeys.balanceOf
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+    
+  }
+
   public async balanceOfAtSessionCode(
     keys: Keys.AsymmetricKey,
     entrypointName:string,
@@ -214,6 +231,15 @@ class VOTINGESCROWClient {
     } else {
       throw Error("Problem with installation");
     }
+  }
+
+  public async totalSupply() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["total_supply"]
+    );
+    return result.value();
   }
 
   public async totalSupplySessionCode(
@@ -298,7 +324,7 @@ class VOTINGESCROWClient {
       ""
     );
     const LIST_OF_NAMED_KEYS = [
-      'balances',
+      'balance_of',
       'nonces',
       'allowances',
       'minBalance',
