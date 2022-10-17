@@ -208,7 +208,6 @@ const handleStartVote = {
     eventObjectId: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
-    
     const session = await mongoose.startSession();
    
     try {
@@ -293,7 +292,6 @@ const handleCastVote = {
     eventObjectId: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
-    
     const session = await mongoose.startSession();
 
     try {
@@ -340,7 +338,7 @@ const handleCastVote = {
       if (castVote === null) {
         castVote = new Cast({id : castVoteId});
       }
-      castVote.stake = args.stake;
+      castVote.voterStake = args.stake;
       castVote.supports = args.supports;
       castVote.createdAt = args.timestamp;
 
@@ -373,7 +371,6 @@ const handleExecuteVote = {
     eventObjectId: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
-    
     const session = await mongoose.startSession();
     try {
       // updating mutation status
