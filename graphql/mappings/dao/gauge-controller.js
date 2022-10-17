@@ -5,6 +5,7 @@ const GaugeTypeWeight = require("../../../models/gaugeTypeWeight");
 const GaugeWeight = require("../../../models/gaugeWeight");
 const GaugeWeightVote = require("../../../models/gaugeWeightVote");
 const Pool = require("../../../models/pool");
+// const allcontractsData = require("../../../models/allcontractsData");
 const { getOrRegisterAccount } = require("../../services/accounts");
 const {
   getGaugeType,
@@ -20,7 +21,7 @@ const { GraphQLString } = require("graphql");
 
 const { GAUGE_TOTAL_WEIGHT_PRECISION } = require("../../constants");
 const GaugeVote = require("../../../models/gaugeVote");
-let votingEscrow = require("../../../JsClients/VOTINGESCROW/votingEscrowFunctionsForBackend/functions.ts");
+// let votingEscrow = require("../../../JsClients/VOTINGESCROW/votingEscrowFunctionsForBackend/functions.ts");
 
 
 let WEEK = "604800";
@@ -403,6 +404,9 @@ const handleVoteForGauge = {
   },
   async resolve(parent, args, context) {
     try {
+      //We get contract hash for gauge controller package hash below
+      // const contractData = await allcontractsData.findOne({packageHash : process.env.GAUGE_CONTROLLER_PACKAGE_HASH});
+
       let gauge = await Gauge.findOne({ id: args.gauge_addr });
       //let gauge = '1000000000';
       if (gauge !== null) {
@@ -443,9 +447,11 @@ const handleVoteForGauge = {
         });
         await GaugeWeightVote.create(gaugeWeightVote);
 
-        //here we fetch values from blockchain using voting contract backend functions
-        let veCRV = await votingEscrow.balanceOf(user.id, "epoch_time");
-        let totalveCRV = await votingEscrow.totalSupply();
+        // let veCRV = await votingEscrow.balanceOf(contractData.contractHash, user.id);
+        // let totalveCRV = await votingEscrow.totalSupply(contractData.contractHash);
+
+        let veCRV = '1000';
+        let totalveCRV = '10000';
 
         let gaugeVote = new GaugeVote({
           id: gauge.id + "-" + user.id + "-" + args.time.toString(),
