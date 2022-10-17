@@ -3,7 +3,7 @@ config();
 import {
 	VOTINGClient,
 	utils,
-} from "../../JsClients/VOTING/src";
+} from "../../../JsClients/VOTING/src";
 import { getDeploy } from "./utils";
 
 import { Keys } from "casper-js-sdk";

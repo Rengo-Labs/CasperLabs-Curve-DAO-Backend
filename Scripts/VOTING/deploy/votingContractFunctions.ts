@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 config();
-import { VOTINGClient } from "../../JsClients/VOTING/src";
+import { VOTINGClient } from "../../../JsClients/VOTING/src";
 import { getDeploy } from "./utils";
 import { CLValueBuilder, Keys } from "casper-js-sdk";
 
