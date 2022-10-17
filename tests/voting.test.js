@@ -1,11 +1,12 @@
 const chai = require('chai');
 const assert = chai.assert;
-const Proposal = require("../models/proposal");
-const ProposalVote = require("../models/proposalVote");
 const VotingApp = require("../models/votingApp");
 
 require("dotenv").config();
 var { request } = require("graphql-request");
+const Vote = require('../models/vote');
+const Voter = require('../models/voter');
+const Cast = require('../models/cast');
 
 async function MinimumBalanceSet(address, minBalance) {
     console.log("Calling handleMinimumBalanceSet mutation...");
@@ -116,49 +117,40 @@ async function StartVote(
     creator,
     voteId,
     metadata,
-    creatorVotingPower,
-    timestamp,
-    block,
-    transactionHash
+    transactionFrom,
+    eventObjectId
   ) {
     console.log("Calling handleStartVote mutation...");
     let response = await request(
       process.env.GRAPHQL,
       `mutation handleStartVote( 
-                  $address: String!,
-                  $creator: String!,
-                  $voteId: String!,
-                  $metadata: String!,
-                  $creatorVotingPower: String!,
-                  $timestamp: String!,
-                  $block: String!,
-                  $transactionHash: String!,
-                  ){
-                      handleStartVote( 
-                    address: $address,
-                    creator: $creator,
-                    voteId: $voteId,
-                    metadata: $metadata,
-                    creatorVotingPower: $creatorVotingPower,
-                    timestamp: $timestamp,
-                    block: $block,
-                    transactionHash: $transactionHash,
-                    ) {
-                  result
-              }
-                        
-              }`,
-      {
-        address: address,
-        creator: creator,
-        voteId: voteId,
-        metadata: metadata,
-        creatorVotingPower: creatorVotingPower,
-        timestamp: timestamp,
-        block: block,
-        transactionHash: transactionHash,
-      }
-    );
+        $address: String!,
+        $creator: String!,
+        $voteId: String!,
+        $metadata: String!,
+        $transactionFrom: String!,
+        $eventObjectId: String!,
+        ){
+            handleStartVote( 
+          address: $address,
+          creator: $creator,
+          voteId: $voteId,
+          metadata: $metadata,
+          transactionFrom: $transactionFrom,
+          eventObjectId : $eventObjectId
+          ) {
+        result
+    }
+              
+    }`,
+{
+address: address,
+creator: creator,
+voteId: voteId,
+metadata: metadata,
+transactionFrom : transactionFrom,
+eventObjectId: eventObjectId,
+});
     console.log(response);
     return response;
   }
@@ -170,56 +162,47 @@ async function CastVote(
     stake,
     supports,
     timestamp,
-    block,
-    transactionHash,
-    logIndex
+    eventObjectId
   ) {
     console.log("Calling handleCastVote mutation...");
-    let response = await request(
+    let response =  await request(
       process.env.GRAPHQL,
       `mutation handleCastVote( 
-                  $address: String!,
-                  $voteId: String!,
-                  $voter: String!,
-                  $stake: String!,
-                  $supports: String!,
-                  $timestamp: String!,
-                  $block: String!,
-                  $transactionHash: String!,
-                  $logIndex: String!
-                  ){
-                      handleCastVote( 
-                    address: $address,
-                    voteId: $voteId,
-                    voter: $voter,
-                    stake: $stake,
-                    supports: $supports,
-                    timestamp: $timestamp,
-                    block: $block,
-                    transactionHash: $transactionHash,
-                    logIndex: $logIndex
-                    ) {
-                  result
-              }
-                        
-              }`,
-      {
-        address: address,
-        voteId: voteId,
-        voter: voter,
-        stake: stake,
-        supports: supports,
-        timestamp: timestamp,
-        block: block,
-        transactionHash: transactionHash,
-        logIndex: logIndex,
-      }
-    );
+        $address: String!,
+        $voteId: String!,
+        $voter: String!,
+        $stake: String!,
+        $supports: Boolean!,
+        $timestamp: String!,
+        $eventObjectId: String!,
+        ){
+            handleCastVote( 
+          address: $address,
+          voteId: $voteId,
+          voter: $voter,
+          stake: $stake,
+          supports: $supports,
+          timestamp: $timestamp,
+          eventObjectId : $eventObjectId
+          ) {
+        result
+    }
+              
+    }`,
+{
+address: address,
+voteId: voteId,
+voter: voter,
+stake: stake,
+supports: supports,
+timestamp: timestamp,
+eventObjectId: eventObjectId,
+});
     console.log(response);
     return response;
   }
   
-async function ExecuteVote(address, voteId, timestamp, block, transactionHash) {
+async function ExecuteVote(address, voteId, timestamp, eventObjectId) {
     console.log("Calling handleExecuteVote mutation...");
     let response = await request(
       process.env.GRAPHQL,
@@ -227,15 +210,13 @@ async function ExecuteVote(address, voteId, timestamp, block, transactionHash) {
                   $address: String!,
                   $voteId: String!,
                   $timestamp: String!,
-                  $block: String!,
-                  $transactionHash: String!,
+                  $eventObjectId : String!,
                   ){
                       handleExecuteVote( 
                     address: $address,
                     voteId: $voteId,
                     timestamp: $timestamp,
-                    block: $block,
-                    transactionHash: $transactionHash,
+                    eventObjectId : $eventObjectId,
                     ) {
                   result
               }
@@ -245,8 +226,7 @@ async function ExecuteVote(address, voteId, timestamp, block, transactionHash) {
         address: address,
         voteId: voteId,
         timestamp: timestamp,
-        block: block,
-        transactionHash: transactionHash,
+        eventObjectId: eventObjectId,
       }
     );
     console.log(response);
@@ -289,51 +269,64 @@ async function ExecuteVote(address, voteId, timestamp, block, transactionHash) {
       })
   
       it('handleStartVote should return true', async () => {
-          const {handleStartVote : {result}} = await StartVote('388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', 'creator','22','meta', '33', '604800', '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+
+          const {handleStartVote : {result}} = 
+          await StartVote(
+            '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', 
+            'creator',
+            '22',
+            'meta', 
+            '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468b',
+            "eventObjectId"
+            );
+            
           assert.equal(result, true);
-          let proposal = await Proposal.findOne({ id: '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-22' });
-          assert.equal(proposal.id, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-22');
-          assert.equal(proposal.number, '22');
-          assert.equal(proposal.app, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-          assert.equal(proposal.creator, 'creator');
-          assert.equal(proposal.metadata, 'meta');
-          assert.equal(proposal.totalStaked, '33');
-          assert.equal(proposal.stakedSupport, '33');
-          assert.equal(proposal.currentQuorum, '4.125000000000000000');
-          assert.equal(proposal.currentSupport, '4.125000000000000000');
-          assert.equal(proposal.created, '604800');
-          assert.equal(proposal.createdAtBlock, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-          assert.equal(proposal.createdAtTransaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+          let vote = await Vote.findOne({id : "appAddress:388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-vote:22"});
+          assert.equal(vote.appAddress, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+          assert.equal(vote.originalCreator, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468b');
+          assert.equal(vote.creator, 'creator');
+          assert.equal(vote.metadata, 'meta');
+          assert.equal(vote.voteNum, '22');
       })
 
       it('handleCastVote should return true', async () => {
-        // const {handleCastVote : {result}} = await CastVote('address', 'voteid','voter','stake', 'supports','604800', 'block', 'txhash', 'logindex');
-        const {handleCastVote : {result}} = await CastVote('388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '22','voter','100', 'true','604800', '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '10');
+        
+        const {handleCastVote : {result}} = 
+        await CastVote(
+          '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', 
+          '22',
+          'voter',
+          '100', 
+          true,
+          '604800', 
+          'eventObjectId');
+          
         assert.equal(result, true);
-        let proposal = await ProposalVote.findOne({ id: '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-10' });
-        assert.equal(proposal.id, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-10');
-        assert.equal(proposal.proposal, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-22');
-        assert.equal(proposal.stake, '100');
-        assert.equal(proposal.supports, true);
-        assert.equal(proposal.voter, 'voter');
-        assert.equal(proposal.created, '604800');
-        assert.equal(proposal.createdAtBlock, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-        assert.equal(proposal.createdAtTransaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        
+        let vote = await Vote.findOne({id : "appAddress:388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-vote:22"})
+        assert.exists(vote.yea, 'yea value is updated for vote');
+        assert.exists(vote.nay, 'nay value is updated for vote');
 
-        let propose = await Proposal.findOne({ id: '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-22' });
-        assert.equal(propose.updated, '604800');
-        assert.equal(propose.updatedAtBlock, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-        assert.equal(propose.updatedAtTransaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        let voter = await Voter.findOne({id : "388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-voter-voter"})
+        assert.equal(voter.address , 'voter');
+        
+        let castVote = await Cast.findOne({id : "22-voter:voter"});
+        assert.equal(castVote.voterStake, '100');
+        assert.equal(castVote.supports, true);
+        assert.equal(castVote.createdAt, '604800');
 
-        let voting = await VotingApp.findOne({ id: '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c' });
-          assert.equal(voting.id, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-          assert.equal(voting.address, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
-          assert.equal(voting.voteCount, '1');
      })
 
     it('handleExecuteVote should return true', async () => {
-        const {handleExecuteVote : {result}} = await ExecuteVote('address', 'voteid','604800','block', 'txhash');
+      
+        const {handleExecuteVote : {result}} = await ExecuteVote('388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '22','604800', "eventObjectId");
+        
         assert.equal(result, true);
+        let vote = await Vote.findOne({id : "appAddress:388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-vote:22"})
+        assert.exists(vote.yea, 'yea value is updated for vote');
+        assert.exists(vote.nay, 'nay value is updated for vote');
+        assert.equal(vote.executed, true);
+        assert.equal(vote.executedAt, 604800);
     })
   
   });

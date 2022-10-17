@@ -54,7 +54,6 @@ async function NewProxyApp(
 module.exports = describe('GraphQL Mutations for Kernel', () => {     
     it('handleNewProxyApp should return true', async () => {
         const {handleNewProxyApp : {result}} = await NewProxyApp('0x2436adbbb3230545df6846695013211d36736f647c91b302b9591e5e2d013485', '5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d1', 'context', '5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d5','5ccbe90f271527aa9c387708c7ed573e79093c55485c05786fc73b93d85598d5','604800');
-        debugger;
         assert.equal(result, true);
         let contract1 = await Contract.findOne({ id: 'Ownership' });
         

@@ -5,7 +5,6 @@ const { MongoMemoryReplSet } = require('mongodb-memory-server');
 const fs =require("fs");
 
 async function startReplicaSet() {
-    
 try{ 
   let connectionString;
   if(fs.existsSync("mongoConnectionString.txt"))
@@ -19,7 +18,7 @@ fs.writeFileSync('mongoConnectionString.txt', "");
         fs.unlink("mongoConnectionString.txt", (err => {
           if (err) console.log(err);
           else {
-            console.log("\nDeleted file: example_file.txt");
+            console.log("\nDeleted file: mongoConnectionString.txt");
           }
         }));
         return await mongoose.connect(connectionString);
