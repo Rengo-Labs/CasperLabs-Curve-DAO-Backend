@@ -9,6 +9,8 @@ const Voter = require("../../../models/voter");
 const Cast = require("../../../models/cast");
 const eventsData = require("../../../models/eventsData");
 var bigdecimal = require("bigdecimal");
+// const {getVote} = require("../../../JsClients/VOTING/votingFunctionsForBackend/functions");
+// const allcontractsData = require("../../../models/allcontractsData");
 
 
 const transactionOptions = {
@@ -228,10 +230,9 @@ const handleStartVote = {
       const vote = new Vote({
         id : voteEntityId
       });
-    
-      //Integrate the votingContract here to fetch voteData.
-      // const voting = VotingContract.bind(event.address)
-      // const voteData = voting.getVote(event.params.voteId)
+
+      // const contractData = await allcontractsData.findOne({packageHash : process.env.VOTING_PACKAGE_HASH});
+      // const voteData = await getVote(contractData.contractHash, args.voteId);
     
       let voteData = {
         value2: "2",
@@ -309,9 +310,8 @@ const handleCastVote = {
       }
       response.result = true;
 
-      // Integrate the voting contract to get the voteData
-      // const votingApp = VotingContract.bind(votingAddress)
-      // const voteData = votingApp.getVote(voteId)
+      // const contractData = await allcontractsData.findOne({packageHash : process.env.VOTING_PACKAGE_HASH});
+      // const voteData = await getVote(contractData.contractHash, args.voteId);
 
       //Below is supposed data
       let voteData = {
@@ -395,9 +395,8 @@ const handleExecuteVote = {
         console.log("vote not found.");
       }
 
-      // Integrate the voting contract to get the voteData
-      // const votingApp = VotingContract.bind(votingAddress)
-      // const voteData = votingApp.getVote(voteId)
+      // const contractData = await allcontractsData.findOne({packageHash : process.env.VOTING_PACKAGE_HASH});
+      // const voteData = await getVote(contractData.contractHash, args.voteId);
 
       //Below is supposed data
       let voteData = {
