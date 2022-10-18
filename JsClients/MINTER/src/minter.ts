@@ -20,7 +20,7 @@ import {
 import { Some, None } from "ts-results";
 import * as blake from "blakejs";
 import { concat } from "@ethersproject/bytes";
-import { ERC20Events } from "./constants";
+import { MINTEREvents } from "./constants";
 import * as utils from "./utils";
 import { RecipientType, IPendingDeploy } from "./types";
 import {createRecipientAddress } from "./utils";
@@ -148,8 +148,8 @@ class MINTERClient {
     }
   }
 
-  public async mint_many( keys: Keys.AsymmetricKey, gauge_addrs : string, paymentAmount: string){
-    let gaugeAddresses = [gauge_addrs];
+  public async mint_many( keys: Keys.AsymmetricKey, gauge_addrs : string[], paymentAmount: string){
+    let gaugeAddresses = [...gauge_addrs];
     let _gaugeAddresses : CLString[] = [];
           for (let i = 0; i < gaugeAddresses.length; i++) {
             const p = new CLString("hash-".concat(gaugeAddresses[i]));
@@ -318,9 +318,9 @@ const runtimeArgs = RuntimeArgs.fromMap({
   }
 
   public onEvent(
-    eventNames: ERC20Events[],
+    eventNames: MINTEREvents[],
     callback: (
-      eventName: ERC20Events,
+      eventName: MINTEREvents,
       deployStatus: {
         deployHash: string;
         success: boolean;
@@ -369,7 +369,7 @@ const runtimeArgs = RuntimeArgs.fromMap({
         const { transforms } =
           value.body.DeployProcessed.execution_result.Success.effect;
 
-        const ERC20Events = transforms.reduce((acc: any, val: any) => {
+        const MINTEREvents = transforms.reduce((acc: any, val: any) => {
           if (
             val.transform.hasOwnProperty("WriteCLValue") &&
             typeof val.transform.WriteCLValue.parsed === "object" &&
@@ -399,7 +399,7 @@ const runtimeArgs = RuntimeArgs.fromMap({
           return acc;
         }, []);
 
-        ERC20Events.forEach((d: any) =>
+        MINTEREvents.forEach((d: any) =>
           callback(
             d.name,
             { deployHash, error: null, success: true },
@@ -424,7 +424,7 @@ const runtimeArgs = RuntimeArgs.fromMap({
     };
   }
 
-  public addPendingDeploy(deployType: ERC20Events, deployHash: string) {
+  public addPendingDeploy(deployType: MINTEREvents, deployHash: string) {
     this.pendingDeploys = [...this.pendingDeploys, { deployHash, deployType }];
   }
 }

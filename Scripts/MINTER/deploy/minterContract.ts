@@ -25,13 +25,13 @@ const KEYS = Keys.Ed25519.parseKeyFiles(
 );
 
 const deploy = async () => {
-  const erc20 = new MINTERClient(
+  const minter = new MINTERClient(
     NODE_ADDRESS!,
     CHAIN_NAME!,
     EVENT_STREAM_ADDRESS!
   );
 
-  const installDeployHash = await erc20.install(
+  const installDeployHash = await minter.install(
     KEYS,
     MINTER_TOKEN!,
     MINTER_CONTROLLER!,
