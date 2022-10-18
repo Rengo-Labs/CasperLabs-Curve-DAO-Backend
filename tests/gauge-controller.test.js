@@ -6,6 +6,7 @@ const GaugeType = require("../models/guageType");
 const GaugeTypeWeight = require("../models/gaugeTypeWeight");
 const GaugeWeight = require("../models/gaugeWeight");
 const GaugeWeightVote = require("../models/gaugeWeightVote");
+const GaugeVote = require("../models/gaugeVote");
 
 require("dotenv").config();
 var { request } = require("graphql-request");
@@ -255,6 +256,9 @@ module.exports = describe('GraphQL Mutations for guage-controller', () => {
     it('handleVoteForGauge should return true', async () => {
         const {handleVoteForGauge : {result}} = await VoteForGauge('01', '604800','1000','399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', 'user');
         assert.equal(result, true);
+        let gauge = await Gauge.findOne({ id: '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c'});
+        assert.exists(gauge, "Gauge is null or undefined");
+
         let gaugeWeight = await GaugeWeight.findOne({ id: '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-1209600' });
         assert.equal(gaugeWeight.id, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-1209600');
         assert.equal(gaugeWeight.gauge, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
@@ -270,6 +274,16 @@ module.exports = describe('GraphQL Mutations for guage-controller', () => {
         assert.equal(voteData.user, 'user');
         assert.equal(voteData.time, '604800');
         assert.equal(voteData.weight, '1000');
+
+        let gaugeVoteData = await GaugeVote.findOne({ id: '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-user-604800' });
+        assert.equal(gaugeVoteData.id, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-user-604800');
+        assert.equal(gaugeVoteData.gauge, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        assert.equal(gaugeVoteData.user, 'user');
+        assert.equal(gaugeVoteData.time, '604800');
+        assert.equal(gaugeVoteData.weight, '1000');
+        assert.equal(gaugeVoteData.total_weight, gaugeTotal.weight);
+        assert.exists(gaugeVoteData.veCRV, "veCRV is null or undefined");
+        assert.exists(gaugeVoteData.totalveCRV, "totalveCRV is null or undefined");
     })
 
 });
