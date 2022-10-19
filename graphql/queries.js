@@ -98,16 +98,15 @@ const castsByVoteId =  {
 };
 
 
-const votesByAppAddress =  {
+const votes =  {
   type: GraphQLList(voteType),
   description: "Retrieves votes by app address",
   args: {
-    appAddresses: {type : GraphQLList(GraphQLString)},
   },
   async resolve(parent, args, context) {
     try {
       let votes = await vote
-      .find({appAddress : {$in : args.appAddresses}})
+      .find()
       .sort({startDate : -1});
       return votes;
     } catch (error) {
@@ -116,11 +115,10 @@ const votesByAppAddress =  {
   },
 };
 
-const votesByAppAddressAndCreator =  {
+const votesByCreator =  {
   type: GraphQLList(voteType),
   description: "Retrieves votes by app address and creator",
   args: {
-    appAddresses: {type : GraphQLList(GraphQLString)},
     creator: {type : GraphQLString},
   },
   async resolve(parent, args, context) {
@@ -128,7 +126,6 @@ const votesByAppAddressAndCreator =  {
 
       let votes = await vote
       .find({
-        appAddress : {$in : args.appAddresses}, 
         creator : args.creator
       });
       return votes;
@@ -186,8 +183,8 @@ module.exports = {
   response,
   castsByVoter,
   castsByVoteId,
-  votesByAppAddress,
-  votesByAppAddressAndCreator,
+  votes,
+  votesByCreator,
   votesByVoteIdAndCreator,
   votesByVoteId
 };
