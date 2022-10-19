@@ -82,7 +82,7 @@ const QueryType = new GraphQLObjectType({
     castsByVoter,
     castsByVoteId,
     votes,
-    votesByAppAddressAndCreator,
+    votesByCreator,
     votesByVoteIdAndCreator,
     votesByVoteId
   },
