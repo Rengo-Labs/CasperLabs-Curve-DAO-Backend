@@ -4,14 +4,17 @@ import { GaugeControllerClient ,utils, constants} from "../../../JsClients/GAUGE
 import { sleep, getDeploy } from "./utils";
 
 import {
-  CLValueBuilder,
   Keys,
-  CLPublicKey,
-  CLAccountHash,
-  CLPublicKeyType,
-  Contracts,
-  CLByteArray
 } from "casper-js-sdk";
+import { 
+  get_total_weight_session_code, 
+  get_weights_sum_per_type_session_code,
+  gauge_relative_weight_write_session_code,
+  gauge_relative_weight_session_code, 
+  gauge_types_session_code,
+  get_gauge_weight_session_code, 
+  get_type_weight_session_code
+} from "./gaugeControllerContract";
 
 const { GAUGECONTROLLEREVENTS } = constants;
 
@@ -19,7 +22,8 @@ const {
   NODE_ADDRESS,
   EVENT_STREAM_ADDRESS,
   CHAIN_NAME,
-  GAUGE_CONTROLLER_MASTER_KEY_PAIR_PATH
+  GAUGE_CONTROLLER_MASTER_KEY_PAIR_PATH,
+  GAUGE_CONTROLLER_PAYMENT_AMOUNT
 } = process.env;
 
 
@@ -28,18 +32,6 @@ const KEYS = Keys.Ed25519.parseKeyFiles(
   `${GAUGE_CONTROLLER_MASTER_KEY_PAIR_PATH}/secret_key.pem`
 );
 
-const ROUTERKEYS = Keys.Ed25519.parseKeyFiles(
-  `${GAUGE_CONTROLLER_MASTER_KEY_PAIR_PATH}/public_key.pem`,
-  `${GAUGE_CONTROLLER_MASTER_KEY_PAIR_PATH}/secret_key.pem`
-);
-
-function splitdata(data:string)
-{
-    var temp=data.split('(');
-    var result=temp[1].split(')');
-    return result[0];
-}
-
 const gaugeController = new GaugeControllerClient(
   NODE_ADDRESS!,
   CHAIN_NAME!,
@@ -47,109 +39,246 @@ const gaugeController = new GaugeControllerClient(
 );
 
 const deploy = async () => {
-  debugger;
+  //Setting contract hash
+  await gaugeController.setContractHash("1f5de252ad46855e8dbcbc02104484fc79cac4d44b47cd888d424abb292a9394");
 
-  // await gaugeController.setContractHash(TOKEN1_CONTRACT!);
-  // await gaugeController.setContractHash("9cc5f4dc6d94076a220bd472904d2823c5606d655067c88d0ecb0d45a06436f4");
-  // getTotalSupply("hash-9cc5f4dc6d94076a220bd472904d2823c5606d655067c88d0ecb0d45a06436f4");
-  // // //name
-  // const name = await gaugeController.name();
-  // console.log(`... Contract name: ${name}`);
 
-  // // //symbol
-  // const symbol = await gaugeController.symbol();
-  // console.log(`... Contract symbol: ${symbol}`);
+  //SIMPLE GETTERS
 
-  // // //decimal
-  // const decimal = await gaugeController.decimal();
-  // console.log(`... Contract decimal: ${decimal}`);
+  //time_total
+  const time_total = await gaugeController.time_total();
+  console.log(`... Contract time_total: ${time_total}`);
 
-  // // //totalsupply
-  // let totalSupply = await gaugeController.totalSupply();
-  // console.log(`... Total supply: ${totalSupply}`);
+  //admin
+  const admin = await gaugeController.admin();
+  console.log(`... Contract admin: ${admin}`);
 
-  // // // //balanceof
-  // let balance = await gaugeController.balanceOf("7b217a09296d5ce360847a7d20f623476157c5f022333c4e988a464035cadd80");
-  // console.log(`... Balance: ${balance}`);
+  //future_admin
+  const future_admin = await gaugeController.future_admin();
+  console.log(`... Contract future_admin: ${future_admin}`);
 
-  // // //nonce
-  // // let nonce = await gaugeController.nonce(KEYS.publicKey);
-  // // console.log(`... Nonce: ${nonce}`);
+  //token
+  let token = await gaugeController.token();
+  console.log(`... Contract token: ${token}`);
 
-  // // // //allowance
-  //let allowance = await gaugeController.allowance(KEYS.publicKey,KEYS.publicKey);
- // console.log(`... Allowance: ${allowance}`);
- 
-  //mint
-  // const mintDeployHash = await gaugeController.mint(
-  //   ROUTERKEYS,
-  //   ROUTERKEYS.publicKey,
-  //   MINT_AMOUNT!,
-  //   MINT_PAYMENT_AMOUNT!
-  // );
-  // console.log("... Mint deploy hash: ", mintDeployHash);
+  //n_gauges
+  let n_gauges = await gaugeController.n_gauges();
+  console.log(`... Contract n_gauges: ${n_gauges}`);
 
-  // await getDeploy(NODE_ADDRESS!, mintDeployHash);
-  // console.log("... Token minted successfully.");
+  //n_gauge_types
+  let n_gauge_types = await gaugeController.n_gauge_types();
+  console.log(`... Contract n_gauge_types: ${n_gauge_types}`);
 
-  //  balanceof
-  // let balance = await gaugeController.balanceOfcontract(PAIR_CONTRACT!);
-  // console.log(`... Balance: ${balance}`);
+  //voting_escrow
+  let voting_escrow = await gaugeController.voting_escrow();
+  console.log(`... Contract voting_escrow: ${voting_escrow}`);  
 
-  // // //burn
-  // // const burnDeployHash = await gaugeController.burn(
-  // //   KEYS,
-  // //   KEYS.publicKey,
-  // //   BURN_AMOUNT!,
-  // //   BURN_PAYMENT_AMOUNT!
-  // // );
-  // // console.log("... Burn deploy hash: ", burnDeployHash);
+  //DICTIONARY GETTERS
+    
+  //gauge_types_
+  let gauge_types_ = await gaugeController.gauge_types_("owner");
+  console.log(`... Contract gauge_types_: ${gauge_types_}`);
 
-  // // await getDeploy(NODE_ADDRESS!, burnDeployHash);
-  // // console.log("... Token burned successfully");
+  //gauge_type_names
+  let gauge_type_names = await gaugeController.gauge_type_names("owner");
+  console.log(`... Contract gauge_type_names: ${gauge_type_names}`);
 
-  // // //totalsupply
-  // // totalSupply = await gaugeController.totalSupply();
-  // // console.log(`... Total supply: ${totalSupply}`);
+  //vote_user_power
+  let vote_user_power = await gaugeController.vote_user_power("owner");
+  console.log(`... Contract vote_user_power: ${vote_user_power}`);
 
-  //approve
-  // const approveDeployHash = await gaugeController.approve(
-  //   ROUTERKEYS,
-  //   "e3671d95b214a45f48cf7ba078d378f585c59b36ff523951859b0f9a78e8dd93",
-  //   "100000000000",
-  //   APPROVE_PAYMENT_AMOUNT!
-  // );
-  // console.log("... Approve deploy hash: ", approveDeployHash);
+  //time_weight
+  let time_weight = await gaugeController.time_weight("owner");
+  console.log(`... Contract time_weight: ${time_weight}`);
 
-  // await getDeploy(NODE_ADDRESS!, approveDeployHash);
-  // console.log("... Token approved successfully");
+  // gauges
+  let gauges = await gaugeController.gauges("owner");
+  console.log(`... Contract gauges: ${gauges}`);
 
-  // // //transfer
-  // // const transferDeployHash = await gaugeController.transfer(
-  // //   KEYS,
-  // //   KEYS.publicKey,
-  // //   TRANSFER_AMOUNT!,
-  // //   TRANSFER_PAYMENT_AMOUNT!
-  // // );
-  // // console.log("... Transfer deploy hash: ", transferDeployHash);
+  //vote_user_slopes
+  let vote_user_slopes = await gaugeController.vote_user_slopes("owner", "spender");
+  console.log(`... Contract vote_user_slopes: ${vote_user_slopes}`);
 
-  // // await getDeploy(NODE_ADDRESS!, transferDeployHash);
-  // // console.log("... Token transfer successfully");
+  //last_user_vote
+  let last_user_vote = await gaugeController.last_user_vote("owner", "spender");
+  console.log(`... Contract last_user_vote: ${last_user_vote}`);
 
-  // // //transfer_from
-  // // const transferfromDeployHash = await gaugeController.transferFrom(
-  // //   KEYS,
-  // //   KEYS.publicKey,
-  // //   KEYS.publicKey,
-  // //   TRANSFER_FROM_AMOUNT!,
-  // //   TRANSFER_FROM_PAYMENT_AMOUNT!
-  // // );
-  // // console.log("... TransferFrom deploy hash: ", transferfromDeployHash);
+  //points_weight
+  let points_weight = await gaugeController.points_weight("owner", "spender");
+  console.log(`... Contract points_weight: ${points_weight}`);
 
-  // // await getDeploy(NODE_ADDRESS!, transferfromDeployHash);
-  // // console.log("... Token transfer successfully");
+  //changes_weight
+  let changes_weight = await gaugeController.changes_weight("owner", "spender");
+  console.log(`... Contract changes_weight: ${changes_weight}`);
+
+  //time_sum
+  let time_sum = await gaugeController.time_sum("owner");
+  console.log(`... Contract time_sum: ${time_sum}`);
+
+  // points_sum
+  let points_sum = await gaugeController.points_sum("owner", "spender");
+  console.log(`... Contract points_sum: ${points_sum}`);
+
+  //changes_sum
+  let changes_sum = await gaugeController.changes_sum("owner", "spender");
+  console.log(`... Contract changes_sum: ${changes_sum}`);
+  
+  // points_total
+  let points_total = await gaugeController.points_total("owner");
+  console.log(`... Contract points_total: ${points_total}`);
+
+  //points_type_weight
+  let points_type_weight = await gaugeController.points_type_weight("owner", "spender");
+  console.log(`... Contract points_type_weight: ${points_type_weight}`);
+
+  //time_type_weight
+  let time_type_weight = await gaugeController.time_type_weight("owner");
+  console.log(`... Contract time_type_weight: ${time_type_weight}`);
+
+  //CONTRACT CALLS
+
+  // commit_transfer_ownership
+  const commitTransferOwnershipDeployHash = await gaugeController.commit_transfer_ownership(
+    KEYS,
+    "address",
+    GAUGE_CONTROLLER_PAYMENT_AMOUNT!
+  );
+  console.log("... commit_transfer_ownership deploy hash: ", commitTransferOwnershipDeployHash);
+
+  await getDeploy(NODE_ADDRESS!, commitTransferOwnershipDeployHash);
+  console.log("... commit_transfer_ownership called successfully.");
+
+  
+  // apply_transfer_ownership
+  const applyTransferOwnershipDeployHash = await gaugeController.apply_transfer_ownership(
+    KEYS,
+    GAUGE_CONTROLLER_PAYMENT_AMOUNT!
+  );
+  console.log("... apply_transfer_ownership deploy hash: ", applyTransferOwnershipDeployHash);
+
+  await getDeploy(NODE_ADDRESS!, applyTransferOwnershipDeployHash);
+  console.log("... apply_transfer_ownership called successfully.");
+
+  // checkpoint_gauge
+  const checkpointGaugeDeployHash = await gaugeController.checkpoint_gauge(
+    KEYS,
+    "address",
+    GAUGE_CONTROLLER_PAYMENT_AMOUNT!
+  );
+  console.log("... checkpoint_gauge deploy hash: ", checkpointGaugeDeployHash);
+
+  await getDeploy(NODE_ADDRESS!, checkpointGaugeDeployHash);
+  console.log("... checkpoint_gauge called successfully.");
+
+    // checkpoint
+    const checkpointDeployHash = await gaugeController.checkpoint(
+      KEYS,
+      GAUGE_CONTROLLER_PAYMENT_AMOUNT!
+    );
+    console.log("... checkpoint deploy hash: ", checkpointDeployHash);
+  
+    await getDeploy(NODE_ADDRESS!, checkpointDeployHash);
+    console.log("... checkpoint called successfully.");
+
+    // change_type_weight
+    const changeTypeWeightDeployHash = await gaugeController.change_type_weight(
+      KEYS,
+      "typeId",
+      "weight",
+      GAUGE_CONTROLLER_PAYMENT_AMOUNT!
+    );
+    console.log("... change_type_weight deploy hash: ", changeTypeWeightDeployHash);
+  
+    await getDeploy(NODE_ADDRESS!, changeTypeWeightDeployHash);
+    console.log("... change_type_weight called successfully.");
+    
+    // change_gauge_weight
+    const changeGaugeWeightDeployHash = await gaugeController.change_gauge_weight(
+      KEYS,
+      "address",
+      "weight",
+      GAUGE_CONTROLLER_PAYMENT_AMOUNT!
+    );
+    console.log("... change_gauge_weight deploy hash: ", changeGaugeWeightDeployHash);
+  
+    await getDeploy(NODE_ADDRESS!, changeGaugeWeightDeployHash);
+    console.log("... change_gauge_weight called successfully.");
+
+    // add_type
+    const addTypeDeployHash = await gaugeController.add_type(
+      KEYS,
+      "name",
+      "weight",
+      GAUGE_CONTROLLER_PAYMENT_AMOUNT!
+    );
+    console.log("... add_type deploy hash: ", addTypeDeployHash);
+  
+    await getDeploy(NODE_ADDRESS!, addTypeDeployHash);
+    console.log("... add_type called successfully.");
+
+    // add_gauge
+    const addGaugeDeployHash = await gaugeController.add_gauge(
+      KEYS,
+      "address",
+      "gaugeType",
+      "weight",
+      GAUGE_CONTROLLER_PAYMENT_AMOUNT!
+    );
+    console.log("... add_gauge deploy hash: ", addGaugeDeployHash);
+  
+    await getDeploy(NODE_ADDRESS!, addGaugeDeployHash);
+    console.log("... add_gauge called successfully.");
+    
+  // vote_for_gauge_weights
+  const voteForGaugeWeightsDeployHash = await gaugeController.vote_for_gauge_weights(
+    KEYS,
+    "gaugeAddress",
+    "userWeight",
+    GAUGE_CONTROLLER_PAYMENT_AMOUNT!
+  );
+  console.log("... vote_for_gauge_weights deploy hash: ", voteForGaugeWeightsDeployHash);
+
+  await getDeploy(NODE_ADDRESS!, voteForGaugeWeightsDeployHash);
+  console.log("... vote_for_gauge_weights called successfully.");
+  
+
+  //SESSION CODES
+  //get_total_weight
+  await get_total_weight_session_code();
+  let get_total_weight = await gaugeController.get_total_weight();
+  console.log(`... Contract get_total_weight: ${get_total_weight}`);  
+  
+  // get_weights_sum_per_type
+  await get_weights_sum_per_type_session_code("typeId");
+  let get_weights_sum_per_type = await gaugeController.get_weights_sum_per_type();
+  console.log(`... Contract get_weights_sum_per_type: ${get_weights_sum_per_type}`);  
+
+  // get_type_weight
+  await get_type_weight_session_code("typeId");
+  let get_type_weight = await gaugeController.get_type_weight();
+  console.log(`... Contract get_type_weight: ${get_type_weight}`);  
+
+   // gauge_relative_weight_write
+  await gauge_relative_weight_write_session_code("address");
+  let gauge_relative_weight_write = await gaugeController.gauge_relative_weight_write();
+  console.log(`... Contract gauge_relative_weight_write: ${gauge_relative_weight_write}`);  
+
+  // gauge_relative_weight
+  await gauge_relative_weight_session_code("address");
+  let gauge_relative_weight = await gaugeController.gauge_relative_weight();
+  console.log(`... Contract gauge_relative_weight: ${gauge_relative_weight}`);  
+
+  // gauge_types
+  await gauge_types_session_code("address");
+  let gauge_types = await gaugeController.gauge_types();
+  console.log(`... Contract gauge_types: ${gauge_types}`);  
+
+  // get_gauge_weight
+  await get_gauge_weight_session_code("address");
+  let get_gauge_weight = await gaugeController.get_gauge_weight();
+  console.log(`... Contract get_gauge_weight: ${get_gauge_weight}`);  
 
 };
 
 
-deploy();
+// deploy();

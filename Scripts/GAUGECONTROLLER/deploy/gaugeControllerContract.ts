@@ -74,7 +74,7 @@ const deploy = async () => {
 deploy();
 
 
-const get_gauge_weight = async (addr : string) => {
+const get_gauge_weight_session_code = async (addr : string) => {
 
   const installDeployHash = await gaugeController.installSessionCodeParamKeyAddr(
     KEYS,
@@ -85,16 +85,16 @@ const get_gauge_weight = async (addr : string) => {
     GAUGE_CONTROLLER_PURSE_PROXY_WASM_PATH!
   );
 
-  console.log(`... Deposit Function deployHash: ${installDeployHash}`);
+  console.log(`... get_gauge_weight Function deployHash: ${installDeployHash}`);
 
   await getDeploy(NODE_ADDRESS!, installDeployHash);
 
-  console.log(`... Deposit Function called successfully through sessionCode.`);
+  console.log(`... get_gauge_weight Function called successfully through sessionCode.`);
 
 };
 
 
-const gauge_types = async (addr : string) => {
+const gauge_types_session_code = async (addr : string) => {
 
   const installDeployHash = await gaugeController.installSessionCodeParamKeyAddr(
     KEYS,
@@ -105,15 +105,15 @@ const gauge_types = async (addr : string) => {
     GAUGE_CONTROLLER_PURSE_PROXY_WASM_PATH!
   );
 
-  console.log(`... Deposit Function deployHash: ${installDeployHash}`);
+  console.log(`... gauge_types Function deployHash: ${installDeployHash}`);
 
   await getDeploy(NODE_ADDRESS!, installDeployHash);
 
-  console.log(`... Deposit Function called successfully through sessionCode.`);
+  console.log(`... gauge_types Function called successfully through sessionCode.`);
 
 };
 
-const gauge_relative_weight = async (addr : string) => {
+const gauge_relative_weight_session_code = async (addr : string) => {
 
   const installDeployHash = await gaugeController.installSessionCodeParamKeyAddr(
     KEYS,
@@ -124,16 +124,16 @@ const gauge_relative_weight = async (addr : string) => {
     GAUGE_CONTROLLER_PURSE_PROXY_WASM_PATH!
   );
 
-  console.log(`... Deposit Function deployHash: ${installDeployHash}`);
+  console.log(`... gauge_relative_weight Function deployHash: ${installDeployHash}`);
 
   await getDeploy(NODE_ADDRESS!, installDeployHash);
 
-  console.log(`... Deposit Function called successfully through sessionCode.`);
+  console.log(`... gauge_relative_weight Function called successfully through sessionCode.`);
 
 };
 
 
-const gauge_relative_weight_write = async (addr : string) => {
+const gauge_relative_weight_write_session_code = async (addr : string) => {
 
   const installDeployHash = await gaugeController.installSessionCodeParamKeyAddr(
     KEYS,
@@ -144,17 +144,16 @@ const gauge_relative_weight_write = async (addr : string) => {
     GAUGE_CONTROLLER_PURSE_PROXY_WASM_PATH!
   );
 
-  console.log(`... Deposit Function deployHash: ${installDeployHash}`);
+  console.log(`... gauge_relative_weight_write Function deployHash: ${installDeployHash}`);
 
   await getDeploy(NODE_ADDRESS!, installDeployHash);
 
-  console.log(`... Deposit Function called successfully through sessionCode.`);
+  console.log(`... gauge_relative_weight_write Function called successfully through sessionCode.`);
 
 };
 
 
-
-const get_type_weight = async (type_id : string) => {
+const get_type_weight_session_code = async (type_id : string) => {
 
   const installDeployHash = await gaugeController.installSessionCodeParamU128TypeId(
     KEYS,
@@ -165,15 +164,15 @@ const get_type_weight = async (type_id : string) => {
     GAUGE_CONTROLLER_PURSE_PROXY_WASM_PATH!
   );
 
-  console.log(`... Deposit Function deployHash: ${installDeployHash}`);
+  console.log(`... get_type_weight Function deployHash: ${installDeployHash}`);
 
   await getDeploy(NODE_ADDRESS!, installDeployHash);
 
-  console.log(`... Deposit Function called successfully through sessionCode.`);
+  console.log(`... get_type_weight Function called successfully through sessionCode.`);
 
 };
 
-const get_weights_sum_per_type = async (type_id : string) => {
+const get_weights_sum_per_type_session_code = async (type_id : string) => {
 
   const installDeployHash = await gaugeController.installSessionCodeParamU128TypeId(
     KEYS,
@@ -184,15 +183,15 @@ const get_weights_sum_per_type = async (type_id : string) => {
     GAUGE_CONTROLLER_PURSE_PROXY_WASM_PATH!
   );
 
-  console.log(`... Deposit Function deployHash: ${installDeployHash}`);
+  console.log(`... get_weights_sum_per_type Function deployHash: ${installDeployHash}`);
 
   await getDeploy(NODE_ADDRESS!, installDeployHash);
 
-  console.log(`... Deposit Function called successfully through sessionCode.`);
+  console.log(`... get_weights_sum_per_type Function called successfully through sessionCode.`);
 
 };
 
-const get_total_weight = async () => {
+const get_total_weight_session_code = async () => {
 
   const installDeployHash = await gaugeController.installSessionCodeNoParam(
     KEYS,
@@ -202,10 +201,21 @@ const get_total_weight = async () => {
     GAUGE_CONTROLLER_PURSE_PROXY_WASM_PATH!
   );
 
-  console.log(`... Deposit Function deployHash: ${installDeployHash}`);
+  console.log(`... get_total_weight Function deployHash: ${installDeployHash}`);
 
   await getDeploy(NODE_ADDRESS!, installDeployHash);
 
-  console.log(`... Deposit Function called successfully through sessionCode.`);
+  console.log(`... get_total_weight Function called successfully through sessionCode.`);
 
+};
+
+
+export {
+  get_total_weight_session_code,
+  get_weights_sum_per_type_session_code,
+  get_type_weight_session_code,
+  gauge_relative_weight_write_session_code,
+  gauge_relative_weight_session_code, 
+  gauge_types_session_code,
+  get_gauge_weight_session_code
 };
