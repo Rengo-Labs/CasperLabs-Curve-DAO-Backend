@@ -7,8 +7,8 @@ const {
   response,   
   castsByVoter,
   castsByVoteId,
-  votesByAppAddress,
-  votesByAppAddressAndCreator,
+  votes,
+  votesByCreator,
   votesByVoteIdAndCreator,
   votesByVoteId } = require("./queries");
 
@@ -81,7 +81,7 @@ const QueryType = new GraphQLObjectType({
     response,
     castsByVoter,
     castsByVoteId,
-    votesByAppAddress,
+    votes,
     votesByAppAddressAndCreator,
     votesByVoteIdAndCreator,
     votesByVoteId
