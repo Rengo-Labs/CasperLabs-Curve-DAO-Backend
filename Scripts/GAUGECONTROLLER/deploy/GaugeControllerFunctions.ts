@@ -245,38 +245,24 @@ const deploy = async () => {
   //SESSION CODES
   //get_total_weight
   await get_total_weight_session_code();
-  let get_total_weight = await gaugeController.get_total_weight();
-  console.log(`... Contract get_total_weight: ${get_total_weight}`);  
   
   // get_weights_sum_per_type
   await get_weights_sum_per_type_session_code("typeId");
-  let get_weights_sum_per_type = await gaugeController.get_weights_sum_per_type();
-  console.log(`... Contract get_weights_sum_per_type: ${get_weights_sum_per_type}`);  
 
   // get_type_weight
   await get_type_weight_session_code("typeId");
-  let get_type_weight = await gaugeController.get_type_weight();
-  console.log(`... Contract get_type_weight: ${get_type_weight}`);  
 
    // gauge_relative_weight_write
   await gauge_relative_weight_write_session_code("address");
-  let gauge_relative_weight_write = await gaugeController.gauge_relative_weight_write();
-  console.log(`... Contract gauge_relative_weight_write: ${gauge_relative_weight_write}`);  
 
   // gauge_relative_weight
   await gauge_relative_weight_session_code("address");
-  let gauge_relative_weight = await gaugeController.gauge_relative_weight();
-  console.log(`... Contract gauge_relative_weight: ${gauge_relative_weight}`);  
 
   // gauge_types
-  await gauge_types_session_code("address");
-  let gauge_types = await gaugeController.gauge_types();
-  console.log(`... Contract gauge_types: ${gauge_types}`);  
+  await gauge_types_session_code("address");  
 
   // get_gauge_weight
   await get_gauge_weight_session_code("address");
-  let get_gauge_weight = await gaugeController.get_gauge_weight();
-  console.log(`... Contract get_gauge_weight: ${get_gauge_weight}`);  
 
 };
 
