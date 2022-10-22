@@ -3,7 +3,9 @@ var Schema = mongoose.Schema;
 
 const castSchema = new Schema({
     id: {
-        type:String
+        type:String,
+        unique : true,
+        required : true
     },
     
     vote: {
