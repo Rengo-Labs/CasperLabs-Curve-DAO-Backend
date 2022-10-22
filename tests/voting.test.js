@@ -222,6 +222,129 @@ async function ExecuteVote(voteId, timestamp, eventObjectId) {
     return response;
   }
 
+async function castsByVoter(voterAccount){
+  console.log("Calling castsByVoter query...");
+  let response = await request(
+    process.env.GRAPHQL,
+    `query castsByVoter(
+                $voterAccount: String!,
+                ){
+                  castsByVoter(
+                    voterAccount: $voterAccount
+                  ) {
+                voter { id }
+            }       
+            }`,
+    {
+      voterAccount: voterAccount,
+    }
+  );
+  console.log(response);
+  return response;
+}
+
+async function castsByVoteId(voteId){
+  console.log("Calling castsByVoteId query...");
+  let response = await request(
+    process.env.GRAPHQL,
+    `query castsByVoteId(
+                $voteId: String!,
+                ){
+                  castsByVoteId(
+                    voteId: $voteId
+                  ) {
+                vote { id }
+            }       
+            }`,
+    {
+      voteId: voteId,
+    }
+  );
+  console.log(response);
+  return response;
+}
+
+async function votes(){
+  console.log("Calling votes query...");
+  let response = await request(
+    process.env.GRAPHQL,
+    `query votes{
+      votes{
+        id
+      }   
+      }`
+  );
+  console.log(response);
+  return response;
+}
+
+async function votesByCreator(creator){
+  console.log("Calling votesByCreator query...");
+  let response = await request(
+    process.env.GRAPHQL,
+    `query votesByCreator(
+                $creator: String!,
+                ){
+                  votesByCreator(
+                    creator: $creator
+                  ) {
+                creator 
+            }       
+            }`,
+    {
+      creator: creator,
+    }
+  );
+  console.log(response);
+  return response;
+}
+
+async function votesByVoteIdAndCreator(voteId, creator){
+  console.log("Calling votesByVoteIdAndCreator query...");
+  let response = await request(
+    process.env.GRAPHQL,
+    `query votesByVoteIdAndCreator(
+                $creator: String!,
+                $voteId : String!
+                ){
+                  votesByVoteIdAndCreator(
+                    creator: $creator,
+                    voteId : $voteId 
+                  ) {
+                id,
+                creator 
+            }       
+            }`,
+    {
+      voteId : voteId,
+      creator: creator,
+    }
+  );
+  console.log(response);
+  return response;
+}
+
+async function votesByVoteId(voteId){
+  console.log("Calling votesByVoteId query...");
+  let response = await request(
+    process.env.GRAPHQL,
+    `query votesByVoteId(
+                $voteId : String!
+                ){
+                  votesByVoteId(
+                    voteId : $voteId 
+                  ) {
+                id 
+            }       
+            }`,
+    {
+      voteId : voteId,
+    }
+  );
+  console.log(response);
+  return response;
+}
+
   module.exports = describe('GraphQL Mutations for voting', () => {     
 
       it('handleMinimumBalanceSet should return true', async () => {
@@ -298,21 +421,69 @@ async function ExecuteVote(voteId, timestamp, eventObjectId) {
         assert.equal(castVote.supports, true);
         assert.equal(castVote.createdAt, '604800');
 
-     })
+      })
 
-    it('handleExecuteVote should return true', async () => {
+      it('handleExecuteVote should return true', async () => {
+        
+          const {handleExecuteVote : {result}} = await ExecuteVote(
+            'voteId',
+            '604800',
+            "eventObjectId");
+          assert.equal(result, true);
+          let vote = await Vote.findOne({id : "voteId"})
+          assert.exists(vote.yea, 'yea is neither null nor undefined');
+          assert.exists(vote.nay, 'nay is neither null nor undefined');
+          assert.equal(vote.executed, true);
+          assert.equal(vote.executedAt, '604800');
+      })
+
+      it('castsByVoter should return casts', async () => {
+        
+        const result = await castsByVoter("voter");
+        result.castsByVoter.forEach(cast => {
+          assert.equal(cast.voter.id, "voter");
+        });
+      })
+
+      it('castsByVoteId should return casts', async () => {
+          
+        const result = await castsByVoteId("voteId");
+        result.castsByVoteId.forEach(cast => {
+          assert.equal(cast.vote.id, "voteId");
+        });
+      })  
+
+      it('votes should return votes', async () => {
+        const result = await votes();
+        result.votes.forEach(vote => {
+          assert.exists(vote.id, "vote id is neither null nor undefined.");
+        });
+      })
       
-        const {handleExecuteVote : {result}} = await ExecuteVote(
-          'voteId',
-          '604800',
-          "eventObjectId");
-        assert.equal(result, true);
-        let vote = await Vote.findOne({id : "voteId"})
-        assert.exists(vote.yea, 'yea is neither null nor undefined');
-        assert.exists(vote.nay, 'nay is neither null nor undefined');
-        assert.equal(vote.executed, true);
-        assert.equal(vote.executedAt, '604800');
-    })
+      it('votesByCreator should return votes', async () => {
+          
+        const result = await votesByCreator("creator");
+        result.votesByCreator.forEach(vote => {
+          assert.equal(vote.creator, "creator");
+        });
+      }) 
+      
+      it('votesByVoteIdAndCreator should return votes', async () => {
+          
+        const result = await votesByVoteIdAndCreator("voteId", "creator");
+        result.votesByVoteIdAndCreator.forEach(vote => {
+          assert.equal(vote.creator, "creator");
+          assert.equal(vote.id, "voteId");
+        });
+      }) 
+
+      it('votesByVoteId should return votes', async () => {
+          
+        const result = await votesByVoteId("voteId");
+        result.votesByVoteId.forEach(vote => {
+          assert.equal(vote.id, "voteId");
+        });
+      }) 
   
   });
   
