@@ -200,7 +200,6 @@ const handleStartVote = {
   type: responseType,
   description: "Handle StartVote",
   args: {
-    address: { type: GraphQLString },
     creator: { type: GraphQLString },
     voteId: { type: GraphQLString },
     metadata: { type: GraphQLString },
@@ -224,10 +223,9 @@ const handleStartVote = {
       }
       response.result = true;
 
-      const voteEntityId = buildVoteEntityId(args.address, args.voteId);
       
       const vote = new Vote({
-        id : voteEntityId
+        id : args.voteId
       });
 
       // const contractData = await allcontractsData.findOne({packageHash : process.env.VOTING_PACKAGE_HASH});
@@ -244,7 +242,6 @@ const handleStartVote = {
         value9: "9",
       };
     
-      vote.appAddress = args.address;
       vote.creator = args.creator;
       vote.originalCreator = args.transactionFrom;
       vote.metadata = args.metadata;
@@ -257,14 +254,12 @@ const handleStartVote = {
       vote.nay = voteData.value7;
       vote.votingPower = voteData.value8;
       vote.script = voteData.value9.toString()
-      // vote.orgAddress = voting.kernel()
-      vote.orgAddress = 'kernel address'
       vote.executedAt = new bigdecimal.BigDecimal("0");
       vote.executed = false
 
       await session.withTransaction(async () => {
         await vote.save({session})
-         await eventDataResult.save({ session });
+        await eventDataResult.save({ session });
         await response.save({session});
       }, transactionOptions);
 
@@ -283,7 +278,6 @@ const handleCastVote = {
   type: responseType,
   description: "Handle CastVote",
   args: {
-    address: { type: GraphQLString },
     voteId: { type: GraphQLString },
     voter: { type: GraphQLString },
     stake: { type: GraphQLString },
@@ -317,19 +311,17 @@ const handleCastVote = {
         value7: "7",
       };
 
-      const voteEntityId = buildVoteEntityId(args.address, args.voteId);
-      const vote = await Vote.findOne({id : voteEntityId});
+      const vote = await Vote.findOne({id : args.voteId});
       if(!vote){
         console.log("vote not found.");
       }
       vote.yea = voteData.value6
       vote.nay = voteData.value7
 
-      const voterId = buildVoterId(args.address, args.voter)
-      let voter = await Voter.findOne({id : voterId});
+      let voter = await Voter.findOne({id : args.voter});
 
       if (voter === null) {
-        voter = new Voter({id : voterId});
+        voter = new Voter({id : args.voter});
         voter.address = args.voter
       }
 
@@ -365,7 +357,6 @@ const handleExecuteVote = {
   type: responseType,
   description: "Handle ExecuteVote",
   args: {
-    address: { type: GraphQLString },
     voteId: { type: GraphQLString },
     timestamp: { type: GraphQLString },
     eventObjectId: { type: GraphQLString },
@@ -386,8 +377,7 @@ const handleExecuteVote = {
       }
       response.result = true;
 
-      const voteEntityId = buildVoteEntityId(args.address, args.voteId)
-      const vote = await Vote.findOne({id : voteEntityId});
+      const vote = await Vote.findOne({id : args.voteId});
       if(!vote){
         console.log("vote not found.");
       }
@@ -457,16 +447,6 @@ async function getOrRegisterVotingApp(address) {
   }
 
   return app;
-}
-
-function buildVoteEntityId(appAddress, voteNum){
-  return (
-    'appAddress:' + appAddress.toString() + '-vote:' + voteNum.toString()
-  )
-}
-
-function buildVoterId(voting, voter){
-  return voting.toString() + '-voter-' + voter.toString()
 }
 
 function buildCastEntityId(voteId, voter){
