@@ -12,8 +12,6 @@ const voteType = new GraphQLObjectType({
     fields: () => ({
       _id: {type: GraphQLID },
       id: {type: GraphQLString },
-      orgAddress:{type:GraphQLString},
-      appAddress:{type:GraphQLString},
       creator:{type:GraphQLString},
       originalCreator:{type:GraphQLString},
       metadata:{type:GraphQLString},

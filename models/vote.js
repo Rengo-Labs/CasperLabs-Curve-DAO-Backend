@@ -7,13 +7,6 @@ const voteSchema = new Schema({
         unique : true,
         required : true
     },
-    orgAddress: {
-        type:String
-    },
-
-    appAddress:{
-        type:String
-    },
 
     creator: {
         type:String
