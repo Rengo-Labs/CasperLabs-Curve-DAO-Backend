@@ -1352,15 +1352,12 @@ return true;
       console.log(newData[3][0].data + " = " + newData[3][1].data);
       console.log(newData[4][0].data + " = " + newData[4][1].data);
       console.log(newData[5][0].data + " = " + newData[5][1].data);
-      console.log(newData[6][0].data + " = " + newData[6][1].data);
+      
+      var creator = splitdata(newData[0][1].data);
+      var voteId = parseInt(newData[1][1].data);
+      var metadata = splitdata(newData[2][1].data);   
+      var transactionFrom = splitdata(newData[3][1].data);
 
-      var address = splitdata(newData[0][1].data);      
-      var creator = splitdata(newData[1][1].data);
-      var voteId = parseInt(newData[2][1].data);
-      var metadata = splitdata(newData[3][1].data);   
-      var transactionFrom = splitdata(newData[4][1].data);
-
-      console.log("address: ", address);
       console.log("creator: ", creator);
       console.log("voteId: ", voteId);
       console.log("metadata: ", metadata);
@@ -1369,7 +1366,6 @@ return true;
       await request(
         process.env.GRAPHQL,
         `mutation handleStartVote( 
-          $address: String!,
           $creator: String!,
           $voteId: String!,
           $metadata: String!,
@@ -1377,7 +1373,6 @@ return true;
           $eventObjectId: String!,
           ){
               handleStartVote( 
-            address: $address,
             creator: $creator,
             voteId: $voteId,
             metadata: $metadata,
@@ -1389,7 +1384,6 @@ return true;
                 
       }`,
 {
-address: address,
 creator: creator,
 voteId: voteId,
 metadata: metadata,
@@ -1406,15 +1400,12 @@ return true;
       console.log(newData[3][0].data + " = " + newData[3][1].data);
       console.log(newData[4][0].data + " = " + newData[4][1].data);
       console.log(newData[5][0].data + " = " + newData[5][1].data);
-      console.log(newData[6][0].data + " = " + newData[6][1].data);
 
-      var address = splitdata(newData[0][1].data);      
-      var voteId = splitdata(newData[1][1].data);
-      var voter = parseInt(newData[2][1].data);
-      var stake = splitdata(newData[3][1].data);
-      var supports = parseInt(newData[4][1].data);  
+      var voteId = splitdata(newData[0][1].data);
+      var voter = parseInt(newData[1][1].data);
+      var stake = splitdata(newData[2][1].data);
+      var supports = parseInt(newData[3][1].data);  
 
-      console.log("address: ", address);
       console.log("voteId: ", voteId);
       console.log("voter: ", voter);
       console.log("stake: ", stake);
@@ -1422,8 +1413,7 @@ return true;
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleCastVote( 
-          $address: String!,
+        `mutation handleCastVote(
           $voteId: String!,
           $voter: String!,
           $stake: String!,
@@ -1431,8 +1421,7 @@ return true;
           $timestamp: String!,
           $eventObjectId: String!,
           ){
-              handleCastVote( 
-            address: $address,
+              handleCastVote(
             voteId: $voteId,
             voter: $voter,
             stake: $stake,
@@ -1445,7 +1434,6 @@ return true;
                 
       }`,
 {
-address: address,
 voteId: voteId,
 voter: voter,
 stake: stake,
@@ -1460,23 +1448,18 @@ return true;
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
       console.log(newData[2][0].data + " = " + newData[2][1].data);
-      console.log(newData[3][0].data + " = " + newData[3][1].data);
+      
+      var voteId = splitdata(newData[0][1].data);
 
-      var address = splitdata(newData[0][1].data);      
-      var voteId = splitdata(newData[1][1].data);
-
-      console.log("address: ", address);
       console.log("voteId: ", voteId);
 
       await request(
         process.env.GRAPHQL,
         `mutation handleExecuteVote(
-           $address: String!,
            $voteId: String!,
            $timestamp: String!,
            $eventObjectId : String!){
               handleExecuteVote( 
-                address: $address,
                 voteId: $voteId,
                 timestamp: $timestamp,
                 eventObjectId : $eventObjectId) 
@@ -1486,7 +1469,6 @@ return true;
                 
       }`,
 {
-address: address,
 voteId: voteId,
 timestamp: timestamp,
 eventObjectId: eventResult._id,
