@@ -1,5 +1,7 @@
 /node_modules
 /Scripts/MINTER/keys
+/Scripts/GAUGECONTROLLER/keys
+
 # Logs
 logs
 *.log
