@@ -18,6 +18,7 @@ const gauge = require("../models/gauge");
 const userBalance = require("../models/userBalance");
 const { gaugeType } = require("./types/gauge");
 const gaugeLiquidity = require("../models/gaugeLiquidity");
+const { gaugeLiquidityType } = require("./types/gaugeLiquidity");
 
 const responses = {
   type: GraphQLList(responseType),
@@ -62,8 +63,22 @@ const gaugeVotesByTime =  {
   },
   async resolve(parent, args, context) {
     try {
-      let gaugeVoteTypes = await gaugeVote.find({time : { $gt: args.time }}).sort({time : -1});
-      return gaugeVoteTypes;
+      debugger;
+      let gaugeVotes = await gaugeVote.find();
+
+      let gaugeVotesResult=[];
+
+      for (var i=0;i<gaugeVotes.length;i++)
+      {
+        if(parseFloat(gaugeVotes[i].time) > parseFloat(args.time))
+        {
+          await gaugeVotes[i].populate("gaugeWeights");
+          gaugeVotesResult.push(gaugeVotes[i]); 
+        }
+      }
+
+      gaugeVotesResult.sort((a, b) => b.time - a.time);
+      return gaugeVotesResult;
     } catch (error) {
       throw new Error(error);
     }
@@ -78,9 +93,11 @@ const gaugeVotesByUser =  {
   },
   async resolve(parent, args, context) {
     try {
-      let userArg = args.user.toLowerCase();
-      let gaugeVoteTypes = await gaugeVote.find({user : userArg}).sort({time : -1});
-      return gaugeVoteTypes;
+      let gaugeVotes = await gaugeVote
+      .find({user : args.user})
+      .sort({time : -1})
+      .populate("gaugeWeights");;
+      return gaugeVotes;
     } catch (error) {
       throw new Error(error);
     }
@@ -109,7 +126,7 @@ const daoPowersByBlock =  {
   },
   async resolve(parent, args, context) {
     try {
-      let daoPowers = await daoPower.find().sort({block : 1});
+      let daoPowers = await daoPower.find().sort({timestamp : 1});
       return daoPowers;
     } catch (error) {
       throw new Error(error);
@@ -135,7 +152,7 @@ const daoPowersByTimestamp =  {
 
 
 const votingPower =  {
-  type: votingPowerType,
+  type: GraphQLList(votingPowerType),
   description: "Retrieves votingPower against id",
   args: {
     id: {type : GraphQLString},
@@ -166,7 +183,7 @@ const userBalancesByUnlockTime = {
 };
 
 const gauges =  {
-  type: GraphQLList(gaugeType),
+  type: GraphQLList(gaugeLiquidityType),
   description: "Retrieves gauges",
   args: {
     user: { type: GraphQLString },
@@ -186,15 +203,12 @@ const userBalancesByWeight =  {
   type: GraphQLList(userBalanceType),
   description: "Retrieves userBalances",
   args: {
-    block: { type: GraphQLString },
     first: {type : GraphQLString},
-    orderBy: {type : GraphQLString},
-    orderDirection: {type : GraphQLString},
     skip: {type : GraphQLString},
   },
   async resolve(parent, args, context) {
     try {
-      let userBalances = await userBalance.find().skip(args.skip).limit(args.first).sort({[args.orderBy] : args.orderDirection == 'asc' ? 1 : -1});;
+      let userBalances = await userBalance.find().sort({weight : -1}).skip(args.skip).limit(args.first);
       return userBalances;
     } catch (error) {
       throw new Error(error);

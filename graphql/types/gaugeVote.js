@@ -20,7 +20,7 @@ const gaugeVoteType = new GraphQLObjectType({
       total_weight : {type:GraphQLString},
       veCRV : {type:GraphQLString},
       totalveCRV : {type:GraphQLString},
-      gauge_weights : { type : GraphQLList(gaugeWeightType)}
+      gaugeWeights : { type : GraphQLList(gaugeWeightType)}
     })
 });
   
