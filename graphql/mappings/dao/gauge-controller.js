@@ -15,7 +15,7 @@ const { getOrCreateLpToken } = require("../../services/token");
 const Response = require("../../../models/response");
 const { responseType } = require("../../types/response");
 const { GraphQLString } = require("graphql");
-// let gaugeController= require('../JsClients/Registry/test/installed.ts')
+let gaugeController = require('../../../JsClients/GAUGECONTROLLER/gaugeControllerFunctionsForBackend/functions');
 // let LpToken= require('../JsClients/Registry/test/installed.ts')
 
 const { GAUGE_TOTAL_WEIGHT_PRECISION } = require("../../constants");
@@ -33,7 +33,7 @@ const handleAddType = {
   },
   async resolve(parent, args, context) {
     try {
-      // await gaugeController.setContractHash(address);
+      // await gaugeController.setContractHash(address); 
       let nextWeek = nextPeriod(args.timestamp, WEEK);
       console.log("args-name", args);
 
@@ -44,9 +44,8 @@ const handleAddType = {
         type: gaugeType.id,
         time: nextWeek.toString(),
         weight: 
-         // gaugeController.points_type_weight(args.type_id, nextWeek)
-         '1000000000'
-        
+         gaugeController.points_type_weight(args.type_id, nextWeek),
+        //  '1000000000'
       });
       await GaugeTypeWeight.create(newData);
 
@@ -59,8 +58,8 @@ const handleAddType = {
         //   GAUGE_TOTAL_WEIGHT_PRECISION
         // ),
         weight:
-          //gaugeController.points_total(nextWeek),
-          '1000000000'
+          gaugeController.points_total(nextWeek),
+          // '1000000000'
       });
       await GaugeTotalWeight.create(data);
 
@@ -203,8 +202,8 @@ const handleNewGauge = {
       if (gaugeType === null) {
         gaugeType = await registerGaugeType(
           (args.gaugeType).toString(),
-         // gaugeController.gauge_type_names(args.gauge_type)
-         '1000000000'
+         gaugeController.gauge_type_names(args.gauge_type)
+        //  '1000000000'
         );
       }
 
@@ -244,19 +243,19 @@ const handleNewGauge = {
         id: gauge.id + "-" + nextWeek.toString(),
         gauge: gauge.id,
         time: nextWeek,
-        //weight: (BigInt(args.weight)).toString(),
-        weight: '1000000000'
+        weight: (BigInt(args.weight)).toString(),
+        // weight: '1000000000'
       });
       await GaugeWeight.create(data);
 
       let dataWeight = new GaugeTotalWeight({
         id: nextWeek.toString(),
         time: nextWeek.toString(),
-        // weight: BigInt(
-        //   gaugeController.points_total(nextWeek),
-        //   GAUGE_TOTAL_WEIGHT_PRECISION
-        // ),
-        weight: '1000000000'
+        weight: BigInt(
+          gaugeController.points_total(nextWeek),
+          GAUGE_TOTAL_WEIGHT_PRECISION
+        ),
+        // weight: '1000000000'
       });
       await GaugeTotalWeight.create(dataWeight);
 
@@ -312,11 +311,11 @@ const handleNewGaugeWeight = {
         let data = new GaugeTotalWeight({
           id: nextWeek.toString(),
           time: nextWeek,
-          // weight: BigInt(
-          //   gaugeController.points_total(nextWeek),
-          //   GAUGE_TOTAL_WEIGHT_PRECISION
-          // ),
-          weight: '1000000000'
+          weight: BigInt(
+            gaugeController.points_total(nextWeek),
+            GAUGE_TOTAL_WEIGHT_PRECISION
+          ),
+          // weight: '1000000000'
         });
         await GaugeTotalWeight.create(data);
       }
@@ -410,21 +409,21 @@ const handleVoteForGauge = {
           id: gauge.id + "-" + nextWeek.toString(),
           gauge: gauge.id,
           time: nextWeek,
-          // weight: BigInt(
-          //   gaugeController.points_weight(args.gauge_addr, nextWeek).value0
-          // ),
-          weight: "1000000000"
+          weight: BigInt(
+            gaugeController.points_weight(args.gauge_addr, nextWeek)
+          ),
+          // weight: "1000000000"
         });
         await GaugeWeight.create(newData);
 
         let data = new GaugeTotalWeight({
           id: nextWeek.toString(),
           time: nextWeek,
-          // weight: BigInt(
-          //   gaugeController.points_total(nextWeek),
-          //   GAUGE_TOTAL_WEIGHT_PRECISION
-          // ),
-          weight: "1000000000"
+          weight: BigInt(
+            gaugeController.points_total(nextWeek),
+            GAUGE_TOTAL_WEIGHT_PRECISION
+          ),
+          // weight: "1000000000"
         });
         await GaugeTotalWeight.create(data);
 
