@@ -14,32 +14,6 @@ const votingEscrow = new VOTINGESCROWClient(
   EVENT_STREAM_ADDRESS!,
 );
 
-export const balanceOf = async (contractHash:string,account:string) => {
-  
-    // We don't need hash- prefix so i'm removing it
-    await votingEscrow.setContractHash(contractHash);
-  
-    //balanceof
-    const balance = await votingEscrow.balanceOf(account);
-    console.log(contractHash +` =... balanceof : ${balance}`);
-  
-    return balance;
-    
-};
-
-export const totalSupply = async (contractHash:string) => {
-  
-  // We don't need hash- prefix so i'm removing it
-  await votingEscrow.setContractHash(contractHash);
-
-  //totalSupply
-  const totalSupply = await votingEscrow.totalSupply();
-  console.log(contractHash +` =... totalSupply : ${totalSupply}`);
-
-  return totalSupply;
-  
-};
-
 // export const minBalance = async (contractHash:string,addr:string) => {
   
 //     // We don't need hash- prefix so i'm removing it

@@ -26,9 +26,9 @@ import { RecipientType, IPendingDeploy } from "./types";
 import {createRecipientAddress } from "./utils";
 
 class CURVEREWARDSClient {
-  private contractName: string = "erc20crv";
-  private contractHash: string= "erc20crv";
-  private contractPackageHash: string= "erc20crv";
+  private contractName: string = "curveRewards";
+  private contractHash: string= "curveRewards";
+  private contractPackageHash: string= "curveRewards";
   private namedKeys: {
     balances:string
     metadata: string;
@@ -37,6 +37,8 @@ class CURVEREWARDSClient {
     ownedTokens: string;
     owners: string;
     paused: string;
+    user_reward_per_token_paid: string;
+    rewards: string;
     
   };
 
@@ -58,7 +60,9 @@ class CURVEREWARDSClient {
       allowances: "null",
       ownedTokens: "null",
       owners: "null",
-      paused: "null"
+      paused: "null",
+      user_reward_per_token_paid: "null",
+      rewards: "null"
     }; 
   }
 
@@ -99,6 +103,37 @@ class CURVEREWARDSClient {
   }
 
   public async lastTimeRewardApplicableJsClientsessioncode(
+    keys: Keys.AsymmetricKey,
+    packageHash: string,
+    entrypointName:string,
+    paymentAmount: string,
+    wasmPath: string
+  ) {
+    const _packageHash = new CLByteArray(
+			Uint8Array.from(Buffer.from(packageHash, "hex"))
+		);
+    const runtimeArgs = RuntimeArgs.fromMap({
+      destination_package_hash: utils.createRecipientAddress(_packageHash),
+      destination_entrypoint: CLValueBuilder.string(entrypointName),
+    });
+
+    const deployHash = await installWasmFile({
+      chainName: this.chainName,
+      paymentAmount,
+      nodeAddress: this.nodeAddress,
+      keys,
+      pathToContract: wasmPath,
+      runtimeArgs,
+    });
+
+    if (deployHash !== null) {
+      return deployHash;
+    } else {
+      throw Error("Problem with installation");
+    }
+  }
+
+  public async isOwnersessioncode(
     keys: Keys.AsymmetricKey,
     packageHash: string,
     entrypointName:string,
@@ -211,6 +246,8 @@ class CURVEREWARDSClient {
       'balances',
       'nonces',
       'allowances',
+      'user_reward_per_token_paid',
+      'rewards',
       `${this.contractName}_package_hash`,
       `${this.contractName}_package_hash_wrapped`,
       `${this.contractName}_contract_hash`,
@@ -244,15 +281,6 @@ class CURVEREWARDSClient {
     return result.value();
   }
 
-  public async isOwnerJsClient() {
-    const result = await contractSimpleGetter(
-      this.nodeAddress,
-      this.contractHash,
-      ["owner"]
-    );
-    return result.value();
-  }
-
   public async balanceOf(owner: string) {
     try {
       
@@ -270,6 +298,106 @@ class CURVEREWARDSClient {
     
   }
 
+  public async uni() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["uni"]
+    );
+    return result.value();
+  }
+
+  public async snx() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["snx"]
+    );
+    return result.value();
+  }
+
+  public async duration() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["duration"]
+    );
+    return result.value();
+  }
+
+  public async periodFinish() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["period_finish"]
+    );
+    return result.value();
+  }
+
+  public async rewardRate() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["reward_rate"]
+    );
+    return result.value();
+  }
+
+  public async lastUpdateTime() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["last_update_time"]
+    );
+    return result.value();
+  }
+
+  public async rewardPerTokenStored() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["reward_per_token_stored"]
+    );
+    return result.value();
+  }
+
+  public async userRewardPerTokenPaid(account: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        account,
+        this.namedKeys.user_reward_per_token_paid
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+    
+  }
+
+  public async rewards(account: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        account,
+        this.namedKeys.rewards
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+    
+  }
+
+  
+
+  
   //CURVE-REWARDS FUNCTIONS
 
   public async stakeLp(

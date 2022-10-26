@@ -36,6 +36,16 @@ class LIQUIDITYGAUGEREWARDClient {
     ownedTokens: string;
     owners: string;
     paused: string;
+    approved_to_deposit: string;
+    working_balances: string;
+    period_timestamp: string;
+    integrate_inv_supply: string;
+    integrate_inv_supply_of: string;
+    integrate_checkpoint_of: string;
+    integrate_fraction : string;
+    reward_integral_for: string;
+    rewards_for: string;
+    claimed_rewards_for: string;
     
   };
 
@@ -57,7 +67,17 @@ class LIQUIDITYGAUGEREWARDClient {
       allowances: "null",
       ownedTokens: "null",
       owners: "null",
-      paused: "null"
+      paused: "null",
+      approved_to_deposit: "null",
+      working_balances: "null",
+      period_timestamp: "null",
+      integrate_inv_supply: "null",
+      integrate_inv_supply_of : "null",
+      integrate_checkpoint_of: "null",
+      integrate_fraction: "null",
+      reward_integral_for: "null",
+      rewards_for: "null",
+      claimed_rewards_for: "null"
     }; 
   }
 
@@ -258,6 +278,16 @@ class LIQUIDITYGAUGEREWARDClient {
       'balances',
       'nonces',
       'allowances',
+      'approved_to_deposit',
+      'working_balances',
+      'period_timestamp',
+      'integrate_inv_supply',
+      'integrate_inv_supply_of',
+      'integrate_checkpoint_of',
+      'integrate_fraction',
+      'reward_integral_for',
+      'rewards_for',
+      'claimed_rewards_for',
       `${this.contractName}_package_hash`,
       `${this.contractName}_package_hash_wrapped`,
       `${this.contractName}_contract_hash`,
@@ -275,99 +305,348 @@ class LIQUIDITYGAUGEREWARDClient {
 
   //LIQUIDITY GAUGE REWARD FUNCTIONS
 
+  public async minter() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["minter"]
+    );
+    return result.value();
+  }
 
-  public async userCheckpointJsClient(
-    keys: Keys.AsymmetricKey,
-    //addr: string,
-    addr: RecipientType,
-    paymentAmount: string
-  ) {
-    // const _addr = new CLByteArray(
-		// 	Uint8Array.from(Buffer.from(addr, "hex"))
-		// );
-    const runtimeArgs = RuntimeArgs.fromMap({
-      //addr: utils.createRecipientAddress(_addr),
-      addr: utils.createRecipientAddress(addr),
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "user_checkpoint_js_client",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
+  public async crvToken() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["crv_token"]
+    );
+    return result.value();
+  }
 
-    if (deployHash !== null) {
+  public async lpToken() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["lp_token"]
+    );
+    return result.value();
+  }
+
+  public async controller() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["controller"]
+    );
+    return result.value();
+  }
+
+  public async votingEscrow() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["voting_escrow"]
+    );
+    return result.value();
+  }
+
+  public async balanceOf(owner: string) {
+    try {
       
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.balances
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+    
+  }
+
+  public async totalSupply() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["total_supply"]
+    );
+    return result.value();
+  }
+
+  public async futureEpochTime() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["future_epoch_time"]
+    );
+    return result.value();
+  }
+
+  public async approvedToDeposit(owner:string, spender:string) {
+    try {
+      const _spender = new CLByteArray(
+        Uint8Array.from(Buffer.from(spender, "hex"))
+      );
+
+      const _owner=new CLKey(new CLAccountHash(Uint8Array.from(Buffer.from(owner, "hex"))));
+      const key_spender = createRecipientAddress(_spender);
+      const finalBytes = concat([CLValueParsers.toBytes(_owner).unwrap(), CLValueParsers.toBytes(key_spender).unwrap()]);
+      const blaked = blake.blake2b(finalBytes, undefined, 32);
+      const encodedBytes = Buffer.from(blaked).toString("hex");
+
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        encodedBytes,
+        this.namedKeys.approved_to_deposit
+      );
+
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+    } catch (error) {
+      return "0";
     }
   }
 
-  public async claimableTokensJsClient(
-    keys: Keys.AsymmetricKey,
-    //addr: string,
-    addr: RecipientType,
-    paymentAmount: string
-  ) {
-    // const _addr = new CLByteArray(
-		// 	Uint8Array.from(Buffer.from(addr, "hex"))
-		// );
-    const runtimeArgs = RuntimeArgs.fromMap({
-      //addr: utils.createRecipientAddress(_addr),
-      addr: utils.createRecipientAddress(addr),
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "claimable_tokens_js_client",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
+  public async workingBalances(owner: string) {
+    try {
       
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.working_balances
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
     }
   }
 
-  public async claimableRewardJsClient(
-    keys: Keys.AsymmetricKey,
-    //addr: string,
-    addr: RecipientType,
-    paymentAmount: string
-  ) {
-    // const _addr = new CLByteArray(
-		// 	Uint8Array.from(Buffer.from(addr, "hex"))
-		// );
-    const runtimeArgs = RuntimeArgs.fromMap({
-      //addr: utils.createRecipientAddress(_addr),
-      addr: utils.createRecipientAddress(addr),
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "claimable_reward_js_client",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
+  public async workingSupply() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["working_supply"]
+    );
+    return result.value();
+  }
 
-    if (deployHash !== null) {
+  public async period() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["period"]
+    );
+    return result.value();
+  }
+
+  public async periodTimestamp(owner: string) {
+    try {
       
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.period_timestamp
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
     }
   }
+
+  public async integrateInvSupply(owner: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.integrate_inv_supply
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+  }
+
+  public async integrateInvSupplyOf(owner: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.integrate_inv_supply_of
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+  }
+
+  public async integrateCheckpointOf(owner: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.integrate_checkpoint_of
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+  }
+
+  public async integrateFraction(owner: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.integrate_fraction
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+  }
+
+  public async inflationRate() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["inflation_rate"]
+    );
+    return result.value();
+  }
+
+  public async rewardContract() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["reward_contract"]
+    );
+    return result.value();
+  }
+
+  public async rewardedToken() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["rewarded_token"]
+    );
+    return result.value();
+  }
+
+  public async rewardIntegral() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["reward_integral"]
+    );
+    return result.value();
+  }
+
+  public async rewardIntegralFor(owner: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.reward_integral_for
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+  }
+
+  public async rewardsFor(owner: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.rewards_for
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+  }
+
+  public async claimedRewardsFor(owner: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.claimed_rewards_for
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+  }
+
+  public async admin() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["admin"]
+    );
+    return result.value();
+  }
+
+  public async futureAdmin() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["future_admin"]
+    );
+    return result.value();
+  }
+
+  public async isKilled() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["is_killed"]
+    );
+    return result.value();
+  }
+
+  public async isClaimingRewards() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["is_claiming_rewards"]
+    );
+    return result.value();
+  }
+
+
+
+
 
   public async kick(
     keys: Keys.AsymmetricKey,
@@ -502,31 +781,7 @@ class LIQUIDITYGAUGEREWARDClient {
     const deployHash = await contractCall({
       chainName: this.chainName,
       contractHash: this.contractHash,
-      entryPoint: "clain_rewards",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
-
-  public async integrateCheckpointJsClient(
-    keys: Keys.AsymmetricKey,
-    paymentAmount: string
-  ) {
-    const runtimeArgs = RuntimeArgs.fromMap({
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "integrate_checkpoint_js_client",
+      entryPoint: "claim_rewards",
       keys,
       nodeAddress: this.nodeAddress,
       paymentAmount,
@@ -565,7 +820,7 @@ class LIQUIDITYGAUGEREWARDClient {
     }
   }
 
-  public async comitTransferOwnership(
+  public async commitTransferOwnership(
     keys: Keys.AsymmetricKey,
     //addr: string,
     addr: RecipientType,
@@ -581,7 +836,7 @@ class LIQUIDITYGAUGEREWARDClient {
     const deployHash = await contractCall({
       chainName: this.chainName,
       contractHash: this.contractHash,
-      entryPoint: "comit_transfer_ownership",
+      entryPoint: "commit_transfer_ownership",
       keys,
       nodeAddress: this.nodeAddress,
       paymentAmount,

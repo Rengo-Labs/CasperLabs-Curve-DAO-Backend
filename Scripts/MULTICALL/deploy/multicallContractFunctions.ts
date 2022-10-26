@@ -52,6 +52,9 @@ const test = async () => {
  const aggregateDeployHash = await multicall.aggregate(
   KEYS!,
   []!,
+  []!,
+  []!,
+  []!,
   MULTICALL_PAYMENT_AMOUNT!
  );
  console.log("... aggregate deploy hash: ", aggregateDeployHash);

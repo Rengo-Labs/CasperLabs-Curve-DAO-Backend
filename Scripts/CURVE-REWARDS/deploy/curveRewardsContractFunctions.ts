@@ -26,7 +26,8 @@ const {
   CURVE_REWARDS_AMOUNT,
   CURVE_REWARDS_DISTRIBUTION,
   CURVE_REWARDS_REWARD,
-  CURVE_REWARDS_NEW_OWNER
+  CURVE_REWARDS_NEW_OWNER,
+  CURVE_REWARDS_ACCOUNT
 
 } = process.env;
 
@@ -66,13 +67,45 @@ const test = async () => {
    const ownerJsClient = await curveRewards.ownerJsClient();
    console.log(`... owner: ${ownerJsClient}`);
 
-   // //isOwnerJsClient
-   const isOwnerJsClient = await curveRewards.isOwnerJsClient();
-   console.log(`... isOwner: ${isOwnerJsClient}`);
-
    // //balanceOf
    const balanceOf = await curveRewards.balanceOf(CURVE_REWARDS_OWNER!);
    console.log(`... balance: ${balanceOf}`);
+
+    // //uni
+    const uni = await curveRewards.uni();
+    console.log(`... uni: ${uni}`);
+
+   // //snx
+   const snx = await curveRewards.snx();
+   console.log(`... snx: ${snx}`);
+
+   // //duration
+   const duration = await curveRewards.duration();
+   console.log(`... duration: ${duration}`);
+
+   // //periodFinish
+   const periodFinish = await curveRewards.periodFinish();
+   console.log(`... periodFinish: ${periodFinish}`);
+
+  // //rewardRate
+  const rewardRate = await curveRewards.rewardRate();
+  console.log(`... rewardRate: ${rewardRate}`);
+
+   // //lastUpdateTime
+   const lastUpdateTime = await curveRewards.lastUpdateTime();
+   console.log(`... lastUpdateTime: ${lastUpdateTime}`);
+
+  // //rewardPerTokenStored
+  const rewardPerTokenStored = await curveRewards.rewardPerTokenStored();
+  console.log(`... rewardPerTokenStored: ${rewardPerTokenStored}`);
+
+  // //userRewardPerTokenPaid
+  const userRewardPerTokenPaid = await curveRewards.userRewardPerTokenPaid(CURVE_REWARDS_ACCOUNT!);
+  console.log(`... userRewardPerTokenPaid: ${userRewardPerTokenPaid}`);
+
+ // //rewards
+ const rewards = await curveRewards.rewards(CURVE_REWARDS_ACCOUNT!);
+ console.log(`... rewards: ${rewards}`);
 
 
  //stakeLp

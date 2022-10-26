@@ -28,6 +28,8 @@ const {
   ERC20CRV_START,
   ERC20CRV_END,
   ERC20CRV_RECIPIENT,
+  ERC20CRV_ACCOUNT,
+  ERC20CRV_OWNER
 
 } = process.env;
 
@@ -59,6 +61,38 @@ const test = async () => {
 
   await erc20Crv.setContractHash(ERC20CRV_CONTRACT_HASH!);
 
+
+ //  // // //name
+ const name = await erc20Crv.name();
+ console.log(`... Contract name: ${name}`);
+
+ //  // // //symbol
+ const symbol = await erc20Crv.symbol();
+ console.log(`... Contract symbol: ${symbol}`);
+
+ //  // // //decimals
+ const decimals = await erc20Crv.decimals();
+ console.log(`... Contract decimals: ${decimals}`);
+
+ //  // // //balanceOf
+ const balanceOf = await erc20Crv.balanceOf(ERC20CRV_ACCOUNT!);
+ console.log(`... Contract balanceOf: ${balanceOf}`);
+
+ //  // // //allowances
+ const allowances = await erc20Crv.allowances(ERC20CRV_OWNER!,ERC20CRV_SPENDER!);
+ console.log(`... Contract allowances: ${allowances}`);
+
+ //  // // //minter
+ const minter = await erc20Crv.minter();
+ console.log(`... Contract minter: ${minter}`);
+
+ //  // // //admin
+ const admin = await erc20Crv.admin();
+ console.log(`... Contract admin: ${admin}`);
+
+ //  // // //rate
+ const rate = await erc20Crv.rate();
+ console.log(`... Contract rate: ${rate}`);
 
    //setMinter
  const setMinterDeployHash = await erc20Crv.setMinter(
@@ -93,48 +127,6 @@ const test = async () => {
  await getDeploy(NODE_ADDRESS!, setAdminDeployHash);
  console.log("... setAdmin function called successfully.");
 
-//  //startEpochTimeWriteJsClient
-//  const startEpochTimeWriteJsClientDeployHash = await erc20Crv.startEpochTimeWriteJsClient(
-//   KEYS!,
-//   ERC20CRV_PAYMENT_AMOUNT!
-//  );
-//  console.log("... startEpochTimeWriteJsClient deploy hash: ", startEpochTimeWriteJsClientDeployHash);
-
-//  await getDeploy(NODE_ADDRESS!, startEpochTimeWriteJsClientDeployHash);
-//  console.log("... startEpochTimeWriteJsClient function called successfully.");
-
-//  //futureEpochTimeWriteJsClient
-//  const futureEpochTimeWriteJsClientDeployHash = await erc20Crv.futureEpochTimeWriteJsClient(
-//   KEYS!,
-//   ERC20CRV_PAYMENT_AMOUNT!
-//  );
-//  console.log("... futureEpochTimeWriteJsClient deploy hash: ", futureEpochTimeWriteJsClientDeployHash);
-
-//  await getDeploy(NODE_ADDRESS!, futureEpochTimeWriteJsClientDeployHash);
-//  console.log("... futureEpochTimeWriteJsClient function called successfully.");
-
-//  //availableSupplyJsClient
-//  const availableSupplyJsClientDeployHash = await erc20Crv.availableSupplyJsClient(
-//   KEYS!,
-//   ERC20CRV_PAYMENT_AMOUNT!
-//  );
-//  console.log("... availableSupplyJsClient deploy hash: ", availableSupplyJsClientDeployHash);
-
-//  await getDeploy(NODE_ADDRESS!, availableSupplyJsClientDeployHash);
-//  console.log("... availableSupplyJsClient function called successfully.");
-
-//  //mintableInTimeframeJsClient
-//  const mintableInTimeframeJsClientDeployHash = await erc20Crv.mintableInTimeframeJsClient(
-//   KEYS!,
-//   ERC20CRV_START!,
-//   ERC20CRV_END!,
-//   ERC20CRV_PAYMENT_AMOUNT!
-//  );
-//  console.log("... mintableInTimeframeJsClient deploy hash: ", mintableInTimeframeJsClientDeployHash);
-
-//  await getDeploy(NODE_ADDRESS!, mintableInTimeframeJsClientDeployHash);
-//  console.log("... mintableInTimeframeJsClient function called successfully.");
-
  //updateMiningParameters
  const updateMiningParametersDeployHash = await erc20Crv.updateMiningParameters(
   KEYS!,
@@ -144,18 +136,6 @@ const test = async () => {
 
  await getDeploy(NODE_ADDRESS!, updateMiningParametersDeployHash);
  console.log("... updateMiningParameters function called successfully.");
-
- //mintJsClient
- const mintJsClientDeployHash = await erc20Crv.mintJsClient(
-  KEYS!,
-  KEYS.publicKey,
-  ERC20CRV_AMOUNT!,
-  ERC20CRV_PAYMENT_AMOUNT!
- );
- console.log("... mintJsClient deploy hash: ", mintJsClientDeployHash);
-
- await getDeploy(NODE_ADDRESS!, mintJsClientDeployHash);
- console.log("... mintJsClient function called successfully.");
 
  //transferFrom
  const transferFromDeployHash = await erc20Crv.transferFrom(

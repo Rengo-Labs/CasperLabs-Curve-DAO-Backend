@@ -37,6 +37,16 @@ class LIQUIDITYGAUGEV3Client {
     ownedTokens: string;
     owners: string;
     paused: string;
+    working_balances: string;
+    period_timestamp: string;
+    integrate_inv_supply: string;
+    integrate_checkpoint_of: string;
+    integrate_inv_supply_of: string;
+    integrate_fraction: string;
+    reward_tokens: string;
+    rewards_receiver: string;
+    reward_integral: string;
+    reward_integral_for: string;
     
   };
 
@@ -58,7 +68,17 @@ class LIQUIDITYGAUGEV3Client {
       allowances: "null",
       ownedTokens: "null",
       owners: "null",
-      paused: "null"
+      paused: "null",
+      working_balances: "null",
+      period_timestamp: "null",
+      integrate_inv_supply: "null",
+      integrate_checkpoint_of: "null",
+      integrate_inv_supply_of: "null",
+      integrate_fraction: "null",
+      reward_tokens: "null",
+      rewards_receiver: "null",
+      reward_integral: "null",
+      reward_integral_for: "null",
     }; 
   }
 
@@ -443,6 +463,16 @@ class LIQUIDITYGAUGEV3Client {
       'balances',
       'nonces',
       'allowances',
+      'working_balances',
+      'period_timestamp',
+      'integrate_inv_supply',
+      'integrate_checkpoint_of',
+      'integrate_inv_supply_of',
+      'integrate_fraction',
+      'reward_tokens',
+      'rewards_receiver',
+      'reward_integral',
+      'reward_integral_for',
       `${this.contractName}_package_hash`,
       `${this.contractName}_package_hash_wrapped`,
       `${this.contractName}_contract_hash`,
@@ -476,234 +506,353 @@ class LIQUIDITYGAUGEV3Client {
     return result.value();
   }
 
+  public async minter() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["minter"]
+    );
+    return result.value();
+  }
+
+  public async crvToken() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["crv_token"]
+    );
+    return result.value();
+  }
+
+  public async lpToken() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["lp_token"]
+    );
+    return result.value();
+  }
+
+  public async controller() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["controller"]
+    );
+    return result.value();
+  }
+
+  public async votingEscrow() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["voting_escrow"]
+    );
+    return result.value();
+  }
+
+  public async futureEpochTime() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["future_epoch_time"]
+    );
+    return result.value();
+  }
+
+  public async balanceOf(owner: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.balances
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+    
+  }
+
+  public async totalSupply() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["total_supply"]
+    );
+    return result.value();
+  }
+
+  public async allowances(owner:string, spender:string) {
+    try {
+      const _spender = new CLByteArray(
+        Uint8Array.from(Buffer.from(spender, "hex"))
+      );
+
+      const _owner=new CLKey(new CLAccountHash(Uint8Array.from(Buffer.from(owner, "hex"))));
+      const key_spender = createRecipientAddress(_spender);
+      const finalBytes = concat([CLValueParsers.toBytes(_owner).unwrap(), CLValueParsers.toBytes(key_spender).unwrap()]);
+      const blaked = blake.blake2b(finalBytes, undefined, 32);
+      const encodedBytes = Buffer.from(blaked).toString("hex");
+
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        encodedBytes,
+        this.namedKeys.allowances
+      );
+
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+    } catch (error) {
+      return "0";
+    }
+  }
+
+  public async name() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["name"]
+    );
+    return result.value();
+  }
+
+  public async symbol() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["symbol"]
+    );
+    return result.value();
+  }
+
+  public async workingBalances(owner: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.working_balances
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+  }
+
+  public async workingSupply() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["working_supply"]
+    );
+    return result.value();
+  }
+
+  public async period() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["period"]
+    );
+    return result.value();
+  }
+
+  public async periodTimestamp(owner: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.period_timestamp
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+  }
+
+  public async integrateInvSupply(owner: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.integrate_inv_supply
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+  }
+
+  public async integrateInvSupplyOf(owner: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.integrate_inv_supply_of
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+  }
+
+  public async integrateCheckpointOf(owner: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.integrate_checkpoint_of
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+  }
+
+  public async integrateFraction(owner: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.integrate_fraction
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+  }
+
+  public async inflationRate() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["inflation_rate"]
+    );
+    return result.value();
+  }
+
+  public async rewardTokens(owner: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.reward_tokens
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+  }
+
+  public async rewardsReceiver(owner: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.rewards_receiver
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+  }
+
+  public async rewardIntegral(owner: string) {
+    try {
+      
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.reward_integral
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+  }
+
+  public async rewardIntegralFor(owner:string, spender:string) {
+    try {
+      const _spender = new CLByteArray(
+        Uint8Array.from(Buffer.from(spender, "hex"))
+      );
+
+      const _owner=new CLKey(new CLAccountHash(Uint8Array.from(Buffer.from(owner, "hex"))));
+      const key_spender = createRecipientAddress(_spender);
+      const finalBytes = concat([CLValueParsers.toBytes(_owner).unwrap(), CLValueParsers.toBytes(key_spender).unwrap()]);
+      const blaked = blake.blake2b(finalBytes, undefined, 32);
+      const encodedBytes = Buffer.from(blaked).toString("hex");
+
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        encodedBytes,
+        this.namedKeys.reward_integral_for
+      );
+
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+    } catch (error) {
+      return "0";
+    }
+  }
+
+  public async admin() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["admin"]
+    );
+    return result.value();
+  }
+
+  public async futureAdmin() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["future_admin"]
+    );
+    return result.value();
+  }
+
+  public async isKilled() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["is_killed"]
+    );
+    return result.value();
+  }
+
   //LIQUIDITY GAUGE V3 FUNCTIONS
-
-  // public async decimals(
-  //   keys: Keys.AsymmetricKey,
-  //   paymentAmount: string
-  // ) {
-  //   const runtimeArgs = RuntimeArgs.fromMap({
-  //   });
-  //   const deployHash = await contractCall({
-  //     chainName: this.chainName,
-  //     contractHash: this.contractHash,
-  //     entryPoint: "decimals",
-  //     keys,
-  //     nodeAddress: this.nodeAddress,
-  //     paymentAmount,
-  //     runtimeArgs,
-  //   });
-
-  //   if (deployHash !== null) {
-      
-  //     return deployHash;
-  //   } else {
-  //     throw Error("Invalid Deploy");
-  //   }
-  // }
-
-  public async userCheckpoint(
-    keys: Keys.AsymmetricKey,
-    //addr: string,
-    addr: RecipientType,
-    paymentAmount: string
-  ) {
-    // const _addr = new CLByteArray(
-		// 	Uint8Array.from(Buffer.from(addr, "hex"))
-		// );
-    const runtimeArgs = RuntimeArgs.fromMap({
-      //addr: utils.createRecipientAddress(_addr),
-      addr: utils.createRecipientAddress(addr),
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "user_checkpoint",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
-
-  public async claimableTokens(
-    keys: Keys.AsymmetricKey,
-    //addr: string,
-    addr: RecipientType,
-    paymentAmount: string
-  ) {
-    // const _addr = new CLByteArray(
-		// 	Uint8Array.from(Buffer.from(addr, "hex"))
-		// );
-    const runtimeArgs = RuntimeArgs.fromMap({
-      //addr: utils.createRecipientAddress(_addr),
-      addr: utils.createRecipientAddress(addr),
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "claimable_tokens",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
-
-  public async rewardContract(
-    keys: Keys.AsymmetricKey,
-    paymentAmount: string
-  ) {
-    const runtimeArgs = RuntimeArgs.fromMap({
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "rewardContract",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
-
-  public async lastClaim(
-    keys: Keys.AsymmetricKey,
-    paymentAmount: string
-  ) {
-    const runtimeArgs = RuntimeArgs.fromMap({
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "last_claim",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
-
-  public async claimedReward(
-    keys: Keys.AsymmetricKey,
-    addr: RecipientType,
-    token: string,
-    paymentAmount: string
-  ) {
-     const _token = new CLByteArray(
-		 	Uint8Array.from(Buffer.from(token, "hex"))
-		 );
-    const runtimeArgs = RuntimeArgs.fromMap({
-      addr: utils.createRecipientAddress(addr),
-      token: utils.createRecipientAddress(_token),
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "claimed_reward",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
-
-  public async claimableReward(
-    keys: Keys.AsymmetricKey,
-    addr: RecipientType,
-    token: string,
-    paymentAmount: string
-  ) {
-     const _token = new CLByteArray(
-		 	Uint8Array.from(Buffer.from(token, "hex"))
-		 );
-    const runtimeArgs = RuntimeArgs.fromMap({
-      addr: utils.createRecipientAddress(addr),
-      token: utils.createRecipientAddress(_token),
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "claimable_reward",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
-
-  public async claimableRewardWrite(
-    keys: Keys.AsymmetricKey,
-    addr: RecipientType,
-    token: string,
-    paymentAmount: string
-  ) {
-     const _token = new CLByteArray(
-		 	Uint8Array.from(Buffer.from(token, "hex"))
-		 );
-    const runtimeArgs = RuntimeArgs.fromMap({
-      addr: utils.createRecipientAddress(addr),
-      token: utils.createRecipientAddress(_token),
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "claimable_reward_write",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
 
   public async setRewardsReceiver(
     keys: Keys.AsymmetricKey,
@@ -720,6 +869,38 @@ class LIQUIDITYGAUGEV3Client {
       chainName: this.chainName,
       contractHash: this.contractHash,
       entryPoint: "set_rewards_receiver",
+      keys,
+      nodeAddress: this.nodeAddress,
+      paymentAmount,
+      runtimeArgs,
+    });
+
+    if (deployHash !== null) {
+      
+      return deployHash;
+    } else {
+      throw Error("Invalid Deploy");
+    }
+  }
+
+  public async claimRewards(
+    keys: Keys.AsymmetricKey,
+    addr: RecipientType,
+    receiver: string,
+    paymentAmount: string
+  ) {
+    const _receiver = new CLByteArray(
+			Uint8Array.from(Buffer.from(receiver, "hex"))
+		);
+    const runtimeArgs = RuntimeArgs.fromMap({
+      addr: new CLOption(Some(utils.createRecipientAddress(addr))),
+      receiver: new CLOption(Some(utils.createRecipientAddress(_receiver)))
+
+    });
+    const deployHash = await contractCall({
+      chainName: this.chainName,
+      contractHash: this.contractHash,
+      entryPoint: "claim_rewards",
       keys,
       nodeAddress: this.nodeAddress,
       paymentAmount,
@@ -810,73 +991,6 @@ class LIQUIDITYGAUGEV3Client {
       chainName: this.chainName,
       contractHash: this.contractHash,
       entryPoint: "withdraw",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
-
-  public async transfer(
-    keys: Keys.AsymmetricKey,
-    to: string,
-    value: string,
-    paymentAmount: string
-  ) {
-     const _to = new CLByteArray(
-		 	Uint8Array.from(Buffer.from(to, "hex"))
-		 );
-    const runtimeArgs = RuntimeArgs.fromMap({
-      to: utils.createRecipientAddress(_to),
-      value:CLValueBuilder.u256(value), 
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "transfer",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
-
-  public async transferFrom(
-    keys: Keys.AsymmetricKey,
-    from:string,
-    to: string,
-    value: string,
-    paymentAmount: string
-  ) {
-     const _to = new CLByteArray(
-		 	Uint8Array.from(Buffer.from(to, "hex"))
-		 );
-     const _from = new CLByteArray(
-      Uint8Array.from(Buffer.from(from, "hex"))
-    );
-    const runtimeArgs = RuntimeArgs.fromMap({
-      from: utils.createRecipientAddress(_from),
-      to: utils.createRecipientAddress(_to),
-      value:CLValueBuilder.u256(value), 
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "transfer_from",
       keys,
       nodeAddress: this.nodeAddress,
       paymentAmount,
@@ -1044,7 +1158,7 @@ class LIQUIDITYGAUGEV3Client {
     }
   }
 
-  public async comitTransferOwnership(
+  public async commitTransferOwnership(
     keys: Keys.AsymmetricKey,
     //addr: string,
     addr: RecipientType,
@@ -1060,7 +1174,7 @@ class LIQUIDITYGAUGEV3Client {
     const deployHash = await contractCall({
       chainName: this.chainName,
       contractHash: this.contractHash,
-      entryPoint: "comit_transfer_ownership",
+      entryPoint: "commit_transfer_ownership",
       keys,
       nodeAddress: this.nodeAddress,
       paymentAmount,

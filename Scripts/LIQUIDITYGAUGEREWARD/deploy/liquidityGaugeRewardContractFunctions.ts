@@ -25,6 +25,8 @@ const {
   LIQUIDITY_GAUGE_REWARD_VALUE,
   LIQUIDITYGAUGEREWARD_CONTRACT_HASH,
   LIQUIDITY_GAUGE_REWARD_CAN_DEPOSIT,
+  LIQUIDITY_GAUGE_REWARD_OWNER,
+  LIQUIDITY_GAUGE_REWARD_SPENDER,
 } = process.env;
 
 
@@ -55,43 +57,122 @@ const test = async () => {
 
   await liquidityGaugeReward.setContractHash(LIQUIDITYGAUGEREWARD_CONTRACT_HASH!);
 
- 
- 
-  //userCheckpointJsClient
-  const userCheckpointJsClientDeployHash = await liquidityGaugeReward.userCheckpointJsClient(
-    KEYS!,
-    //LIQUIDITY_GAUGE_REWARD_ADDRESS!,
-    KEYS.publicKey,
-    LIQUIDITY_GAUGE_REWARD_PAYMENT_AMOUNT!
-  );
-  console.log("... userCheckpointJsClient deploy hash: ", userCheckpointJsClientDeployHash);
 
-  await getDeploy(NODE_ADDRESS!, userCheckpointJsClientDeployHash);
-  console.log("... userCheckpointJsClient function called successfully.");
+   //  // // //minter
+ const minter = await liquidityGaugeReward.minter();
+ console.log(`... minter: ${minter}`);
 
-  //claimableTokensJsClient
-  const claimableTokensJsClientDeployHash = await liquidityGaugeReward.claimableTokensJsClient(
-    KEYS!,
-    //LIQUIDITY_GAUGE_REWARD_ADDRESS!,
-    KEYS.publicKey,
-    LIQUIDITY_GAUGE_REWARD_PAYMENT_AMOUNT!
-  );
-  console.log("... claimableTokensJsClient deploy hash: ", claimableTokensJsClientDeployHash);
+  //  // // //crvToken
+  const crvToken = await liquidityGaugeReward.crvToken();
+  console.log(`... crvToken: ${crvToken}`);
 
-  await getDeploy(NODE_ADDRESS!, claimableTokensJsClientDeployHash);
-  console.log("... claimableTokensJsClient function called successfully.");
+  //  // // //lpToken
+ const lpToken = await liquidityGaugeReward.lpToken();
+ console.log(`... lpToken: ${lpToken}`);
 
-  //claimableRewardJsClient
-  const claimableRewardJsClientDeployHash = await liquidityGaugeReward.claimableRewardJsClient(
-    KEYS!,
-    //LIQUIDITY_GAUGE_REWARD_ADDRESS!,
-    KEYS.publicKey,
-    LIQUIDITY_GAUGE_REWARD_PAYMENT_AMOUNT!
-  );
-  console.log("... claimableRewardJsClient deploy hash: ", claimableRewardJsClientDeployHash);
+  //  // // //controller
+  const controller = await liquidityGaugeReward.controller();
+  console.log(`... controller: ${controller}`);
 
-  await getDeploy(NODE_ADDRESS!, claimableRewardJsClientDeployHash);
-  console.log("... claimableRewardJsClient function called successfully.");
+  //  // // //votingEscrow
+ const votingEscrow = await liquidityGaugeReward.votingEscrow();
+ console.log(`... votingEscrow: ${votingEscrow}`);
+
+  //  // // //balanceOf
+  const balanceOf = await liquidityGaugeReward.balanceOf(LIQUIDITY_GAUGE_REWARD_OWNER!);
+  console.log(`... balanceOf: ${balanceOf}`);
+
+  //  // // //totalSupply
+ const totalSupply = await liquidityGaugeReward.totalSupply();
+ console.log(`... totalSupply: ${totalSupply}`);
+
+  //  // // //futureEpochTime
+  const futureEpochTime = await liquidityGaugeReward.futureEpochTime();
+  console.log(`... futureEpochTime: ${futureEpochTime}`);
+
+  //  // // //approvedToDeposit
+ const approvedToDeposit = await liquidityGaugeReward.approvedToDeposit(LIQUIDITY_GAUGE_REWARD_OWNER!,LIQUIDITY_GAUGE_REWARD_SPENDER!);
+ console.log(`... approvedToDeposit: ${approvedToDeposit}`);
+
+  //  // // //workingBalances
+  const workingBalances = await liquidityGaugeReward.workingBalances(LIQUIDITY_GAUGE_REWARD_OWNER!);
+  console.log(`... workingBalances: ${workingBalances}`);
+
+  //  // // //workingSupply
+ const workingSupply = await liquidityGaugeReward.workingSupply();
+ console.log(`... workingSupply: ${workingSupply}`);
+
+  //  // // //period
+  const period = await liquidityGaugeReward.period();
+  console.log(`... period: ${period}`);
+
+    //  // // //periodTimestamp
+ const periodTimestamp = await liquidityGaugeReward.periodTimestamp(LIQUIDITY_GAUGE_REWARD_OWNER!);
+ console.log(`... periodTimestamp: ${periodTimestamp}`);
+
+  //  // // //integrateInvSupply
+  const integrateInvSupply = await liquidityGaugeReward.integrateInvSupply(LIQUIDITY_GAUGE_REWARD_OWNER!);
+  console.log(`... integrateInvSupply: ${integrateInvSupply}`);
+
+  //  // // //integrateInvSupplyOf
+ const integrateInvSupplyOf = await liquidityGaugeReward.integrateInvSupplyOf(LIQUIDITY_GAUGE_REWARD_OWNER!);
+ console.log(`... integrateInvSupplyOf: ${integrateInvSupplyOf}`);
+
+  //  // // //integrateCheckpointOf
+  const integrateCheckpointOf = await liquidityGaugeReward.integrateCheckpointOf(LIQUIDITY_GAUGE_REWARD_OWNER!);
+  console.log(`... integrateCheckpointOf: ${integrateCheckpointOf}`);
+
+      //  // // //integrateFraction
+ const integrateFraction = await liquidityGaugeReward.integrateFraction(LIQUIDITY_GAUGE_REWARD_OWNER!);
+ console.log(`... integrateFraction: ${integrateFraction}`);
+
+  //  // // //inflationRate
+  const inflationRate = await liquidityGaugeReward.inflationRate();
+  console.log(`... inflationRate: ${inflationRate}`);
+
+  //  // // //rewardContract
+ const rewardContract = await liquidityGaugeReward.rewardContract();
+ console.log(`... rewardContract: ${rewardContract}`);
+
+  //  // // //rewardedToken
+  const rewardedToken = await liquidityGaugeReward.rewardedToken();
+  console.log(`... rewardedToken: ${rewardedToken}`);
+
+        //  // // //rewardIntegral
+ const rewardIntegral = await liquidityGaugeReward.rewardIntegral();
+ console.log(`... rewardIntegral: ${rewardIntegral}`);
+
+  //  // // //rewardIntegralFor
+  const rewardIntegralFor = await liquidityGaugeReward.rewardIntegralFor(LIQUIDITY_GAUGE_REWARD_OWNER!);
+  console.log(`... rewardIntegralFor: ${rewardIntegralFor}`);
+
+  //  // // //rewardsFor
+ const rewardsFor = await liquidityGaugeReward.rewardsFor(LIQUIDITY_GAUGE_REWARD_OWNER!);
+ console.log(`... rewardsFor: ${rewardsFor}`);
+
+  //  // // //claimedRewardsFor
+  const claimedRewardsFor = await liquidityGaugeReward.claimedRewardsFor(LIQUIDITY_GAUGE_REWARD_OWNER!);
+  console.log(`... claimedRewardsFor: ${claimedRewardsFor}`);
+
+          //  // // //admin
+ const admin = await liquidityGaugeReward.admin();
+ console.log(`... admin: ${admin}`);
+
+  //  // // //futureAdmin
+  const futureAdmin = await liquidityGaugeReward.futureAdmin();
+  console.log(`... futureAdmin: ${futureAdmin}`);
+
+  //  // // //isKilled
+ const isKilled = await liquidityGaugeReward.isKilled();
+ console.log(`... isKilled: ${isKilled}`);
+
+  //  // // //isClaimingRewards
+  const isClaimingRewards = await liquidityGaugeReward.isClaimingRewards();
+  console.log(`... isClaimingRewards: ${isClaimingRewards}`);
+
+
+
+
 
  //kick
  const kickDeployHash = await liquidityGaugeReward.kick(
@@ -156,16 +237,6 @@ const test = async () => {
  await getDeploy(NODE_ADDRESS!, claimRewardsDeployHash);
  console.log("... claimRewards function called successfully.");
 
- //integrateCheckpointJsClient
- const integrateCheckpointJsClientDeployHash = await liquidityGaugeReward.integrateCheckpointJsClient(
-  KEYS!,
-  LIQUIDITY_GAUGE_REWARD_PAYMENT_AMOUNT!
- );
- console.log("... integrateCheckpointJsClient deploy hash: ", integrateCheckpointJsClientDeployHash);
-
- await getDeploy(NODE_ADDRESS!, integrateCheckpointJsClientDeployHash);
- console.log("... integrateCheckpointJsClient function called successfully.");
-
  //killMe
  const killMeDeployHash = await liquidityGaugeReward.killMe(
   KEYS!,
@@ -177,16 +248,16 @@ const test = async () => {
  console.log("... killMe function called successfully.");
 
  //comitTransferOwnership
- const comitTransferOwnershipDeployHash = await liquidityGaugeReward.comitTransferOwnership(
+ const commitTransferOwnershipDeployHash = await liquidityGaugeReward.commitTransferOwnership(
   KEYS!,
   //LIQUIDITY_GAUGE_REWARD_ADDRESS!,
   KEYS.publicKey,
   LIQUIDITY_GAUGE_REWARD_PAYMENT_AMOUNT!
  );
- console.log("... comitTransferOwnership deploy hash: ", comitTransferOwnershipDeployHash);
+ console.log("... commitTransferOwnership deploy hash: ", commitTransferOwnershipDeployHash);
 
- await getDeploy(NODE_ADDRESS!, comitTransferOwnershipDeployHash);
- console.log("... comitTransferOwnership function called successfully.");
+ await getDeploy(NODE_ADDRESS!, commitTransferOwnershipDeployHash);
+ console.log("... commitTransferOwnership function called successfully.");
 
   //applyTransferOwnership
   const applyTransferOwnershipDeployHash = await liquidityGaugeReward.applyTransferOwnership(

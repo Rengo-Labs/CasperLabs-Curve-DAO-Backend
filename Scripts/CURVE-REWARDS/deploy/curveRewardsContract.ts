@@ -96,6 +96,31 @@ const lastTimeRewardApplicableJsClientsessioncode = async () => {
 
 lastTimeRewardApplicableJsClientsessioncode();
 
+const isOwnersessioncode = async () => {
+  const curveRewards = new CURVEREWARDSClient(
+    NODE_ADDRESS!,
+    CHAIN_NAME!,
+    EVENT_STREAM_ADDRESS!
+  );
+
+  const isOwnersessioncodeDeployHash = await curveRewards.isOwnersessioncode(
+    KEYS,
+    CURVE_REWARDS_PACKAGE_HASH!,
+    "is_owner",
+    CURVE_REWARDS_INSTALL_PAYMENT_AMOUNT!,
+    CURVE_REWARDS_PROXY_WASM_PATH!
+  );
+
+  console.log(`... isOwnersessioncode Function deployHash: ${isOwnersessioncodeDeployHash}`);
+
+  await getDeploy(NODE_ADDRESS!, isOwnersessioncodeDeployHash);
+
+  console.log(`... isOwnersessioncode Function called successfully through sessionCode.`);
+
+};
+
+//isOwnersessioncode();
+
 const rewardPerTokenJsClientsessioncode = async () => {
   const curveRewards = new CURVEREWARDSClient(
     NODE_ADDRESS!,

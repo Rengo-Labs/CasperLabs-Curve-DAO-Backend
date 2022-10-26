@@ -26,9 +26,9 @@ import { RecipientType, IPendingDeploy } from "./types";
 import {createRecipientAddress } from "./utils";
 
 class VESTINGESCROWFACTORYClient {
-  private contractName: string = "liquiditygaugev3";
-  private contractHash: string= "liquiditygaugev3";
-  private contractPackageHash: string= "liquiditygaugev3";
+  private contractName: string = "vestingEscrowFactory";
+  private contractHash: string= "vestingEscrowFactory";
+  private contractPackageHash: string= "vestingEscrowFactory";
   private namedKeys: {
     balances:string
     metadata: string;
@@ -37,6 +37,9 @@ class VESTINGESCROWFACTORYClient {
     ownedTokens: string;
     owners: string;
     paused: string;
+    initial_locked: string;
+    total_claimed: string;
+    disabled_at: string;
     
   };
 
@@ -58,7 +61,10 @@ class VESTINGESCROWFACTORYClient {
       allowances: "null",
       ownedTokens: "null",
       owners: "null",
-      paused: "null"
+      paused: "null",
+      initial_locked: "null",
+      total_claimed: "null",
+      disabled_at: "null"
     }; 
   }
 
@@ -95,6 +101,243 @@ class VESTINGESCROWFACTORYClient {
     }
   }
 
+  public async vestedOfSessionCode(
+    keys: Keys.AsymmetricKey,
+    entrypointName:string,
+    packageHash: string,
+    recipient:string,
+    paymentAmount: string,
+    wasmPath: string
+  ) {
+    const _packageHash = new CLByteArray(
+			Uint8Array.from(Buffer.from(packageHash, "hex"))
+		);
+    const _recipient = new CLByteArray(
+			Uint8Array.from(Buffer.from(recipient, "hex"))
+		);
+    const runtimeArgs = RuntimeArgs.fromMap({
+      entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+      recipient:CLValueBuilder.key(_recipient)
+    });
+
+    const deployHash = await installWasmFile({
+      chainName: this.chainName,
+      paymentAmount,
+      nodeAddress: this.nodeAddress,
+      keys,
+      pathToContract: wasmPath,
+      runtimeArgs,
+    });
+
+    if (deployHash !== null) {
+      return deployHash;
+    } else {
+      throw Error("Problem with installation");
+    }
+  }
+
+  public async balanceOfSessionCode(
+    keys: Keys.AsymmetricKey,
+    entrypointName:string,
+    packageHash: string,
+    recipient:string,
+    paymentAmount: string,
+    wasmPath: string
+  ) {
+    const _packageHash = new CLByteArray(
+			Uint8Array.from(Buffer.from(packageHash, "hex"))
+		);
+    const _recipient = new CLByteArray(
+			Uint8Array.from(Buffer.from(recipient, "hex"))
+		);
+    const runtimeArgs = RuntimeArgs.fromMap({
+      entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+      recipient:CLValueBuilder.key(_recipient)
+    });
+
+    const deployHash = await installWasmFile({
+      chainName: this.chainName,
+      paymentAmount,
+      nodeAddress: this.nodeAddress,
+      keys,
+      pathToContract: wasmPath,
+      runtimeArgs,
+    });
+
+    if (deployHash !== null) {
+      return deployHash;
+    } else {
+      throw Error("Problem with installation");
+    }
+  }
+
+  public async vestedSupplySessionCode(
+    keys: Keys.AsymmetricKey,
+    entrypointName:string,
+    packageHash: string,
+    paymentAmount: string,
+    wasmPath: string
+  ) {
+    const _packageHash = new CLByteArray(
+			Uint8Array.from(Buffer.from(packageHash, "hex"))
+		);
+    const runtimeArgs = RuntimeArgs.fromMap({
+      entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+    });
+
+    const deployHash = await installWasmFile({
+      chainName: this.chainName,
+      paymentAmount,
+      nodeAddress: this.nodeAddress,
+      keys,
+      pathToContract: wasmPath,
+      runtimeArgs,
+    });
+
+    if (deployHash !== null) {
+      return deployHash;
+    } else {
+      throw Error("Problem with installation");
+    }
+  }
+
+  public async lockedSupplySessionCode(
+    keys: Keys.AsymmetricKey,
+    entrypointName:string,
+    packageHash: string,
+    paymentAmount: string,
+    wasmPath: string
+  ) {
+    const _packageHash = new CLByteArray(
+			Uint8Array.from(Buffer.from(packageHash, "hex"))
+		);
+    const runtimeArgs = RuntimeArgs.fromMap({
+      entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+    });
+
+    const deployHash = await installWasmFile({
+      chainName: this.chainName,
+      paymentAmount,
+      nodeAddress: this.nodeAddress,
+      keys,
+      pathToContract: wasmPath,
+      runtimeArgs,
+    });
+
+    if (deployHash !== null) {
+      return deployHash;
+    } else {
+      throw Error("Problem with installation");
+    }
+  }
+
+  public async lockedOfSessionCode(
+    keys: Keys.AsymmetricKey,
+    entrypointName:string,
+    packageHash: string,
+    recipient:string,
+    paymentAmount: string,
+    wasmPath: string
+  ) {
+    const _packageHash = new CLByteArray(
+			Uint8Array.from(Buffer.from(packageHash, "hex"))
+		);
+    const _recipient = new CLByteArray(
+			Uint8Array.from(Buffer.from(recipient, "hex"))
+		);
+    const runtimeArgs = RuntimeArgs.fromMap({
+      entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+      recipient:CLValueBuilder.key(_recipient)
+    });
+
+    const deployHash = await installWasmFile({
+      chainName: this.chainName,
+      paymentAmount,
+      nodeAddress: this.nodeAddress,
+      keys,
+      pathToContract: wasmPath,
+      runtimeArgs,
+    });
+
+    if (deployHash !== null) {
+      return deployHash;
+    } else {
+      throw Error("Problem with installation");
+    }
+  }
+
+  public async commitTransferOwnershipSessionCode(
+    keys: Keys.AsymmetricKey,
+    entrypointName:string,
+    packageHash: string,
+    addr:string,
+    paymentAmount: string,
+    wasmPath: string
+  ) {
+    const _packageHash = new CLByteArray(
+			Uint8Array.from(Buffer.from(packageHash, "hex"))
+		);
+    const _addr = new CLByteArray(
+			Uint8Array.from(Buffer.from(addr, "hex"))
+		);
+    const runtimeArgs = RuntimeArgs.fromMap({
+      entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+      addr:CLValueBuilder.key(_addr)
+    });
+
+    const deployHash = await installWasmFile({
+      chainName: this.chainName,
+      paymentAmount,
+      nodeAddress: this.nodeAddress,
+      keys,
+      pathToContract: wasmPath,
+      runtimeArgs,
+    });
+
+    if (deployHash !== null) {
+      return deployHash;
+    } else {
+      throw Error("Problem with installation");
+    }
+  }
+
+  public async applyTransferOwnershipSessionCode(
+    keys: Keys.AsymmetricKey,
+    entrypointName:string,
+    packageHash: string,
+    paymentAmount: string,
+    wasmPath: string
+  ) {
+    const _packageHash = new CLByteArray(
+			Uint8Array.from(Buffer.from(packageHash, "hex"))
+		);
+    const runtimeArgs = RuntimeArgs.fromMap({
+      entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+    });
+
+    const deployHash = await installWasmFile({
+      chainName: this.chainName,
+      paymentAmount,
+      nodeAddress: this.nodeAddress,
+      keys,
+      pathToContract: wasmPath,
+      runtimeArgs,
+    });
+
+    if (deployHash !== null) {
+      return deployHash;
+    } else {
+      throw Error("Problem with installation");
+    }
+  }
+
   public async setContractHash(hash: string) {
     const stateRootHash = await utils.getStateRootHash(this.nodeAddress);
     const contractData = await utils.getContractData(
@@ -113,6 +356,9 @@ class VESTINGESCROWFACTORYClient {
       'balances',
       'nonces',
       'allowances',
+      'initial_locked',
+      'total_claimed',
+      'disabled_at',
       `${this.contractName}_package_hash`,
       `${this.contractName}_package_hash_wrapped`,
       `${this.contractName}_contract_hash`,
@@ -131,40 +377,155 @@ class VESTINGESCROWFACTORYClient {
   //VESTING ESCROW FACTORY FUNCTIONS
 
   public async packageHash() {
-    const unlockTime = await contractSimpleGetter(
+    const result = await contractSimpleGetter(
       this.nodeAddress,
       this.contractHash,
       ["self_contract_package_hash"]
     );
-    return unlockTime.value();
+    return result.value();
   }
 
   public async adminVef() {
-    const unlockTime = await contractSimpleGetter(
+    const result = await contractSimpleGetter(
       this.nodeAddress,
       this.contractHash,
       ["admin"]
     );
-    return unlockTime.value();
+    return result.value();
   }
 
   public async target() {
-    const unlockTime = await contractSimpleGetter(
+    const result = await contractSimpleGetter(
       this.nodeAddress,
       this.contractHash,
       ["target"]
     );
-    return unlockTime.value();
+    return result.value();
   }
 
   public async futureAdminVef() {
-    const unlockTime = await contractSimpleGetter(
+    const result = await contractSimpleGetter(
       this.nodeAddress,
       this.contractHash,
       ["future_admin"]
     );
-    return unlockTime.value();
+    return result.value();
   }
+
+  public async token() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["token"]
+    );
+    return result.value();
+  }
+
+  public async startTime() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["start_time"]
+    );
+    return result.value();
+  }
+
+  public async endTime() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["end_time"]
+    );
+    return result.value();
+  }
+
+  public async initialLockedSupply() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["initial_locked_supply"]
+    );
+    return result.value();
+  }
+
+  public async canDisable() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["can_disable"]
+    );
+    return result.value();
+  }
+
+  public async admin() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["admin"]
+    );
+    return result.value();
+  }
+
+  public async futureAdmin() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["future_admin"]
+    );
+    return result.value();
+  }
+
+  public async initialLocked(owner: string) {
+    try {
+
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.initial_locked
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+    
+  }
+
+  public async totalClaimed(owner: string) {
+    try {
+
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.total_claimed
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+    
+  }
+
+  public async disabledAt(owner: string) {
+    try {
+
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        owner,
+        this.namedKeys.disabled_at
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+    
+  }
+
 
   public async applyTransferOwnershipVef(
     keys: Keys.AsymmetricKey,
@@ -264,7 +625,7 @@ class VESTINGESCROWFACTORYClient {
 
   //VESTING-ESCROW-SIMPLE FUNCTIONS
 
-
+//issue
   public async initialize(
     keys: Keys.AsymmetricKey,
     admin: RecipientType,
@@ -348,191 +709,6 @@ class VESTINGESCROWFACTORYClient {
       chainName: this.chainName,
       contractHash: this.contractHash,
       entryPoint: "disable_can_disable",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
-
-  public async vestedOf(
-    keys: Keys.AsymmetricKey,
-    recipient:string,
-    paymentAmount: string
-  ) {
-    const _recipient = new CLByteArray(
-			Uint8Array.from(Buffer.from(recipient, "hex"))
-		);
-    const runtimeArgs = RuntimeArgs.fromMap({
-      recipient: utils.createRecipientAddress(_recipient),
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "vested_of",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
-
-  public async balanceOf(
-    keys: Keys.AsymmetricKey,
-    recipient:string,
-    paymentAmount: string
-  ) {
-    const _recipient = new CLByteArray(
-			Uint8Array.from(Buffer.from(recipient, "hex"))
-		);
-    const runtimeArgs = RuntimeArgs.fromMap({
-      recipient: utils.createRecipientAddress(_recipient),
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "balance_of",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
-
-  public async vestedSupply(
-    keys: Keys.AsymmetricKey,
-    paymentAmount: string
-  ) {
-    const runtimeArgs = RuntimeArgs.fromMap({ 
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "vested_supply",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
-
-  public async lockedSupply(
-    keys: Keys.AsymmetricKey,
-    paymentAmount: string
-  ) {
-    const runtimeArgs = RuntimeArgs.fromMap({ 
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "locked_supply",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
-
-  public async lockedOf(
-    keys: Keys.AsymmetricKey,
-    recipient:string,
-    paymentAmount: string
-  ) {
-    const _recipient = new CLByteArray(
-			Uint8Array.from(Buffer.from(recipient, "hex"))
-		);
-    const runtimeArgs = RuntimeArgs.fromMap({
-      recipient: utils.createRecipientAddress(_recipient),
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "locked_of",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
-
-  public async commitTransferOwnership(
-    keys: Keys.AsymmetricKey,
-    addr:RecipientType,
-    paymentAmount: string
-  ) {
-    const runtimeArgs = RuntimeArgs.fromMap({
-      addr: utils.createRecipientAddress(addr),
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "commit_transfer_ownership",
-      keys,
-      nodeAddress: this.nodeAddress,
-      paymentAmount,
-      runtimeArgs,
-    });
-
-    if (deployHash !== null) {
-      
-      return deployHash;
-    } else {
-      throw Error("Invalid Deploy");
-    }
-  }
-
-  public async applyTransferOwnership(
-    keys: Keys.AsymmetricKey,
-    paymentAmount: string
-  ) {
-    const runtimeArgs = RuntimeArgs.fromMap({ 
-    });
-    const deployHash = await contractCall({
-      chainName: this.chainName,
-      contractHash: this.contractHash,
-      entryPoint: "apply_transfer_ownership",
       keys,
       nodeAddress: this.nodeAddress,
       paymentAmount,

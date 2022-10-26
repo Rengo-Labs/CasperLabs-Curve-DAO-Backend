@@ -16,7 +16,8 @@ import {
   Keys,
   RuntimeArgs,
   CLOption,
-  ToBytes
+  ToBytes,
+  CLList
 } from "casper-js-sdk";
 import { Some, None } from "ts-results";
 import * as blake from "blakejs";
@@ -155,11 +156,41 @@ class MULTICALLClient {
 
   public async aggregate(
     keys: Keys.AsymmetricKey,
-    calls: string[],
+    targetAddr: string[],
+    functionName:string[],
+    functionArgsName:string[],
+    functionArgsValue:string[],
     paymentAmount: string
   ) {
+    let _targetAddr : CLString[] = [];
+    for (let i = 0; i < targetAddr.length; i++) {
+      const p = new CLString("hash-".concat(targetAddr[i]));
+      _targetAddr.push(p);
+    }
+
+    let _functionName : CLString[] = [];
+    for (let i = 0; i < functionName.length; i++) {
+      const p = new CLString("hash-".concat(functionName[i]));
+      _functionName.push(p);
+    }
+
+    let _functionArgsName : CLString[] = [];
+    for (let i = 0; i < functionArgsName.length; i++) {
+      const p = new CLString("hash-".concat(functionArgsName[i]));
+      _functionArgsName.push(p);
+    }
+
+    let _functionArgsValue : CLString[] = [];
+    for (let i = 0; i < functionArgsValue.length; i++) {
+      const p = new CLString("hash-".concat(functionArgsValue[i]));
+      _functionArgsValue.push(p);
+    }
     const runtimeArgs = RuntimeArgs.fromMap({
-      calls: CLValueBuilder.list(calls.map(calls => CLValueBuilder.string(calls)))
+      target_addr: new CLList(_targetAddr),
+      function_name: new CLList(_functionName),
+      function_args_name: new CLList(_functionArgsName),
+      function_args_value: new CLList(_functionArgsValue),
+      
     });
     const deployHash = await contractCall({
       chainName: this.chainName,

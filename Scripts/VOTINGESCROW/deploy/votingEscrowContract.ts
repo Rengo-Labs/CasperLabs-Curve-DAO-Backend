@@ -22,7 +22,8 @@ const {
   VOTING_ESCROW_PACKAGE_HASH,
   VOTING_ESCROW_PROXY_WASM_PATH,
   VOTING_ESCROW_T,
-  VOTING_ESCROW_TIME
+  VOTING_ESCROW_TIME,
+  VOTING_ESCROW_IDX,
 } = process.env;
 
 const KEYS = Keys.Ed25519.parseKeyFiles(
@@ -102,6 +103,57 @@ const getLastUserSlopeSessionCode = async () => {
 };
 //getLastUserSlopeSessionCode();
 
+const userPointHistoryTsSessionCode = async () => {
+  const votingEscrow = new VOTINGESCROWClient(
+    NODE_ADDRESS!,
+    CHAIN_NAME!,
+    EVENT_STREAM_ADDRESS!
+  );
+
+  const userPointHistoryTsSessionCodeDeployHash = await votingEscrow.userPointHistoryTsSessionCode(
+    KEYS,
+    "user_point_history_ts",
+    VOTING_ESCROW_PACKAGE_HASH!,
+    KEYS.publicKey!,
+    VOTING_ESCROW_IDX!,
+    VOTING_ESCROW_INSTALL_PAYMENT_AMOUNT!,
+    VOTING_ESCROW_PROXY_WASM_PATH!
+  );
+
+  console.log(`... userPointHistoryTsSessionCode Function deployHash: ${userPointHistoryTsSessionCodeDeployHash}`);
+
+  await getDeploy(NODE_ADDRESS!, userPointHistoryTsSessionCodeDeployHash);
+
+  console.log(`... userPointHistoryTsSessionCode Function called successfully through sessionCode.`);
+
+};
+//userPointHistoryTsSessionCode();
+
+const lockedEndSessionCode = async () => {
+  const votingEscrow = new VOTINGESCROWClient(
+    NODE_ADDRESS!,
+    CHAIN_NAME!,
+    EVENT_STREAM_ADDRESS!
+  );
+
+  const lockedEndSessionCodeDeployHash = await votingEscrow.lockedEndSessionCode(
+    KEYS,
+    "locked_end",
+    VOTING_ESCROW_PACKAGE_HASH!,
+    KEYS.publicKey!,
+    VOTING_ESCROW_INSTALL_PAYMENT_AMOUNT!,
+    VOTING_ESCROW_PROXY_WASM_PATH!
+  );
+
+  console.log(`... lockedEndSessionCode Function deployHash: ${lockedEndSessionCodeDeployHash}`);
+
+  await getDeploy(NODE_ADDRESS!, lockedEndSessionCodeDeployHash);
+
+  console.log(`... lockedEndSessionCode Function called successfully through sessionCode.`);
+
+};
+//lockedEndSessionCode();
+
 const balanceOfSessionCode = async () => {
   const votingEscrow = new VOTINGESCROWClient(
     NODE_ADDRESS!,
@@ -136,7 +188,7 @@ const balanceOfATSessionCode = async () => {
 
   const balanceOfAtSessionCodeDeployHash = await votingEscrow.balanceOfAtSessionCode(
     KEYS,
-    "balance_of",
+    "balance_of_at",
     VOTING_ESCROW_PACKAGE_HASH!,
     KEYS.publicKey!,
     VOTING_ESCROW_TIME!,
