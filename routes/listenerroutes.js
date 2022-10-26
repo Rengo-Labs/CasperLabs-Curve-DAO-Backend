@@ -59,7 +59,7 @@ async function geteventsdata(eventResult, _deployHash, _timestamp, _block_hash, 
     console.log("... Block hash: ", block_hash);
     console.log("Event Data: ", newData);
     
- if(eventName == "addLiquidity") {
+
      if(eventName == "addLiquidity") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);

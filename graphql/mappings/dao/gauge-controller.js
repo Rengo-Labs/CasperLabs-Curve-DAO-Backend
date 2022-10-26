@@ -16,10 +16,9 @@ const { getOrCreateLpToken } = require("../../services/token");
 const Response = require("../../../models/response");
 const { responseType } = require("../../types/response");
 const { GraphQLString } = require("graphql");
-let gaugeController = require('../../../JsClients/GAUGECONTROLLER/gaugeControllerFunctionsForBackend/functions');
+// let gaugeController = require('../../../JsClients/GAUGECONTROLLER/gaugeControllerFunctionsForBackend/functions');
 const mongoose = require("mongoose");
 const bigDecimal = require("js-big-decimal");
-// let gaugeController= require('../JsClients/Registry/test/installed.ts')
 // let LpToken= require('../JsClients/Registry/test/installed.ts')
 
 const { GAUGE_TOTAL_WEIGHT_PRECISION } = require("../../constants");
@@ -513,7 +512,28 @@ const handleVoteForGauge = {
           weight: new bigdecimal.BigDecimal(args.weight),
         //weight:"1000000000"
         });
+
         await GaugeWeightVote.create([gaugeWeightVote], {session});
+
+        // let veCRV = await votingEscrow.balanceOf(contractData.contractHash, user.id);
+        // let totalveCRV = await votingEscrow.totalSupply(contractData.contractHash);
+
+        let veCRV = '1000';
+        let totalveCRV = '10000';
+
+        let gaugeVote = new GaugeVote({
+          id: gauge.id + "-" + user.id + "-" + args.time.toString(),
+          gauge: gauge.id,
+          user: user.id,
+          time: args.time,
+          weight: BigInt(args.weight),
+          total_weight : gaugeTotalWeight.weight,
+          veCRV : veCRV,
+          totalveCRV : totalveCRV,
+          gaugeWeights : [gaugeWeight._id]
+        });
+
+        await GaugeVote.create(gaugeVote);
       }
         let response = await Response.findOne({ id: "1" });
         if (response === null) {
