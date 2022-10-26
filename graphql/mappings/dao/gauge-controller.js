@@ -16,9 +16,14 @@ const Response = require("../../../models/response");
 const { responseType } = require("../../types/response");
 const { GraphQLString } = require("graphql");
 let gaugeController = require('../../../JsClients/GAUGECONTROLLER/gaugeControllerFunctionsForBackend/functions');
+const mongoose = require("mongoose");
+const bigDecimal = require("js-big-decimal");
+// let gaugeController= require('../JsClients/Registry/test/installed.ts')
 // let LpToken= require('../JsClients/Registry/test/installed.ts')
 
 const { GAUGE_TOTAL_WEIGHT_PRECISION } = require("../../constants");
+var bigdecimal = require("bigdecimal");
+var halfUp = bigdecimal.RoundingMode.HALF_UP();
 
 let WEEK = "604800";
 
@@ -32,40 +37,45 @@ const handleAddType = {
     name: {type: GraphQLString}
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
+
     try {
-      // await gaugeController.setContractHash(address); 
+      // await gaugeController.setContractHash(address);
+      
       let nextWeek = nextPeriod(args.timestamp, WEEK);
       console.log("args-name", args);
 
-      let gaugeType = await registerGaugeType(args.type_id, args.name);
-      await gaugeType.save();
+      let gaugeType = await registerGaugeType(args.type_id, args.name,session);
+      await gaugeType.save({session});
       let newData = new GaugeTypeWeight({
         id: nextWeek.toString(),
         type: gaugeType.id,
         time: nextWeek.toString(),
         weight: 
-         gaugeController.points_type_weight(args.type_id, nextWeek),
-        //  '1000000000'
+          // gaugeController.points_type_weight(args.type_id, nextWeek)
+         '1000000000'
+        
       });
-      await GaugeTypeWeight.create(newData);
+      await GaugeTypeWeight.create([newData],{session});
 
       let data = new GaugeTotalWeight({
         id: nextWeek.toString(),
         time: nextWeek.toString(),
-        // weight: BigInt(  //ISSUE
+        weight : bigDecimal.round(
+          // parseFloat(gaugeController.points_total(nextWeek)),
+          '1000000000',
+          parseFloat(GAUGE_TOTAL_WEIGHT_PRECISION)), //issue fixed
+        // weight:
         //   //gaugeController.points_total(nextWeek),
-        //   '1000000000',
-        //   GAUGE_TOTAL_WEIGHT_PRECISION
-        // ),
-        weight:
-          gaugeController.points_total(nextWeek),
-          // '1000000000'
+        //   '1000000000'
       });
-      await GaugeTotalWeight.create(data);
+      await GaugeTotalWeight.create([data], {session});
 
-      let state = await getSystemState(args);
-      state.gaugeTypeCount = (BigInt(state.gaugeTypeCount) + BigInt('1')).toString();
-      await state.save();
+      let state = await getSystemState(args,session);
+      state.gaugeTypeCount = ((new bigdecimal.BigDecimal(state.gaugeTypeCount)).add(new bigdecimal.BigDecimal('1'))).toString();
+      await state.save({session});
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -74,10 +84,20 @@ const handleAddType = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+
+      //committing the transaction 
+      await session.commitTransaction();
+
+      // Ending the session
+      session.endSession();
+
       return response;
     } catch (error) {
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+
       throw new Error(error);
     }
   },
@@ -109,7 +129,7 @@ const handleAddType = {
 //       //   );
 //       // }
 
-//       // //gaugeType.gaugeCount = (BigInt(gaugeType.gaugeCount)+ BigInt('1')).toString();
+//       // //gaugeType.gaugeCount = ((new bigdecimal.BigDecimal(gaugeType.gaugeCount)).add (new bigdecimal.BigDecimal('1')).toString();
 //       // gaugeType.gaugeCount = '1000000000'
 //       //  await gaugeType.save();
 
@@ -143,7 +163,7 @@ const handleAddType = {
 //       //   id: gauge.id + "-" + nextWeek.toString(),
 //       //   gauge: gauge.id,
 //       //   time: nextWeek,
-//       //   //weight: (BigInt(args.weight)).toString(),
+//       //   //weight: (new bigdecimalBigDecimal(args.weight)).toString(),
 //       //   weight: '1000000000'
 //       // });
 //       // await GaugeWeight.create(data);
@@ -195,21 +215,27 @@ const handleNewGauge = {
     timestamp: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
+
     try {
+      
       let nextWeek = nextPeriod(args.timestamp, WEEK);
        let gaugeType = await getGaugeType((args.gaugeType).toString());
 
       if (gaugeType === null) {
         gaugeType = await registerGaugeType(
           (args.gaugeType).toString(),
-         gaugeController.gauge_type_names(args.gauge_type)
-        //  '1000000000'
+          // gaugeController.gauge_type_names(args.gauge_type),
+          '1000000000',
+          session
         );
       }
 
-      gaugeType.gaugeCount = (BigInt(gaugeType.gaugeCount)+ BigInt('1')).toString();
+      gaugeType.gaugeCount = ((new bigdecimal.BigDecimal(gaugeType.gaugeCount)).add(new bigdecimal.BigDecimal('1'))).toString();
       //gaugeType.gaugeCount = '1000000000';
-       await gaugeType.save();
+       await gaugeType.save({session});
 
       let gauge = new Gauge({
         id: args.addr,
@@ -219,7 +245,7 @@ const handleNewGauge = {
         createdAtBlock: args.blockNumber,
         createdAtTransaction: args.transactionHash,
       });
-      await Gauge.create(gauge);
+      await Gauge.create([gauge],{session});
       console.log(gauge);
 
       // await lpToken.setContractHash(args.addr).try_lp_token();
@@ -227,42 +253,42 @@ const handleNewGauge = {
 
       if (lpToken !== null) {
         //let token = getOrCreateLpToken(lpToken.value);
-        let token = await getOrCreateLpToken('1000000000');
+        let token = await getOrCreateLpToken('1000000000', session);
         token.gauge = gauge.id;
-        await token.save();
+        await token.save({session});
 
         if (token.pool != null) {
           let pool = await Pool.findOne(token.pool);
           gauge.pool = pool.id;
         }
       }
-      await gauge.save();
+      await gauge.save({session});
 
 
       let data = new GaugeWeight({
         id: gauge.id + "-" + nextWeek.toString(),
         gauge: gauge.id,
         time: nextWeek,
-        weight: (BigInt(args.weight)).toString(),
-        // weight: '1000000000'
+        weight: (new bigdecimal.BigDecimal(args.weight)).toString(),
+        //weight: '1000000000'
       });
-      await GaugeWeight.create(data);
+      await GaugeWeight.create([data], {session});
 
       let dataWeight = new GaugeTotalWeight({
         id: nextWeek.toString(),
         time: nextWeek.toString(),
-        weight: BigInt(
-          gaugeController.points_total(nextWeek),
-          GAUGE_TOTAL_WEIGHT_PRECISION
-        ),
+        weight : bigDecimal.round(
+          // parseFloat(gaugeController.points_total(nextWeek)),
+          '1000000000',
+          parseFloat(GAUGE_TOTAL_WEIGHT_PRECISION)), //issue fixed 
         // weight: '1000000000'
       });
-      await GaugeTotalWeight.create(dataWeight);
+      await GaugeTotalWeight.create([dataWeight], {session});
 
-      let state = await getSystemState(args);
-      state.gaugeCount = (BigInt(state.gaugeCount)+ BigInt('1')).toString();
+      let state = await getSystemState(args, session);
+      state.gaugeCount = ((new bigdecimal.BigDecimal(state.gaugeCount)).add(new bigdecimal.BigDecimal('1'))).toString();
       //state.gaugeCount = '1000000000'
-      await state.save();
+      await state.save({session});
 
       //LiquidityGauge.create(args.addr);
 
@@ -274,10 +300,20 @@ const handleNewGauge = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+      
+      //committing the transaction 
+      await session.commitTransaction();
+
+      // Ending the session
+      session.endSession();
+      
       return response;
     } catch (error) {
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+
       throw new Error(error);
     }
   },
@@ -293,6 +329,10 @@ const handleNewGaugeWeight = {
     gauge_address: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
+    
     try {
       let gauge = await Gauge.findOne({ id: args.gauge_address });
       //let gauge = '1000000000';
@@ -306,18 +346,18 @@ const handleNewGaugeWeight = {
           weight: args.weight,
         // weight: '1000000000'
         });
-        await GaugeWeight.create(newData);
+        await GaugeWeight.create([newData],{session});
 
         let data = new GaugeTotalWeight({
           id: nextWeek.toString(),
           time: nextWeek,
-          weight: BigInt(
-            gaugeController.points_total(nextWeek),
-            GAUGE_TOTAL_WEIGHT_PRECISION
-          ),
+          weight : bigDecimal.round(
+            // parseFloat(gaugeController.points_total(nextWeek)),
+            '1000000000',
+            parseFloat(GAUGE_TOTAL_WEIGHT_PRECISION)), //issue fixed
           // weight: '1000000000'
         });
-        await GaugeTotalWeight.create(data);
+        await GaugeTotalWeight.create([data],{session});
       }
         let response = await Response.findOne({ id: "1" });
         if (response === null) {
@@ -326,11 +366,20 @@ const handleNewGaugeWeight = {
             id: "1",
             result: true,
           });
-          await response.save();
+          await response.save({session});
         }
+
+        //committing the transaction 
+        await session.commitTransaction();
+
+        // Ending the session
+        session.endSession();
         return response;
       
     } catch (error) {
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+
       throw new Error(error);
     }
   },
@@ -347,6 +396,10 @@ const handleNewTypeWeight = {
     total_weight: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
+
     try {
           let gaugeType = await GaugeType.findOne({ id: (args.type_id.toString()) });
           //let gaugeType = '1000000000';
@@ -355,18 +408,20 @@ const handleNewTypeWeight = {
               id: gaugeType.id + "-" + args.time.toString(),
               type: gaugeType.id,
               time: args.time,
-              weight: BigInt(args.weight),
+              weight: new bigdecimal.BigDecimal(args.weight),
              //weight:"1000000000"
             });
-            await GaugeTypeWeight.create(d);
+            await GaugeTypeWeight.create([d],{session});
 
             let data = new GaugeTotalWeight({
               id: gaugeType.id + "-" + args.time.toString(),
               time: args.time,
-              weight: BigInt(args.total_weight, GAUGE_TOTAL_WEIGHT_PRECISION),
+              weight : bigDecimal.round(
+                args.total_weight,
+                parseFloat(GAUGE_TOTAL_WEIGHT_PRECISION)), //issue fixed
             //weight: "1000000000"
             });
-            await GaugeTotalWeight.create(data);
+            await GaugeTotalWeight.create([data], {session});
           }
             let response = await Response.findOne({ id: "1" });
             if (response == null) {
@@ -375,13 +430,23 @@ const handleNewTypeWeight = {
                 id: "1",
                 result: true,
               });
-              await response.save();
+              await response.save({session});
             }
+
+              //committing the transaction 
+              await session.commitTransaction();
+
+              // Ending the session
+              session.endSession();
+
             return response;
           
           
       }  
       catch (error) {
+        // Rollback any changes made in the database
+      await session.abortTransaction();
+
         throw new Error(error);
       }
   },
@@ -398,6 +463,10 @@ const handleVoteForGauge = {
     user: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
+    
     try {
       let gauge = await Gauge.findOne({ id: args.gauge_addr });
       //let gauge = '1000000000';
@@ -409,35 +478,35 @@ const handleVoteForGauge = {
           id: gauge.id + "-" + nextWeek.toString(),
           gauge: gauge.id,
           time: nextWeek,
-          weight: BigInt(
-            gaugeController.points_weight(args.gauge_addr, nextWeek)
-          ),
-          // weight: "1000000000"
+          // weight: new bigdecimal.BigDecimal(
+          //   gaugeController.points_weight(args.gauge_addr, nextWeek).value0
+          // ),
+          weight: "1000000000"
         });
-        await GaugeWeight.create(newData);
+        await GaugeWeight.create([newData],{ session });
 
         let data = new GaugeTotalWeight({
           id: nextWeek.toString(),
           time: nextWeek,
-          weight: BigInt(
-            gaugeController.points_total(nextWeek),
-            GAUGE_TOTAL_WEIGHT_PRECISION
-          ),
+          weight : bigDecimal.round(
+            // parseFloat(gaugeController.points_total(nextWeek)),
+            '1000000000',
+            parseFloat(GAUGE_TOTAL_WEIGHT_PRECISION)), //issue fixed
           // weight: "1000000000"
         });
-        await GaugeTotalWeight.create(data);
+        await GaugeTotalWeight.create([data],{ session });
 
-        let user = await getOrRegisterAccount(args.user);
+        let user = await getOrRegisterAccount(args.user, session);
 
         let voteData = new GaugeWeightVote({
           id: gauge.id + "-" + user.id + "-" + args.time.toString(),
           gauge: gauge.id,
           user: user.id,
           time: args.time,
-          weight: BigInt(args.weight),
+          weight: new bigdecimal.BigDecimal(args.weight),
         //weight:"1000000000"
         });
-        await GaugeWeightVote.create(voteData);
+        await GaugeWeightVote.create([voteData], {session});
       }
         let response = await Response.findOne({ id: "1" });
         if (response === null) {
@@ -446,11 +515,21 @@ const handleVoteForGauge = {
             id: "1",
             result: true,
           });
-          await response.save();
+          await response.save({session});
         }
+
+         //committing the transaction 
+         await session.commitTransaction();
+
+         // Ending the session
+         session.endSession();
+
         return response;
       
     } catch (error) {
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+      
       throw new Error(error);
     }
   },
@@ -459,8 +538,8 @@ const handleVoteForGauge = {
 function nextPeriod(timestamp, period) {
   console.log(timestamp);
   console.log(period);
-  let nextPeriod = BigInt(timestamp) + BigInt(period);
-  return (nextPeriod / BigInt(period)) * BigInt(period);
+  let nextPeriod = (new bigdecimal.BigDecimal(timestamp)).add(new bigdecimal.BigDecimal(period));
+  return (nextPeriod.divide((new bigdecimal.BigDecimal(period)))).multiply(new bigdecimal.BigDecimal(period));
   
 }
 
