@@ -72,9 +72,9 @@ const handleNewProxyApp = {
         //await Voting.createWithContext(args.proxy, args.context);
       }
        // updating mutation status
-       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-       eventDataResult.status="completed"
-       await eventDataResult.save({ session });
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {

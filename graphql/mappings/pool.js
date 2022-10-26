@@ -151,9 +151,9 @@ const handleAddLiquidity = {
       console.log("pool",pool);
 
        // updating mutation status
-       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-       eventDataResult.status="completed"
-       await eventDataResult.save({ session });
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -222,9 +222,9 @@ const handleRemoveLiquidity = {
       }
 
        // updating mutation status
-       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-       eventDataResult.status="completed"
-       await eventDataResult.save({ session });
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -294,9 +294,9 @@ const handleRemoveLiquidityImbalance = {
         await pool.save({session});
       }
        // updating mutation status
-       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-       eventDataResult.status="completed"
-       await eventDataResult.save({ session });
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -366,9 +366,9 @@ const handleRemoveLiquidityOne = {
         await pool.save({session});
       }
        // updating mutation status
-       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-       eventDataResult.status="completed"
-       await eventDataResult.save({ session });
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -486,9 +486,9 @@ const handleTokenExchange = {
       }
 
        // updating mutation status
-       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-       eventDataResult.status="completed"
-       await eventDataResult.save({ session });
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -608,9 +608,9 @@ const handleTokenExchangeUnderlying = {
       }
 
        // updating mutation status
-       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-       eventDataResult.status="completed"
-       await eventDataResult.save({ session });
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -679,9 +679,9 @@ const handleNewAdmin = {
       }
 
        // updating mutation status
-       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-       eventDataResult.status="completed"
-       await eventDataResult.save({ session });
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -762,9 +762,9 @@ const handleNewFee = {
       }
 
        // updating mutation status
-       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-       eventDataResult.status="completed"
-       await eventDataResult.save({ session });
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -862,9 +862,9 @@ const handleNewParameters = {
        }
        
         // updating mutation status
-      let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-      eventDataResult.status="completed"
-      await eventDataResult.save({ session });
+      // let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      // eventDataResult.status="completed"
+      // await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -928,9 +928,9 @@ const handleRampA = {
         await pool.save({session});
       }
        // updating mutation status
-       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-       eventDataResult.status="completed"
-       await eventDataResult.save({ session });
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
@@ -995,9 +995,9 @@ const handleStopRampA = {
         await pool.save({session});
       }
        // updating mutation status
-       let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
-       eventDataResult.status="completed"
-       await eventDataResult.save({ session });
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
 
       let response = await Response.findOne({ id: "1" });
       if (response === null) {

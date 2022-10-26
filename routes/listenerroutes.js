@@ -16,7 +16,7 @@ function splitdata(data) {
   return result[0];
 }
 
-function geteventsdata(eventResult, _deployHash, _timestamp, _block_hash, _eventname, _eventdata){
+async function geteventsdata(eventResult, _deployHash, _timestamp, _block_hash, _eventname, _eventdata){
   try {
     if (!_deployHash) {
       return res.status(400).json({
@@ -58,7 +58,8 @@ function geteventsdata(eventResult, _deployHash, _timestamp, _block_hash, _event
     console.log("... Timestamp: ", timestamp);
     console.log("... Block hash: ", block_hash);
     console.log("Event Data: ", newData);
-
+    
+ if(eventName == "addLiquidity") {
      if(eventName == "addLiquidity") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -97,7 +98,7 @@ function geteventsdata(eventResult, _deployHash, _timestamp, _block_hash, _event
       console.log("blockNumber: ", blockNumber);
 
 
-      request(
+     await request(
         process.env.GRAPHQL,
         `mutation handleAddLiquidity( 
           $tokenAmounts: String!,
@@ -136,7 +137,7 @@ tokenAmounts: tokenAmounts,
 fees: fees,
 invariant: invariant,
 tokenSupply: tokenSupply,
-block: block,
+block: block_hash,
 timestamp: timestamp,
 poolId: poolId,
 providerId: providerId,
@@ -145,18 +146,9 @@ logIndex: logIndex,
 registryAddress: registryAddress,
 blockNumber: blockNumber,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleAddLiquidity Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleAddLiquidity Mutation called.")
+        return true;
     }else if(eventName == "removeLiquidity") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -192,7 +184,7 @@ blockNumber: blockNumber,
       console.log("blockNumber: ", blockNumber);
 
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleRemoveLiquidity( 
           $tokenAmounts: String!,
@@ -228,7 +220,7 @@ blockNumber: blockNumber,
 tokenAmounts: tokenAmounts,
 fees: fees,
 tokenSupply: tokenSupply,
-block: block,
+block: block_hash,
 timestamp: timestamp,
 poolId: poolId,
 providerId: providerId,
@@ -237,18 +229,9 @@ logIndex: logIndex,
 registryAddress: registryAddress,
 blockNumber: blockNumber,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleRemoveLiquidity Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleRemoveLiquidity Mutation called.")
+        return true;
     }else if(eventName == "removeLiquidityImbalance") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -287,7 +270,7 @@ blockNumber: blockNumber,
       console.log("blockNumber: ", blockNumber);
 
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleRemoveLiquidityImbalance( 
           $tokenAmounts: String!,
@@ -326,7 +309,7 @@ tokenAmounts: tokenAmounts,
 fees: fees,
 invariant: invariant,
 tokenSupply: tokenSupply,
-block: block,
+block: block_hash,
 timestamp: timestamp,
 poolId: poolId,
 providerId: providerId,
@@ -335,18 +318,9 @@ logIndex: logIndex,
 registryAddress: registryAddress,
 blockNumber: blockNumber,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleRemoveLiquidityImbalance Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleRemoveLiquidityImbalance Mutation called.")
+        return true;
     }else if(eventName == "removeLiquidityOne") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -379,7 +353,7 @@ blockNumber: blockNumber,
       console.log("blockNumber: ", blockNumber);
 
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleRemoveLiquidityOne( 
           $tokenAmount: String!,
@@ -412,7 +386,7 @@ blockNumber: blockNumber,
 {
 tokenAmount: tokenAmount,
 coinAmount: coinAmount,
-block: block,
+block: block_hash,
 timestamp: timestamp,
 poolId: poolId,
 providerId: providerId,
@@ -421,18 +395,9 @@ logIndex: logIndex,
 registryAddress: registryAddress,
 blockNumber: blockNumber,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleRemoveLiquidityOne Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleRemoveLiquidityOne Mutation called.")
+        return true;
     }else if(eventName == "tokenExchange") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -467,7 +432,7 @@ blockNumber: blockNumber,
       console.log("tokens_bought: ", tokens_bought);
 
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleTokenExchange( 
           $poolId: String!,
@@ -500,7 +465,7 @@ blockNumber: blockNumber,
 {
   poolId: poolId,
   transactionHash: transactionHash,
-  block: block,
+  block: block_hash,
   timestamp: timestamp,
   logIndex: logIndex,
   buyer: buyer,
@@ -509,18 +474,9 @@ blockNumber: blockNumber,
   bought_id: bought_id,
   tokens_bought: tokens_bought
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleTokenExchangeUnderlying Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleTokenExchange Mutation called.")
+        return true;
     }else if(eventName == "exchangeUnderlying") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -555,7 +511,7 @@ blockNumber: blockNumber,
       console.log("tokens_bought: ", tokens_bought);
 
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleTokenExchangeUnderlying( 
           $poolId: String!,
@@ -588,7 +544,7 @@ blockNumber: blockNumber,
 {
   poolId: poolId,
   transactionHash: transactionHash,
-  block: block,
+  block: block_hash,
   timestamp: timestamp,
   logIndex: logIndex,
   buyer: buyer,
@@ -597,18 +553,9 @@ blockNumber: blockNumber,
   bought_id: bought_id,
   tokens_bought: tokens_bought
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleTokenExchangeUnderlying Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleExchangeUnderlying Mutation called.")
+return true;
     }else if(eventName == "newAdmin") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -630,7 +577,7 @@ blockNumber: blockNumber,
       console.log("logIndex: ", logIndex);
       console.log("admin: ", admin);
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleNewAdmin( 
           $poolId: String!,
@@ -655,23 +602,14 @@ blockNumber: blockNumber,
 {
   poolId: poolId,
   transactionHash: transactionHash,
-  block: block,
+  block: block_hash,
   timestamp: timestamp,
   logIndex: logIndex,
   admin: admin,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleNewAdmin Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleNewAdmin Mutation called.")
+return true;
     }else if(eventName == "newFee") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -696,7 +634,7 @@ blockNumber: blockNumber,
       console.log("fee: ", fee);
       console.log("admin_fee: ", admin_fee);
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleNewFee( 
           $poolId: String!,
@@ -723,24 +661,15 @@ blockNumber: blockNumber,
 {
   poolId: poolId,
   transactionHash: transactionHash,
-  block: block,
+  block: block_hash,
   timestamp: timestamp,
   logIndex: logIndex,
   fee: fee,
   admin_fee: admin_fee
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleNewFee Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleNewFee Mutation called.")
+return true;
     }else if(eventName == "newParameters") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -768,7 +697,7 @@ blockNumber: blockNumber,
       console.log("fee: ", fee);
       console.log("admin_fee: ", admin_fee);
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleNewParameters( 
           $poolId: String!,
@@ -798,24 +727,15 @@ blockNumber: blockNumber,
   poolId: poolId,
   A: A,
   transactionHash: transactionHash,
-  block: block,
+  block: block_hash,
   timestamp: timestamp,
   logIndex: logIndex,
   fee: fee,
   admin_fee: admin_fee
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleNewParameters Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleNewParameters Mutation called.")
+return true;
     }else if(eventName == "RampA") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -836,7 +756,7 @@ blockNumber: blockNumber,
       console.log("newA: ", new_A);
       console.log("transactionHash: ", transactionHash);
       console.log("logIndex: ", logIndex);
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleRampA( 
           $poolId: String!,
@@ -862,22 +782,13 @@ blockNumber: blockNumber,
   poolId: poolId,
   new_A: new_A,
   transactionHash: transactionHash,
-  block: block,
+  block: block_hash,
   timestamp: timestamp,
   logIndex: logIndex,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleRampA Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleRampA Mutation called.")
+return true;
     }else if(eventName == "stopRampA") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -898,7 +809,7 @@ blockNumber: blockNumber,
       console.log("A: ", A);
       console.log("transactionHash: ", transactionHash);
       console.log("logIndex: ", logIndex);
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleStopRampA( 
           $poolId: String!,
@@ -924,22 +835,13 @@ blockNumber: blockNumber,
   poolId: poolId,
   A: A,
   transactionHash: transactionHash,
-  block: block,
+  block: block_hash,
   timestamp: timestamp,
   logIndex: logIndex,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleStopRampA Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleStopRampA Mutation called.")
+return true;
     }else if(eventName == "addressModified") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -958,7 +860,7 @@ blockNumber: blockNumber,
       console.log("id: ", id);
       console.log("transactionHash: ", transactionHash);
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleAddressModified( 
           $addressProviderContractHash: String!,
@@ -981,22 +883,13 @@ blockNumber: blockNumber,
 {
 addressProviderContractHash: addressProviderContractHash,
 id: id,
-block: block,
+block: block_hash,
 timestamp: timestamp,
 transactionHash: transactionHash,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleAddressModified Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleAddressModified Mutation called.")
+return true;
     }else if(eventName == "newAddressIdentifier") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -1015,7 +908,7 @@ transactionHash: transactionHash,
       console.log("id: ", id);
       console.log("transactionHash: ", transactionHash);
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleNewAddressIdentifier( 
           $addressProviderContractHash: String!,
@@ -1038,22 +931,13 @@ transactionHash: transactionHash,
 {
 addressProviderContractHash: addressProviderContractHash,
 id: id,
-block: block,
+block: block_hash,
 timestamp: timestamp,
 transactionHash: transactionHash,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleNewAddressIdentifier Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleNewAddressIdentifier Mutation called.")
+return true;
     }else if(eventName == "poolAdded") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -1069,7 +953,7 @@ transactionHash: transactionHash,
       console.log("poolId: ", poolId);
       console.log("transactionHash: ", transactionHash);
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handlePoolAdded( $poolId: String!,$transactionHash: String!,$block: String!,$timestamp: String!){
            handlePoolAdded( poolId: $poolId,transactionHash: $transactionHash,block: $block,timestamp: $timestamp) {
@@ -1080,21 +964,12 @@ transactionHash: transactionHash,
 {
  poolId: poolId,
  transactionHash: transactionHash,
- block: block,
+ block: block_hash,
  timestamp: timestamp,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handlePoolAdded Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handlePoolAdded Mutation called.")
+return true;
     }else if(eventName == "poolRemoved") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -1110,7 +985,7 @@ transactionHash: transactionHash,
       console.log("poolId: ", poolId);
       console.log("transactionHash: ", transactionHash);
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handlePoolRemoved( $poolId: String!,$transactionHash: String!,$block: String!,$timestamp: String!){
           handlePoolRemoved( poolId: $poolId,transactionHash: $transactionHash,block: $block,timestamp: $timestamp) {
@@ -1121,21 +996,12 @@ transactionHash: transactionHash,
 {
  poolId: poolId,
  transactionHash: transactionHash,
- block: block,
+ block: block_hash,
  timestamp: timestamp,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handlePoolRemoved Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handlePoolRemoved Mutation called.")
+return true;
     }else if(eventName == "newProxyApp") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -1155,7 +1021,7 @@ transactionHash: transactionHash,
       console.log("context: ", context);
       console.log("transactionHash: ", transactionHash);
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleNewProxyApp( $appId: String!,$proxy: String!,$context: String!,$transactionHash: String!,$block: String!,$timestamp: String!){
            handleNewProxyApp( appId: $appId,proxy: $proxy,context: $context,transactionHash: $transactionHash,block: $block,timestamp: $timestamp) {
@@ -1168,21 +1034,12 @@ transactionHash: transactionHash,
  proxy: proxy,
  context: context,
  transactionHash: transactionHash,
- block: block,
+ block: block_hash,
  timestamp: timestamp,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleNewProxyApp Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleNewProxyApp Mutation called.")
+return true;
     }else if(eventName == "updateLiquidityLimit") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -1211,7 +1068,7 @@ transactionHash: transactionHash,
       console.log("working_supply: ", working_supply);
       console.log("transactionHash: ", transactionHash);
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleUpdateLiquidityLimit( 
           $user: String!,
@@ -1247,21 +1104,12 @@ transactionHash: transactionHash,
     working_balance: working_balance,
     working_supply: working_supply,
     transactionHash: transactionHash,
-    block: block,
+    block: block_hash,
     timestamp: timestamp,
   }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleUpdateLiquidityLimit Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleUpdateLiquidityLimit Mutation called.")
+return true;
     }else if(eventName == "deposit") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -1284,7 +1132,7 @@ transactionHash: transactionHash,
       console.log("transactionHash: ", transactionHash);
       console.log("logIndex: ", logIndex);
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleDeposit( $provider: String!,$id: String!,$value: String!,$transactionHash: String!,$logIndex: String!){
            handleDeposit( provider: $provider,id: $id,value: $value,transactionHash: $transactionHash,logIndex: $logIndex) {
@@ -1299,18 +1147,9 @@ transactionHash: transactionHash,
  transactionHash: transactionHash,
  logIndex: logIndex,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleDeposit Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleDeposit Mutation called.")
+return true;
     }else if(eventName == "withdraw") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -1333,7 +1172,7 @@ transactionHash: transactionHash,
       console.log("transactionHash: ", transactionHash);
       console.log("logIndex: ", logIndex);
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleWithdraw( $provider: String!,$id: String!,$value: String!,$transactionHash: String!,$logIndex: String!){
           handleWithdraw( provider: $provider,id: $id,value: $value,transactionHash: $transactionHash,logIndex: $logIndex) {
@@ -1348,18 +1187,9 @@ transactionHash: transactionHash,
  transactionHash: transactionHash,
  logIndex: logIndex,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleWithdraw Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleWithdraw Mutation called.")
+return true;
     }else if(eventName == "minimumBalanceSet") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -1373,10 +1203,10 @@ transactionHash: transactionHash,
       console.log("address: ", address);
       console.log("minBalance: ", minBalance);
 
-      request(
+      await request(
         process.env.GRAPHQL,
-        `mutation handleMinimumBalanceSet( $address: String!,$minBalance: String!){
-           handleMinimumBalanceSet( address: $address,minBalance: $minBalance) {
+        `mutation handleMinimumBalanceSet( $address: String!,$minBalance: String!, $eventObjectId: String!,){
+           handleMinimumBalanceSet( address: $address,minBalance: $minBalance, eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -1384,19 +1214,11 @@ transactionHash: transactionHash,
 {
  address: address,
  minBalance: minBalance,
+ eventObjectId: eventResult._id,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleMinimumBalanceSet Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleMinimumBalanceSet Mutation called.")
+return true;
     }else if(eventName == "minimumTimeSet") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -1410,10 +1232,10 @@ transactionHash: transactionHash,
       console.log("address: ", address);
       console.log("minTime: ", minTime);
 
-      request(
+      await request(
         process.env.GRAPHQL,
-        `mutation handleMinimumTimeSet( $address: String!,$minTime: String!){
-          handleMinimumTimeSet( address: $address,minTime: $minTime) {
+        `mutation handleMinimumTimeSet( $address: String!,$minTime: String!, $eventObjectId: String!,){
+          handleMinimumTimeSet( address: $address,minTime: $minTime, eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -1421,19 +1243,11 @@ transactionHash: transactionHash,
 {
  address: address,
  minTime: minTime,
+ eventObjectId: eventResult._id,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleMinimumTimeSet Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleMinimumTimeSet Mutation called.")
+return true;
     }else if(eventName == "changeMinQuorum") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -1447,10 +1261,10 @@ transactionHash: transactionHash,
       console.log("address: ", address);
       console.log("minAcceptQuorumPct: ", minAcceptQuorumPct);
 
-      request(
+      await request(
         process.env.GRAPHQL,
-        `mutation handleChangeMinQuorum( $address: String!,$minAcceptQuorumPct: String!){
-          handleChangeMinQuorum( address: $address,minAcceptQuorumPct: $minAcceptQuorumPct) {
+        `mutation handleChangeMinQuorum( $address: String!,$minAcceptQuorumPct: String!, $eventObjectId: String!,){
+          handleChangeMinQuorum( address: $address,minAcceptQuorumPct: $minAcceptQuorumPct, eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -1458,19 +1272,11 @@ transactionHash: transactionHash,
 {
  address: address,
  minAcceptQuorumPct: minAcceptQuorumPct,
+ eventObjectId: eventResult._id,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleChangeMinQuorum Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleChangeMinQuorum Mutation called.")
+return true;
     }else if(eventName == "changeSupportRequired") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -1484,10 +1290,10 @@ transactionHash: transactionHash,
       console.log("address: ", address);
       console.log("supportRequiredPct: ", supportRequiredPct);
 
-      request(
+      await request(
         process.env.GRAPHQL,
-        `mutation handleChangeSupportRequired( $address: String!,$supportRequiredPct: String!){
-          handleChangeSupportRequired( address: $address,supportRequiredPct: $supportRequiredPct) {
+        `mutation handleChangeSupportRequired( $address: String!,$supportRequiredPct: String!,$eventObjectId: String!,){
+          handleChangeSupportRequired( address: $address,supportRequiredPct: $supportRequiredPct, eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -1495,19 +1301,11 @@ transactionHash: transactionHash,
 {
  address: address,
  supportRequiredPct: supportRequiredPct,
+ eventObjectId: eventResult._id,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleChangeSupportRequired Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleChangeSupportRequired Mutation called.")
+return true;
     }else if(eventName == "startVote") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -1516,72 +1314,47 @@ transactionHash: transactionHash,
       console.log(newData[3][0].data + " = " + newData[3][1].data);
       console.log(newData[4][0].data + " = " + newData[4][1].data);
       console.log(newData[5][0].data + " = " + newData[5][1].data);
-      console.log(newData[6][0].data + " = " + newData[6][1].data);
-      console.log(newData[7][0].data + " = " + newData[7][1].data);
+      
+      var creator = splitdata(newData[0][1].data);
+      var voteId = parseInt(newData[1][1].data);
+      var metadata = splitdata(newData[2][1].data);   
+      var transactionFrom = splitdata(newData[3][1].data);
 
-      var address = splitdata(newData[0][1].data);      
-      var creator = splitdata(newData[1][1].data);
-      var voteId = parseInt(newData[2][1].data);
-      var metadata = splitdata(newData[4][1].data);
-      var creatorVotingPower = parseInt(newData[4][1].data);      
-      var transactionHash = splitdata(newData[3][1].data);
-
-      console.log("address: ", address);
       console.log("creator: ", creator);
       console.log("voteId: ", voteId);
       console.log("metadata: ", metadata);
-      console.log("creatorVotingPower: ", creatorVotingPower);
-      console.log("transactionHash: ", transactionHash);
+      console.log("transactionFrom: ", transactionFrom);
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleStartVote( 
-          $address: String!,
           $creator: String!,
           $voteId: String!,
           $metadata: String!,
-          $creatorVotingPower: String!,
-          $timestamp: String!,
-          $block: String!,
-          $transactionHash: String!,
+          $transactionFrom: String!,
+          $eventObjectId: String!,
           ){
               handleStartVote( 
-            address: $address,
             creator: $creator,
             voteId: $voteId,
             metadata: $metadata,
-            creatorVotingPower: $creatorVotingPower,
-            timestamp: $timestamp,
-            block: $block,
-            transactionHash: $transactionHash,
+            transactionFrom: $transactionFrom,
+            eventObjectId : $eventObjectId
             ) {
           result
       }
                 
       }`,
 {
-address: address,
 creator: creator,
 voteId: voteId,
 metadata: metadata,
-creatorVotingPower: creatorVotingPower,
-timestamp: timestamp,
-block: block,
-transactionHash: transactionHash,
-}
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleStartVote Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    }else if(eventName == "CastVote") {
+transactionFrom : transactionFrom,
+eventObjectId: eventResult._id,
+});
+console.log("handleStartVote Mutation called.");
+return true;
+    }else if(eventName == "castVote") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -1589,120 +1362,81 @@ transactionHash: transactionHash,
       console.log(newData[3][0].data + " = " + newData[3][1].data);
       console.log(newData[4][0].data + " = " + newData[4][1].data);
       console.log(newData[5][0].data + " = " + newData[5][1].data);
-      console.log(newData[6][0].data + " = " + newData[6][1].data);
-      console.log(newData[7][0].data + " = " + newData[7][1].data);
-      console.log(newData[8][0].data + " = " + newData[8][1].data);
 
-      var address = splitdata(newData[0][1].data);      
-      var voteId = splitdata(newData[1][1].data);
-      var voter = parseInt(newData[2][1].data);
-      var stake = splitdata(newData[3][1].data);
-      var supports = parseInt(newData[4][1].data);      
-      var transactionHash = splitdata(newData[5][1].data);
-      var logIndex = splitdata(newData[6][1].data);
+      var voteId = splitdata(newData[0][1].data);
+      var voter = parseInt(newData[1][1].data);
+      var stake = splitdata(newData[2][1].data);
+      var supports = parseInt(newData[3][1].data);  
 
-      console.log("address: ", address);
       console.log("voteId: ", voteId);
       console.log("voter: ", voter);
       console.log("stake: ", stake);
       console.log("supports: ", supports);
-      console.log("transactionHash: ", transactionHash);
-      console.log("logIndex: ", logIndex);
 
-      request(
+      await request(
         process.env.GRAPHQL,
-        `mutation handleCastVote( 
-          $address: String!,
+        `mutation handleCastVote(
           $voteId: String!,
           $voter: String!,
           $stake: String!,
           $supports: String!,
           $timestamp: String!,
-          $block: String!,
-          $transactionHash: String!,
-          $logIndex: String!
+          $eventObjectId: String!,
           ){
-              handleCastVote( 
-            address: $address,
+              handleCastVote(
             voteId: $voteId,
             voter: $voter,
             stake: $stake,
             supports: $supports,
             timestamp: $timestamp,
-            block: $block,
-            transactionHash: $transactionHash,
-            logIndex: $logIndex
+            eventObjectId : $eventObjectId
             ) {
           result
       }
                 
       }`,
 {
-address: address,
 voteId: voteId,
 voter: voter,
 stake: stake,
 supports: supports,
 timestamp: timestamp,
-block: block,
-transactionHash: transactionHash,
-logIndex: logIndex,
-}
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleCastVote Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+eventObjectId: eventResult._id,
+});
+console.log("handleCastVote Mutation called.");
+return true;
     }else if(eventName == "executeVote") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
       console.log(newData[2][0].data + " = " + newData[2][1].data);
-      console.log(newData[3][0].data + " = " + newData[3][1].data);
-      console.log(newData[4][0].data + " = " + newData[4][1].data);
+      
+      var voteId = splitdata(newData[0][1].data);
 
-      var address = splitdata(newData[0][1].data);      
-      var voteId = splitdata(newData[1][1].data);
-      var transactionHash = splitdata(newData[2][1].data);
-
-      console.log("address: ", address);
       console.log("voteId: ", voteId);
-      console.log("transactionHash: ", transactionHash);
 
-      request(
+      await request(
         process.env.GRAPHQL,
-        `mutation handleExecuteVote( $address: String!,$voteId: String!,$timestamp: String!,$block: String!,$transactionHash: String!,){
-              handleExecuteVote( address: $address,voteId: $voteId,timestamp: $timestamp,block: $block,transactionHash: $transactionHash,) {
+        `mutation handleExecuteVote(
+           $voteId: String!,
+           $timestamp: String!,
+           $eventObjectId : String!){
+              handleExecuteVote( 
+                voteId: $voteId,
+                timestamp: $timestamp,
+                eventObjectId : $eventObjectId) 
+                {
           result
       }
                 
       }`,
 {
-address: address,
 voteId: voteId,
 timestamp: timestamp,
-block: block,
-transactionHash: transactionHash,
-}
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleExecuteVote Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+eventObjectId: eventResult._id,
+});
+console.log("handleExecuteVote Mutation called.");
+return true;
     }else if(eventName == "addType") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -1719,7 +1453,7 @@ transactionHash: transactionHash,
       console.log("type_id: ", type_id);
       console.log("name: ", name);
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleAddType( $id: String!,$type_id: String!,$timestamp: String!,$name: String!){
               handleAddType( id: $id,type_id: $type_id,timestamp: $timestamp,name:$name) {
@@ -1733,18 +1467,9 @@ type_id: type_id,
 timestamp: timestamp,
 name:name
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleAddType Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleAddType Mutation called.")
+return true;
     }else if(eventName == "newGauge") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -1764,7 +1489,7 @@ name:name
       console.log("transactionHash: ", transactionHash);
       console.log("weight: ", weight);
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleNewGauge($gaugeType: String!,$addr: String!,$blockNumber: String!,$transactionHash: String!,$weight: String!,$timestamp: String!,){
               handleNewGauge(gaugeType: $gaugeType,addr: $addr,blockNumber: $blockNumber,transactionHash: $transactionHash,weight: $weight,timestamp: $timestamp,) {
@@ -1779,18 +1504,9 @@ transactionHash: transactionHash,
 weight: weight,
 timestamp: timestamp,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleNewGauge Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleNewGauge Mutation called.")
+return true;
     }else if(eventName == "newGaugeWeight") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -1810,7 +1526,7 @@ timestamp: timestamp,
       console.log("weight: ", weight);
       console.log("gauge_address: ", gauge_address);
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleNewGaugeWeight( $id: String!,$time: String!,$weight: String!,$gauge_address: String!,){
            handleNewGaugeWeight( id: $id,time: $time,weight: $weight,gauge_address: $gauge_address,) {
@@ -1824,18 +1540,9 @@ timestamp: timestamp,
  weight: weight,
  gauge_address: gauge_address,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleNewGaugeWeight Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleNewGaugeWeight Mutation called.")
+return true;
     }else if(eventName == "newTypeWeight") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -1858,7 +1565,7 @@ timestamp: timestamp,
       console.log("type_id: ", type_id);
       console.log("total_weight: ", total_weight);
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleNewTypeWeight( $id: String!,$time: String!,$weight: String!,$type_id: String!,$total_weight: String!){
            handleNewTypeWeight( id: $id,time: $time,weight: $weight,type_id: $type_id,total_weight: $total_weight) {
@@ -1873,18 +1580,9 @@ timestamp: timestamp,
  type_id: type_id,
  total_weight: total_weight,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleNewTypeWeight Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+);
+console.log("handleNewTypeWeight Mutation called.")
+return true;
     }else if(eventName == "voteForGauge") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -1907,7 +1605,7 @@ timestamp: timestamp,
       console.log("gauge_addr: ", gauge_addr);
       console.log("user: ", user);
 
-      request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleVoteForGauge( $id: String!,$time: String!,$weight: String!,$gauge_addr: String!,$user: String!){
            handleVoteForGauge( id: $id,time: $time,weight: $weight,gauge_addr: $gauge_addr,user: $user) {
@@ -1922,19 +1620,86 @@ timestamp: timestamp,
  gauge_addr: gauge_addr,
  user: user,
 }
-).then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "handleVoteForGauge Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    }                        
+);
+console.log("handleVoteForGauge Mutation called.")
+return true;
+    } else if(eventName == "Deposit") {
+      console.log(eventName + " Event result: ");
+      console.log(newData[0][0].data + " = " + newData[0][1].data);
+      console.log(newData[1][0].data + " = " + newData[1][1].data);
+      console.log(newData[2][0].data + " = " + newData[2][1].data);
+      console.log(newData[3][0].data + " = " + newData[3][1].data);
+      console.log(newData[4][0].data + " = " + newData[4][1].data);
+      console.log(newData[5][0].data + " = " + newData[5][1].data);
+      console.log(newData[6][0].data + " = " + newData[6][1].data);
+
+      var provider = splitdata(newData[0][1].data);      
+      var value = parseInt(newData[1][1].data);
+      var locktime = parseInt(newData[2][1].data);
+      var _type = splitdata(newData[3][1].data);
+      var ts = parseInt(newData[4][1].data);
+
+      console.log("provider: ", provider);
+      console.log("value: ", value);
+      console.log("locktime: ", locktime);
+      console.log("_type: ", _type);
+      console.log("ts: ", ts);
+
+      await request(
+        process.env.GRAPHQL,
+        `mutation handleVotingDeposit( $provider: String!,$value: String!,$locktime: String!,$type: String!,$timestamp: String!, block: String!, eventObjectId: String!){
+           handleVotingDeposit( provider: $provider,value: $value,locktime: $locktime,type: $type,timestamp: $timestamp, block: $block, eventObjectId: $eventObjectId) {
+          result
+      }
+                
+      }`,
+{
+ provider: provider,
+ value: value,
+ locktime: locktime,
+ type: _type,
+ timestamp: ts,
+ block: block_hash,
+ eventObjectId: eventResult._id,
+}
+);
+console.log("handleVotingWithdraw Mutation called.")
+return true;
+    } else if(eventName == "Withdraw") {
+      console.log(eventName + " Event result: ");
+      console.log(newData[0][0].data + " = " + newData[0][1].data);
+      console.log(newData[1][0].data + " = " + newData[1][1].data);
+      console.log(newData[2][0].data + " = " + newData[2][1].data);
+      console.log(newData[3][0].data + " = " + newData[3][1].data);
+      console.log(newData[4][0].data + " = " + newData[4][1].data);
+
+      var provider = splitdata(newData[0][1].data);      
+      var value = parseInt(newData[1][1].data);
+      var ts = parseInt(newData[2][1].data);
+
+      console.log("provider: ", provider);
+      console.log("value: ", value);
+      console.log("ts: ", ts);
+
+      await request(
+        process.env.GRAPHQL,
+        `mutation handleVotingWithdraw( $provider: String!,$value: String!,$timestamp: String!, block: String!, eventObjectId: String!){
+           handleVotingWithdraw( provider: $provider,value: $value,timestamp: $timestamp, block: $block, eventObjectId: $eventObjectId) {
+          result
+      }
+                
+      }`,
+{
+ provider: provider,
+ value: value,
+ timestamp: ts,
+ block: block_hash,
+ eventObjectId: eventResult._id,
+}
+);
+console.log("handleVotingWithdraw Mutation called.")
+return true;
+    }                             
   } catch (error) {
     console.log("error (try-catch) : " + error);
     return res.status(500).json({
@@ -1977,7 +1742,7 @@ router
 
 router.route("/geteventsdata").post(async function (req, res, next) {
   const {eventResult, deployHash, timestamp, blockhash, eventname, eventdata} = req.body;
-  geteventsdata(eventResult, deployHash, timestamp, blockhash, eventname, eventdata);
+  await geteventsdata(eventResult, deployHash, timestamp, blockhash, eventname, eventdata);
 });
 
 module.exports = {router, geteventsdata};
