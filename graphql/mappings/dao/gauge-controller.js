@@ -5,6 +5,7 @@ const GaugeTypeWeight = require("../../../models/gaugeTypeWeight");
 const GaugeWeight = require("../../../models/gaugeWeight");
 const GaugeWeightVote = require("../../../models/gaugeWeightVote");
 const Pool = require("../../../models/pool");
+// const allcontractsData = require("../../../models/allcontractsData");
 const { getOrRegisterAccount } = require("../../services/accounts");
 const {
   getGaugeType,
@@ -24,6 +25,9 @@ const bigDecimal = require("js-big-decimal");
 const { GAUGE_TOTAL_WEIGHT_PRECISION } = require("../../constants");
 var bigdecimal = require("bigdecimal");
 var halfUp = bigdecimal.RoundingMode.HALF_UP();
+const GaugeVote = require("../../../models/gaugeVote");
+// let votingEscrow = require("../../../JsClients/VOTINGESCROW/votingEscrowFunctionsForBackend/functions.ts");
+
 
 let WEEK = "604800";
 
@@ -468,13 +472,16 @@ const handleVoteForGauge = {
     session.startTransaction();
     
     try {
+      //We get contract hash for gauge controller package hash below
+      // const contractData = await allcontractsData.findOne({packageHash : process.env.GAUGE_CONTROLLER_PACKAGE_HASH});
+
       let gauge = await Gauge.findOne({ id: args.gauge_addr });
       //let gauge = '1000000000';
       if (gauge !== null) {
         // await gaugeController.setContractHash(address);
         let nextWeek = nextPeriod(args.time, WEEK);
 
-        let newData = new GaugeWeight({
+        let gaugeWeight = new GaugeWeight({
           id: gauge.id + "-" + nextWeek.toString(),
           gauge: gauge.id,
           time: nextWeek,
@@ -483,9 +490,9 @@ const handleVoteForGauge = {
           // ),
           weight: "1000000000"
         });
-        await GaugeWeight.create([newData],{ session });
+        await GaugeWeight.create([gaugeWeight],{ session });
 
-        let data = new GaugeTotalWeight({
+        let gaugeTotalWeight = new GaugeTotalWeight({
           id: nextWeek.toString(),
           time: nextWeek,
           weight : bigDecimal.round(
@@ -494,11 +501,11 @@ const handleVoteForGauge = {
             parseFloat(GAUGE_TOTAL_WEIGHT_PRECISION)), //issue fixed
           // weight: "1000000000"
         });
-        await GaugeTotalWeight.create([data],{ session });
+        await GaugeTotalWeight.create([gaugeTotalWeight],{ session });
 
         let user = await getOrRegisterAccount(args.user, session);
 
-        let voteData = new GaugeWeightVote({
+        let gaugeWeightVote = new GaugeWeightVote({
           id: gauge.id + "-" + user.id + "-" + args.time.toString(),
           gauge: gauge.id,
           user: user.id,
@@ -506,7 +513,7 @@ const handleVoteForGauge = {
           weight: new bigdecimal.BigDecimal(args.weight),
         //weight:"1000000000"
         });
-        await GaugeWeightVote.create([voteData], {session});
+        await GaugeWeightVote.create([gaugeWeightVote], {session});
       }
         let response = await Response.findOne({ id: "1" });
         if (response === null) {
