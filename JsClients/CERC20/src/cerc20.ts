@@ -69,6 +69,7 @@ class CERC20Client {
     name: string,
     tokenSymbol: string,
     decimals: string,
+    contract_name : string,
     paymentAmount: string,
     wasmPath: string
   ) {
@@ -89,6 +90,7 @@ class CERC20Client {
       name: CLValueBuilder.string(name),
       symbol: CLValueBuilder.string(tokenSymbol),
       decimals: CLValueBuilder.u8(decimals),
+      contract_name : CLValueBuilder.string(contract_name)
     });
 
     const deployHash = await installWasmFile({
@@ -204,7 +206,7 @@ class CERC20Client {
     const deployHash = await contractCall({
       chainName: this.chainName,
       contractHash: this.contractHash,
-      entryPoint: "redeem_under_lying",
+      entryPoint: "redeem_underlying",
       keys,
       nodeAddress: this.nodeAddress,
       paymentAmount,
@@ -379,7 +381,7 @@ class CERC20Client {
     const deployHash = await contractCall({
       chainName: this.chainName,
       contractHash: this.contractHash,
-      entryPoint: "delegat_comp_like_to",
+      entryPoint: "delegate_comp_like_to",
       keys,
       nodeAddress: this.nodeAddress,
       paymentAmount,

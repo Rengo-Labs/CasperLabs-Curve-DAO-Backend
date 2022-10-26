@@ -59,56 +59,7 @@ function geteventsdata(eventResult, _deployHash, _timestamp, _block_hash, _event
     console.log("... Block hash: ", block_hash);
     console.log("Event Data: ", newData);
 
-    if (eventName == "pair_created") {
-      console.log(eventName + " Event result: ");
-      console.log(newData[0][0].data + " = " + newData[0][1].data);
-      console.log(newData[1][0].data + " = " + newData[1][1].data);
-      console.log(newData[2][0].data + " = " + newData[2][1].data);
-      console.log(newData[3][0].data + " = " + newData[3][1].data);
-      console.log(newData[4][0].data + " = " + newData[4][1].data);
-      console.log(newData[5][0].data + " = " + newData[5][1].data);
-
-      var allpairslength = parseInt(newData[0][1].data);
-      var pair = splitdata(newData[3][1].data);
-      var token0 = splitdata(newData[4][1].data);
-      var token1 = splitdata(newData[5][1].data);
-
-      console.log("allpairslength: ", allpairslength);
-      console.log("pair splited: ", pair);
-      console.log("token0 splited: ", token0);
-      console.log("token1 splited: ", token1);
-
-      request(
-        process.env.GRAPHQL,
-        `mutation handleNewPair( $token0: String!, $token1: String!, $pair: String!, $all_pairs_length: Int!,$deployHash: String!,$timeStamp: String!, $blockHash: String!){
-      		handleNewPair( token0: $token0, token1: $token1, pair: $pair, all_pairs_length: $all_pairs_length, deployHash:$deployHash,timeStamp: $timeStamp, blockHash: $blockHash) {
-      		result
-      		}
-                      
-      		}`,
-        {
-          token0: token0,
-          token1: token1,
-          pair: pair,
-          all_pairs_length: allpairslength,
-          deployHash: deployHash,
-          timeStamp: timestamp.toString(),
-          blockHash: block_hash,
-        }
-      )
-        .then(async function (response) {
-          console.log(response);
-          eventResult.status="completed";
-          await eventResult.save();
-          return res.status(200).json({
-            success: true,
-            message: "HandleNewPair Mutation called.",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    }else if(eventName == "addLiquidity") {
+     if(eventName == "addLiquidity") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
