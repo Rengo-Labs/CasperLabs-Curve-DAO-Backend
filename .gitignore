@@ -1,5 +1,8 @@
 /node_modules
 /mongoConnectionString.txt
+/Scripts/MINTER/keys
+/Scripts/GAUGECONTROLLER/keys
+
 # Logs
 logs
 *.log
