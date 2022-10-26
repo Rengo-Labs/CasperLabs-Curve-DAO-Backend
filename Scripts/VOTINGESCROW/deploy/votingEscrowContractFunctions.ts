@@ -19,13 +19,17 @@ const {
   CHAIN_NAME,
   VOTING_ESCROW_MASTER_KEY_PAIR_PATH,
   VOTING_ESCROW_PAYMENT_AMOUNT,
-  T,
-  ADDRESS,
-  IDX,
-  VALUE,
-  UNLOCK_TIME,
-  BLOCK,
-  VOTINGESCROW_CONTRACT_HASH
+  VOTING_ESCROW_T,
+  VOTING_ESCROW_ADDRESS,
+  VOTING_ESCROW_IDX,
+  VOTING_ESCROW_VALUE,
+  VOTING_ESCROW_UNLOCK_TIME,
+  VOTING_ESCROW_BLOCK,
+  VOTINGESCROW_CONTRACT_HASH,
+  VOTING_ESCROW_EPOCH,
+  VOTING_ESCROW_USER,
+  VOTING_ESCROW_USER_EPOCH,
+  VOTING_ESCROW_TIME,
 } = process.env;
 
 
@@ -51,15 +55,74 @@ const test = async () => {
 
   await votingEscrow.setContractHash(VOTINGESCROW_CONTRACT_HASH!);
 
-  // console.log('key result');
+  // // token 
+  const token = await votingEscrow.token();
+  console.log(`... token: ${token}`);
+
+   // // supply 
+   const supply = await votingEscrow.supply();
+   console.log(`...  supply: ${supply}`);
+ 
+   // // locked 
+   const locked = await votingEscrow.locked();
+   console.log(`... locked: ${locked}`);
+
+   // // epoch 
+  const epoch = await votingEscrow.epoch();
+  console.log(`...  epoch: ${epoch}`);
+
+  // // pointHistory 
+  const pointHistory = await votingEscrow.pointHistory(VOTING_ESCROW_EPOCH!);
+  console.log(`... pointHistory: ${pointHistory}`);
+
+   // // userPointHistory 
+   const userPointHistory = await votingEscrow.userPointHistory(VOTING_ESCROW_USER!,VOTING_ESCROW_USER_EPOCH!);
+   console.log(`...  userPointHistory: ${userPointHistory}`);
+ 
+   // // userPointEpoch 
+   const userPointEpoch = await votingEscrow.userPointEpoch(VOTING_ESCROW_USER!);
+   console.log(`... userPointEpoch: ${userPointEpoch}`);
   
-  //  const unlockTime = await votingEscrow.unlockTime();
-  // console.log(`... Contract blockTime: ${unlockTime}`);
+   // // slopeChanges 
+   const slopeChanges = await votingEscrow.slopeChanges(VOTING_ESCROW_TIME!);
+   console.log(`...  epoch: ${slopeChanges}`);
+ 
+   // // controller 
+   const controller = await votingEscrow.controller();
+   console.log(`... controller: ${controller}`);
+ 
+    // // transfersEnabled 
+    const transfersEnabled = await votingEscrow.transfersEnabled();
+    console.log(`...  transfersEnabled: ${transfersEnabled}`);
+  
+    // // name 
+    const name = await votingEscrow.name();
+    console.log(`... name: ${name}`);
+
+     // // symbol 
+   const symbol = await votingEscrow.symbol();
+   console.log(`...  symbol: ${symbol}`);
+ 
+   // // version 
+   const version = await votingEscrow.version();
+   console.log(`... version: ${version}`);
+ 
+    // // decimals 
+    const decimals = await votingEscrow.decimals();
+    console.log(`...  decimals: ${decimals}`);
+  
+    // // admin 
+    const admin = await votingEscrow.admin();
+    console.log(`... admin: ${admin}`);
+
+    // // futureAdmin 
+    const futureAdmin = await votingEscrow.futureAdmin();
+    console.log(`... futureAdmin: ${futureAdmin}`);
  
   // //commitTransferOwnership
   // const commitTransferOwnershipDeployHash = await votingEscrow.commitTransferOwnership(
   //   KEYS!,
-  //   //ADDRESS!,
+  //   //VOTING_ESCROW_ADDRESS!,
   //   KEYS.publicKey,
   //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
@@ -78,43 +141,6 @@ const test = async () => {
   // await getDeploy(NODE_ADDRESS!, applyTransferOwnershipDeployHash);
   // console.log("... applyTransferOwnership function called successfully.");
 
-  // //getLastUserSlopeJsClient
-  // const getLastUserSlopeJsClientDeployHash = await votingEscrow.getLastUserSlopeJsClient(
-  //   KEYS!,
-  //   //ADDRESS!,
-  //   KEYS.publicKey,
-  //   VOTING_ESCROW_PAYMENT_AMOUNT!
-  // );
-  // console.log("... getLastUserSlopeJsClient deploy hash: ", getLastUserSlopeJsClientDeployHash);
-
-  // await getDeploy(NODE_ADDRESS!, getLastUserSlopeJsClientDeployHash);
-  // console.log("... getLastUserSlopeJsClient function called successfully.");
-
-  // //userPointHistoryTsJsclient
-  // const userPointHistoryTsJsclientDeployHash = await votingEscrow.userPointHistoryTsJsclient(
-  //   KEYS!,
-  //   //ADDRESS!,
-  //   KEYS.publicKey,
-  //   IDX!,
-  //   VOTING_ESCROW_PAYMENT_AMOUNT!
-  // );
-  // console.log("... userPointHistoryTsJsclient deploy hash: ", userPointHistoryTsJsclientDeployHash);
-
-  // await getDeploy(NODE_ADDRESS!, userPointHistoryTsJsclientDeployHash);
-  // console.log("... userPointHistoryTsJsclient function called successfully.");
-
-  // //lockedEndJsClient
-  // const lockedEndJsClientDeployHash = await votingEscrow.lockedEndJsClient(
-  //   KEYS!,
-  //   //ADDRESS!,
-  //   KEYS.publicKey,
-  //   VOTING_ESCROW_PAYMENT_AMOUNT!
-  // );
-  // console.log("... lockedEndJsClient deploy hash: ", lockedEndJsClientDeployHash);
-
-  // await getDeploy(NODE_ADDRESS!, lockedEndJsClientDeployHash);
-  // console.log("... lockedEndJsClient function called successfully.");
-
   // //checkpoint
   // const checkpointDeployHash = await votingEscrow.checkpoint(
   //   KEYS!,
@@ -128,8 +154,8 @@ const test = async () => {
   // //depositFor
   // const depositForDeployHash = await votingEscrow.depositFor(
   //   KEYS,
-  //   ADDRESS!,
-  //   VALUE!,
+  //   VOTING_ESCROW_ADDRESS!,
+  //   VOTING_ESCROW_VALUE!,
   //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
   // console.log("... depositFor deploy hash: ", depositForDeployHash);
@@ -140,8 +166,8 @@ const test = async () => {
   //createlock
   // const createlockDeployHash = await votingEscrow.createlock(
   //   KEYS!,
-  //   VALUE!,
-  //   UNLOCK_TIME!,
+  //   VOTING_ESCROW_VALUE!,
+  //   VOTING_ESCROW_UNLOCK_TIME!,
   //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );
   // console.log("... createlock deploy hash: ", createlockDeployHash);
@@ -152,7 +178,7 @@ const test = async () => {
 //   //increaseAmount
 //   const increaseAmountDeployHash = await votingEscrow.increaseAmount(
 //     KEYS,
-//     VALUE!,
+//     VOTING_ESCROW_VALUE!,
 //     VOTING_ESCROW_PAYMENT_AMOUNT!
 //   );
 //   console.log("... increaseAmount deploy hash: ", increaseAmountDeployHash);
@@ -163,7 +189,7 @@ const test = async () => {
 //   //increaseUnlockTime
 //   const increaseUnlockTimeDeployHash = await votingEscrow.increaseUnlockTime(
 //     KEYS,
-//     UNLOCK_TIME!,
+//     VOTING_ESCROW_UNLOCK_TIME!,
 //     VOTING_ESCROW_PAYMENT_AMOUNT!
 //   );
 //   console.log("... increaseUnlockTime deploy hash: ", increaseUnlockTimeDeployHash);
@@ -183,62 +209,10 @@ const test = async () => {
 //   console.log("... withdraw function called successfully");
 
 
-//   //balanceOfJsClient
-  // const balanceOfJsClientDeployHash = await votingEscrow.balanceOfJsClient(
-  //   KEYS,
-  //   //ADDRESS!,
-  //   KEYS.publicKey,
-  //   T!,
-  //   VOTING_ESCROW_PAYMENT_AMOUNT!
-  // );
-  // console.log("... balanceOfJsClient deploy hash: ", balanceOfJsClientDeployHash);
-
-  // await getDeploy(NODE_ADDRESS!, balanceOfJsClientDeployHash);
-  // console.log("... balanceOfJsClient function called successfully");
-
-
-//  //balanceOfAtJsClient
-//  const balanceOfAtJsClientDeployHash = await votingEscrow.balanceOfAtJsClient(
-//    KEYS,
-//    //ADDRESS!,
-//    KEYS.publicKey,
-//    BLOCK!,
-//    VOTING_ESCROW_PAYMENT_AMOUNT!
-//   );
-//   console.log("... balanceOfAtJsClient deploy hash: ", balanceOfAtJsClientDeployHash);
-
-//   await getDeploy(NODE_ADDRESS!, balanceOfAtJsClientDeployHash);
-//   console.log("... balanceOfAtJsClient function called successfully");
-
-
-//   //totalSupplyJsClient
-  const totalSupplyJsClientDeployHash = await votingEscrow.totalSupplyJsClient(
-    KEYS,
-    T!,
-    VOTING_ESCROW_PAYMENT_AMOUNT!
-  );
-  console.log("... totalSupplyJsClient deploy hash: ", totalSupplyJsClientDeployHash);
-
-  await getDeploy(NODE_ADDRESS!, totalSupplyJsClientDeployHash);
-  console.log("... totalSupplyJsClient function called successfully");
-
-
-//   //totalSupplyAtJsClient
-  // const totalSupplyAtJsClientDeployHash = await votingEscrow.totalSupplyAtJsClient(
-  //   KEYS,
-  //   BLOCK!,
-  //   VOTING_ESCROW_PAYMENT_AMOUNT!
-  // );
-  // console.log("... totalSupplyAtJsClient deploy hash: ", totalSupplyAtJsClientDeployHash);
-
-  // await getDeploy(NODE_ADDRESS!, totalSupplyAtJsClientDeployHash);
-  // console.log("... totalSupplyAtJsClient function called successfully");
-
-
 //   //changeController
   // const changeControllerDeployHash = await votingEscrow.changeController(
   //   KEYS,
-  //   //NEW_CONTROLLER!,
+  //   //VOTING_ESCROW_NEW_CONTROLLER!,
   //   KEYS.publicKey,
   //   VOTING_ESCROW_PAYMENT_AMOUNT!
   // );

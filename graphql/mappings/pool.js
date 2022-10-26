@@ -46,8 +46,12 @@ async function getPoolSnapshot(pool, args, session) {
     // Workaround needed because batch_set_pool_asset_type() doesn't emit events
     // See https://etherscan.io/tx/0xf8e8d67ec16657ecc707614f733979d105e0b814aa698154c153ba9b44bf779b
     console.log("block-42",args.block);
-    
-    if (new bigdecimal.BigDecimal(args.block) >= new bigdecimal.BigDecimal("12667823")) {
+
+    if (
+      ((new bigdecimal.BigDecimal(args.block)).compareTo(new bigdecimal.BigDecimal("12667823")) == 1) 
+      || 
+      ((new bigdecimal.BigDecimal(args.block)).compareTo(new bigdecimal.BigDecimal("12667823")) == 0)
+      ) {
     //if(args.block){
       console.log("block-46",args.block);
       // Reference asset

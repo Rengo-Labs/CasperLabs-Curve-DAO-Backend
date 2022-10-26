@@ -14,11 +14,13 @@ const {
   LIQUIDITY_GAUGE_REWARD_WASM_PATH,
   LIQUIDITY_GAUGE_REWARD_MASTER_KEY_PAIR_PATH,
   LIQUIDITY_GAUGE_REWARD_INSTALL_PAYMENT_AMOUNT,
-  LP_ADDR,
-  MINTER,
-  REWARD_CONTRACT,
-  REWARDED_TOKEN,
+  LIQUIDITY_GAUGE_REWARD_LP_ADDR,
+  LIQUIDITY_GAUGE_REWARD_MINTER,
+  LIQUIDITY_GAUGE_REWARD_REWARD_CONTRACT,
+  LIQUIDITY_GAUGE_REWARD_REWARDED_TOKEN,
   LIQUIDITY_GAUGE_REWARD_CONTRACT_NAME,
+  LIQUIDITY_GAUGE_REWARD_PACKAGE_HASH,
+  LIQUIDITY_GAUGE_REWARD_PROXY_WASM_PATH
 } = process.env;
 
 const KEYS = Keys.Ed25519.parseKeyFiles(
@@ -35,10 +37,10 @@ const test = async () => {
 
   const installDeployHash = await liquidityGaugeReward.install(
     KEYS,
-    LP_ADDR!,
-    MINTER!,
-    REWARD_CONTRACT!,
-    REWARDED_TOKEN!,
+    LIQUIDITY_GAUGE_REWARD_LP_ADDR!,
+    LIQUIDITY_GAUGE_REWARD_MINTER!,
+    LIQUIDITY_GAUGE_REWARD_REWARD_CONTRACT!,
+    LIQUIDITY_GAUGE_REWARD_REWARDED_TOKEN!,
     KEYS.publicKey,
     LIQUIDITY_GAUGE_REWARD_CONTRACT_NAME!,
     LIQUIDITY_GAUGE_REWARD_INSTALL_PAYMENT_AMOUNT!,
@@ -73,3 +75,104 @@ const test = async () => {
 };
 
 test();
+
+
+const userCheckpointSessionCode = async () => {
+  const liquidityGaugeReward = new LIQUIDITYGAUGEREWARDClient(
+    NODE_ADDRESS!,
+    CHAIN_NAME!,
+    EVENT_STREAM_ADDRESS!
+  );
+
+  const userCheckpointSessionCodeDeployHash = await liquidityGaugeReward.userCheckpointSessionCode(
+    KEYS,
+    "user_checkpoint",
+    LIQUIDITY_GAUGE_REWARD_PACKAGE_HASH!,
+    KEYS.publicKey!,
+    LIQUIDITY_GAUGE_REWARD_INSTALL_PAYMENT_AMOUNT!,
+    LIQUIDITY_GAUGE_REWARD_PROXY_WASM_PATH!
+  );
+
+  console.log(`... userCheckpointSessionCode Function deployHash: ${userCheckpointSessionCodeDeployHash}`);
+
+  await getDeploy(NODE_ADDRESS!, userCheckpointSessionCodeDeployHash);
+
+  console.log(`... userCheckpointSessionCode Function called successfully through sessionCode.`);
+
+};
+//userCheckpointSessionCode();
+
+const claimableTokensSessionCode = async () => {
+  const liquidityGaugeReward = new LIQUIDITYGAUGEREWARDClient(
+    NODE_ADDRESS!,
+    CHAIN_NAME!,
+    EVENT_STREAM_ADDRESS!
+  );
+
+  const claimableTokensSessionCodeDeployHash = await liquidityGaugeReward.claimableTokensSessionCode(
+    KEYS,
+    "claimable_tokens",
+    LIQUIDITY_GAUGE_REWARD_PACKAGE_HASH!,
+    KEYS.publicKey!,
+    LIQUIDITY_GAUGE_REWARD_INSTALL_PAYMENT_AMOUNT!,
+    LIQUIDITY_GAUGE_REWARD_PROXY_WASM_PATH!
+  );
+
+  console.log(`... claimableTokensSessionCode Function deployHash: ${claimableTokensSessionCodeDeployHash}`);
+
+  await getDeploy(NODE_ADDRESS!, claimableTokensSessionCodeDeployHash);
+
+  console.log(`... claimableTokensSessionCode Function called successfully through sessionCode.`);
+
+};
+//claimableTokensSessionCode();
+
+const claimableRewardSessionCode = async () => {
+  const liquidityGaugeReward = new LIQUIDITYGAUGEREWARDClient(
+    NODE_ADDRESS!,
+    CHAIN_NAME!,
+    EVENT_STREAM_ADDRESS!
+  );
+
+  const claimableRewardSessionCodeDeployHash = await liquidityGaugeReward.claimableRewardSessionCode(
+    KEYS,
+    "claimable_reward",
+    LIQUIDITY_GAUGE_REWARD_PACKAGE_HASH!,
+    KEYS.publicKey!,
+    LIQUIDITY_GAUGE_REWARD_INSTALL_PAYMENT_AMOUNT!,
+    LIQUIDITY_GAUGE_REWARD_PROXY_WASM_PATH!
+  );
+
+  console.log(`... claimableRewardSessionCode Function deployHash: ${claimableRewardSessionCodeDeployHash}`);
+
+  await getDeploy(NODE_ADDRESS!, claimableRewardSessionCodeDeployHash);
+
+  console.log(`... claimableRewardSessionCode Function called successfully through sessionCode.`);
+
+};
+//claimableRewardSessionCode();
+
+const integrateCheckpointSessionCode = async () => {
+  const liquidityGaugeReward = new LIQUIDITYGAUGEREWARDClient(
+    NODE_ADDRESS!,
+    CHAIN_NAME!,
+    EVENT_STREAM_ADDRESS!
+  );
+
+  const integrateCheckpointSessionCodeDeployHash = await liquidityGaugeReward.integrateCheckpointSessionCode(
+    KEYS,
+    "integrate_checkpoint",
+    LIQUIDITY_GAUGE_REWARD_PACKAGE_HASH!,
+    LIQUIDITY_GAUGE_REWARD_INSTALL_PAYMENT_AMOUNT!,
+    LIQUIDITY_GAUGE_REWARD_PROXY_WASM_PATH!
+  );
+
+  console.log(`... integrateCheckpointSessionCode Function deployHash: ${integrateCheckpointSessionCodeDeployHash}`);
+
+  await getDeploy(NODE_ADDRESS!, integrateCheckpointSessionCodeDeployHash);
+
+  console.log(`... integrateCheckpointSessionCode Function called successfully through sessionCode.`);
+
+};
+//integrateCheckpointSessionCode();
+
