@@ -133,10 +133,29 @@ async function Withdraw(provider, id, value, transactionHash, logIndex) {
     return response;
   }
 
+
+  async function gauges(user) {
+    console.log("Calling gauges query...");
+    let response = await request(
+      process.env.GRAPHQL,
+      `query gauges($user : String){
+        gauges(user : $user){
+          user
+        }   
+        }`,
+      {
+        user : user
+      }
+    );
+    console.log(response);
+    return response;
+  }
+
 module.exports = describe('GraphQL Mutations for Gauge', () => {     
     it('handleUpdateLiquidityLimit should return true', async () => {
         const {handleUpdateLiquidityLimit : {result}} = await UpdateLiquidityLimit('user', '01', '1000', '1000','2000','2000','388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '604800');
         assert.equal(result, true);
+        
         let gauge = await GaugeLiquidity.findOne({ id: 'user-01' });
         assert.equal(gauge.id, 'user-01');
         assert.equal(gauge.originalBalance, '1000');
@@ -146,6 +165,14 @@ module.exports = describe('GraphQL Mutations for Gauge', () => {
         assert.equal(gauge.timestamp, '604800');
         assert.equal(gauge.block, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
         assert.equal(gauge.transaction, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+    })
+
+    it('gauges Should fetch gauges filtered by user', async() => {
+      const result = await gauges("user");
+      
+      result.gauges.forEach(gauge => {
+        assert.equal(gauge.user, "user");
+      });
     })
 
     it('handleDeposit should return true', async () => {

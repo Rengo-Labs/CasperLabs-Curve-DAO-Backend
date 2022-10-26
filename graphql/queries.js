@@ -93,7 +93,7 @@ const gaugeVotesByTime =  {
   },
   async resolve(parent, args, context) {
     try {
-      debugger;
+      
       let gaugeVotes = await gaugeVote.find();
 
       let gaugeVotesResult=[];

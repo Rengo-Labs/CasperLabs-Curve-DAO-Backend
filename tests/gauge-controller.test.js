@@ -187,6 +187,53 @@ async function VoteForGauge(id, time, weight, gauge_addr, user) {
     return response;
   }
 
+
+  async function gaugeVotesByTime(time) {
+    console.log("Calling gaugeVotesByTime query...");
+    let response = await request(
+      process.env.GRAPHQL,
+      `query gaugeVotesByTime( 
+                 $time: String!,
+  
+                 ){
+                  gaugeVotesByTime( 
+                   time: $time,
+                   ) {
+                 time
+             }
+                       
+             }`,
+      {
+        time: time,
+      }
+    );
+    console.log(response);
+    return response;
+  }
+
+  async function gaugeVotesByUser(user) {
+    console.log("Calling gaugeVotesByUser query...");
+    let response = await request(
+      process.env.GRAPHQL,
+      `query gaugeVotesByUser( 
+                 $user: String!,
+  
+                 ){
+                  gaugeVotesByUser( 
+                   user: $user,
+                   ) {
+                  user
+             }
+                       
+             }`,
+      {
+        user: user,
+      }
+    );
+    console.log(response);
+    return response;
+  }
+
 module.exports = describe('GraphQL Mutations for guage-controller', () => {     
 
   it('handleAddType should return true', async () => {
@@ -284,6 +331,21 @@ module.exports = describe('GraphQL Mutations for guage-controller', () => {
         assert.equal(gaugeVoteData.total_weight, gaugeTotal.weight);
         assert.exists(gaugeVoteData.veCRV, "veCRV is null or undefined");
         assert.exists(gaugeVoteData.totalveCRV, "totalveCRV is null or undefined");
+    })
+    
+    it('gaugeVotesByTime Should fetch gaugeVotes sorted by time', async() => {
+      const result = await gaugeVotesByTime('604700');
+      result.gaugeVotesByTime.forEach(gaugeVote => {
+        assert.isAbove(parseFloat(gaugeVote.time), 604700, 'gaugeVote time is strictly greater than 604700');
+      });
+    })
+
+    it('gaugeVotesByUser Should fetch gaugeVotes filtered on user', async() => {
+      const result = await gaugeVotesByUser('user');
+      
+      result.gaugeVotesByUser.forEach(gaugeVote => {
+        assert.equal(gaugeVote.user, "user");
+      });
     })
 
 });

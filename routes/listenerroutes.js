@@ -1647,7 +1647,7 @@ return true;
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleVotingDeposit( $provider: String!,$value: String!,$locktime: String!,$type: String!,$timestamp: String!, block: String!, eventObjectId: String!){
+        `mutation handleVotingDeposit( $provider: String!,$value: String!,$locktime: String!,$type: String!,$timestamp: String!, $block: String!, $eventObjectId: String!){
            handleVotingDeposit( provider: $provider,value: $value,locktime: $locktime,type: $type,timestamp: $timestamp, block: $block, eventObjectId: $eventObjectId) {
           result
       }
@@ -1663,7 +1663,7 @@ return true;
  eventObjectId: eventResult._id,
 }
 );
-console.log("handleVotingWithdraw Mutation called.")
+console.log("handleVotingDeposit Mutation called.")
 return true;
     } else if(eventName == "Withdraw") {
       console.log(eventName + " Event result: ");
@@ -1683,7 +1683,7 @@ return true;
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleVotingWithdraw( $provider: String!,$value: String!,$timestamp: String!, block: String!, eventObjectId: String!){
+        `mutation handleVotingWithdraw( $provider: String!,$value: String!,$timestamp: String!, $block: String!, $eventObjectId: String!){
            handleVotingWithdraw( provider: $provider,value: $value,timestamp: $timestamp, block: $block, eventObjectId: $eventObjectId) {
           result
       }
