@@ -681,6 +681,61 @@ class VOTINGClient {
 			throw Error("Invalid Deploy");
 		}
 	}
+
+	public async min_balance() {
+		const result = await contractSimpleGetter(
+			this.nodeAddress,
+			this.contractHash,
+			["min_balance"]
+		);
+		return result.value();
+	}
+
+	public async minTime() {
+		const result = await contractSimpleGetter(
+			this.nodeAddress,
+			this.contractHash,
+			["min_time"]
+		);
+		return result.value();
+	}
+	
+	public async supportRequiredPct() {
+		const result = await contractSimpleGetter(
+			this.nodeAddress,
+			this.contractHash,
+			["support_required_pct"]
+		);
+		return result.value();
+	}
+
+	public async voteTime() {
+		const result = await contractSimpleGetter(
+			this.nodeAddress,
+			this.contractHash,
+			["vote_time"]
+		);
+		return result.value();
+	}
+
+	public async token() {
+		const result = await contractSimpleGetter(
+			this.nodeAddress,
+			this.contractHash,
+			["token"]
+		);
+		return result.value();
+	}
+
+	public async minAcceptQuorumPct() {
+		const result = await contractSimpleGetter(
+			this.nodeAddress,
+			this.contractHash,
+			["min_accept_quorum_pct"]
+		);
+		return result.value();
+	}
+
 }
 
 interface IInstallParams {

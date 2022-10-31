@@ -15,10 +15,10 @@ const gaugeController = new GaugeControllerClient(
   EVENT_STREAM_ADDRESS!,
 );
 
-export const points_type_weight = async (owner : string, spender : string) => {
+export const points_type_weight = async (contractHash : string ,owner : string, spender : string) => {
  
   // We don't need hash- prefix so i'm removing it
- await gaugeController.setContractHash(GAUGE_CONTROLLER_CONTRACT!);
+ await gaugeController.setContractHash(contractHash);
 
  //pointsTypeWeight
  const pointsTypeWeight = await gaugeController.points_type_weight(owner ,  spender);
@@ -27,10 +27,10 @@ export const points_type_weight = async (owner : string, spender : string) => {
  return pointsTypeWeight;
 }
 
-export const points_weight = async (owner : string, spender : string) => {
+export const points_weight = async (contractHash : string ,owner : string, spender : string) => {
  
   // We don't need hash- prefix so i'm removing it
- await gaugeController.setContractHash(GAUGE_CONTROLLER_CONTRACT!);
+  await gaugeController.setContractHash(contractHash);
 
  //pointsWeight
  const pointsWeight = await gaugeController.points_type_weight(owner ,  spender);
@@ -39,9 +39,9 @@ export const points_weight = async (owner : string, spender : string) => {
  return pointsWeight;
 }
 
-export const points_total = async (owner : string) => {
+export const points_total = async (contractHash : string, owner : string) => {
   // We don't need hash- prefix so i'm removing it
-  await gaugeController.setContractHash(GAUGE_CONTROLLER_CONTRACT!);
+  await gaugeController.setContractHash(contractHash);
 
   //pointsTotal
   const pointsTotal = await gaugeController.points_total(owner);
@@ -50,9 +50,9 @@ export const points_total = async (owner : string) => {
   return pointsTotal;
 }
 
-export const gauge_type_names = async (owner : string) => {
+export const gauge_type_names = async (contractHash : string,owner : string) => {
   // We don't need hash- prefix so i'm removing it
-  await gaugeController.setContractHash(GAUGE_CONTROLLER_CONTRACT!);
+  await gaugeController.setContractHash(contractHash);
 
   //gaugeTypeNames
   const gaugeTypeNames = await gaugeController.gauge_type_names(owner);
