@@ -9,8 +9,8 @@ const Voter = require("../../../models/voter");
 const Cast = require("../../../models/cast");
 const eventsData = require("../../../models/eventsData");
 var bigdecimal = require("bigdecimal");
-// const {getVote} = require("../../../JsClients/VOTING/votingFunctionsForBackend/functions");
-// const allcontractsData = require("../../../models/allcontractsData");
+const voting = require("../../../JsClients/VOTING/votingFunctionsForBackend/functions");
+const allcontractsData = require("../../../models/allcontractsData");
 
 
 const transactionOptions = {
@@ -229,8 +229,9 @@ const handleStartVote = {
       });
 
       // const contractData = await allcontractsData.findOne({packageHash : process.env.VOTING_PACKAGE_HASH});
-      // const voteData = await getVote(contractData.contractHash, args.voteId);
+      // const voteData = await voting.getVote(contractData.contractHash, args.voteId);
     
+      //supposed values
       let voteData = {
         value2: "2",
         value3: "3",
@@ -303,9 +304,9 @@ const handleCastVote = {
       response.result = true;
 
       // const contractData = await allcontractsData.findOne({packageHash : process.env.VOTING_PACKAGE_HASH});
-      // const voteData = await getVote(contractData.contractHash, args.voteId);
+      // const voteData = await voting.getVote(contractData.contractHash, args.voteId);
 
-      //Below is supposed data
+      //supposed values
       let voteData = {
         value6: "6",
         value7: "7",
@@ -383,9 +384,9 @@ const handleExecuteVote = {
       }
 
       // const contractData = await allcontractsData.findOne({packageHash : process.env.VOTING_PACKAGE_HASH});
-      // const voteData = await getVote(contractData.contractHash, args.voteId);
+      // const voteData = await voting.getVote(contractData.contractHash, args.voteId);
 
-      //Below is supposed data
+      //Supposed values
       let voteData = {
         value6: "6",
         value7: "7",
@@ -417,13 +418,14 @@ async function getOrRegisterVotingApp(address) {
   if (app == null) {
     let codename = "codename";
     
-      //  let minBalance =  await votingEscrow.minBalance(address);
-      // let minAcceptQuorumPct =  await votingEscrow.minAcceptQuorumPct(address);
-      //  let minTime =  await votingEscrow.minTime(address);
-      //  let supportRequiredPct =  await votingEscrow.supportRequiredPct(address);
-      //  let voteTime =  await votingEscrow.voteTime(address);
-      //  let token =  await votingEscrow.token(address);
+    // let minBalance =  await voting.min_balance();
+    // let minAcceptQuorumPct =  await voting.minAcceptQuorumPct();
+    // let minTime =  await voting.minTime();
+    // let supportRequiredPct =  await voting.supportRequiredPct();
+    // let voteTime =  await voting.voteTime();
+    // let token =  await voting.token();
 
+    //supposed values
     let minBalance = "1000000000";
     let minAcceptQuorumPct = "1000000000";
     let minTime = "1000000000";
@@ -431,19 +433,19 @@ async function getOrRegisterVotingApp(address) {
     let voteTime = "1000000000";
     let token = "123";
 
-     app = new VotingApp({
-      id: address,
-      address: address,
-      codename: codename,
-      minimumBalance: minBalance,
-      minimumQuorum: minAcceptQuorumPct,
-      minimumTime: minTime,
-      requiredSupport: supportRequiredPct,
-      voteTime: voteTime,
-      token: token,
-      proposalCount: "0",
-      voteCount: "0",
-    });
+    app = new VotingApp({
+    id: address,
+    address: address,
+    codename: codename,
+    minimumBalance: minBalance,
+    minimumQuorum: minAcceptQuorumPct,
+    minimumTime: minTime,
+    requiredSupport: supportRequiredPct,
+    voteTime: voteTime,
+    token: token,
+    proposalCount: "0",
+    voteCount: "0",
+  });
   }
 
   return app;

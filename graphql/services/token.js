@@ -41,7 +41,7 @@ async function getOrCreateToken(address, args,session) {
     }
     await token.save({session});
 
-    let state = await getSystemState(args,session);
+    let state = await getSystemState(args);
     state.tokenCount = ((new bigdecimal.BigDecimal(state.tokenCount)).add(new bigdecimal.BigDecimal("1"))).toString();
     await state.save({session});
   }
@@ -49,7 +49,7 @@ async function getOrCreateToken(address, args,session) {
   return token;
 }
 
-async function getOrCreateLpToken(address,session) {
+async function getOrCreateLpToken(address) {
   let token = await LpToken.findOne({ id: address });
   if (token == null) {
     let info = await getTokenInfo(address);
@@ -60,7 +60,6 @@ async function getOrCreateLpToken(address,session) {
       symbol: info.symbol,
       decimals: info.decimals,
     });
-    await LpToken.create([token],{session});
   }
   return token;
 }

@@ -5,7 +5,7 @@ async function getGaugeType(id) {
   return gaugeType;
 }
 
-async function registerGaugeType(id, name, session) {
+async function registerGaugeType(id, name) {
   console.log("gaugename", name);
   let gaugetype = new GaugeType({
     id: id,
@@ -13,7 +13,6 @@ async function registerGaugeType(id, name, session) {
     gaugeCount: "0",
   });
   console.log("gaugename", name);
-  await GaugeType.create([gaugetype], {session});
   return gaugetype;
 }
 

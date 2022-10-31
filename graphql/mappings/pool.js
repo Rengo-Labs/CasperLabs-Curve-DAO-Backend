@@ -131,7 +131,7 @@ const handleAddLiquidity = {
       let pool = await Pool.findOne({ id: args.poolId });
       if (pool !== null) {
         pool = await getPoolSnapshot(pool, args,session);
-        let provider = await getOrRegisterAccount(args.providerId, session);
+        let provider = await getOrRegisterAccount(args.providerId);
         let eventId =  getEventId(args.transactionHash, args.logIndex);
         let newData = new AddLiquidityEvent({
           id: "al-" + eventId,
@@ -204,7 +204,7 @@ const handleRemoveLiquidity = {
       let pool = await Pool.findOne({ id: args.poolId });
       if (pool !== null) {
         pool = await getPoolSnapshot(pool, args,session);
-        let provider = await getOrRegisterAccount(args.providerId, session);
+        let provider = await getOrRegisterAccount(args.providerId);
         let eventId = getEventId(args.transactionHash, args.logIndex);
         let newData = new RemoveLiquidityEvent({
           id: "rl-" + eventId,
@@ -276,7 +276,7 @@ const handleRemoveLiquidityImbalance = {
       let pool = await Pool.findOne({ id: args.poolId });
       if (pool !== null) {
         pool = await getPoolSnapshot(pool, args, session);
-        let provider = await getOrRegisterAccount(args.providerId, session);
+        let provider = await getOrRegisterAccount(args.providerId);
         let eventId = getEventId(args.transactionHash, args.logIndex);
         let newData = new RemoveLiquidityEvent({
           id: "rli-" + eventId,
@@ -348,7 +348,7 @@ const handleRemoveLiquidityOne = {
       let pool = await Pool.findOne({ id: args.poolId });
       if (pool !== null) {
         pool = await getPoolSnapshot(pool, args, session);
-        let provider = await getOrRegisterAccount(args.providerId, session);
+        let provider = await getOrRegisterAccount(args.providerId);
         let eventId = getEventId(args.transactionHash, args.logIndex);
         console.log('tokenAmount', args.tokenAmount)
         let newData = new RemoveLiquidityOneEvent({
@@ -435,7 +435,7 @@ const handleTokenExchange = {
 
         let amountBought = new bigdecimal.BigDecimal(args.tokens_bought); //issue
 
-        let buyer = await getOrRegisterAccount(args.buyer, session);
+        let buyer = await getOrRegisterAccount(args.buyer);
 
         let eventId = getEventId(args.transactionHash, args.logIndex);
 
@@ -557,7 +557,7 @@ const handleTokenExchangeUnderlying = {
 
         let amountBought = (new bigdecimal.BigDecimal(args.tokens_bought)); //issue
 
-        let buyer = await getOrRegisterAccount(args.buyer, session);
+        let buyer = await getOrRegisterAccount(args.buyer);
 
         let eventId = getEventId(args.transactionHash, args.logIndex);
 

@@ -1,6 +1,6 @@
 const Account = require("../../models/account");
 
-async function getOrRegisterAccount(address,session) {
+async function getOrRegisterAccount(address) {
   let account = await Account.findOne({ id: address });
 
   if (account  === null) {
@@ -8,7 +8,6 @@ async function getOrRegisterAccount(address,session) {
       id: address,
       address: address,
     });
-    await Account.create ([account],{session} );
   }
 
   return account;

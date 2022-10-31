@@ -209,7 +209,7 @@ async function getOrCreatePool(address, args, session) {
 
     await pool.save({session});
 
-    let state = await getSystemState(args,session);
+    let state = await getSystemState(args);
     state.poolCount = (new bigdecimal.BigDecimal(state.poolCount).add( new bigdecimal.BigDecimal("1"))).toString();
     state.totalPoolCount = (
       new bigdecimal.BigDecimal(state.totalPoolCount).add(new bigdecimal.BigDecimal("1"))
@@ -237,7 +237,7 @@ async function removePool(address, args,session) {
     await pool.save({session});
 
     // Count pools
-    let state = await getSystemState(args,session);
+    let state = await getSystemState(args);
     state.poolCount = (new bigdecimal.BigDecimal(state.poolCount).subtract( new bigdecimal.BigDecimal("1"))).toString();
     await state.save({session});
 

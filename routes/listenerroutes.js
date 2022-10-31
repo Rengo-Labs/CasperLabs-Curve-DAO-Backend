@@ -113,6 +113,7 @@ async function geteventsdata(eventResult, _deployHash, _timestamp, _block_hash, 
           $logIndex: String!,
           $registryAddress: String!,
           $blockNumber: String!,
+          $eventObjectId: String!
           ){
         handleAddLiquidity( 
             tokenAmounts: $tokenAmounts,
@@ -127,6 +128,7 @@ async function geteventsdata(eventResult, _deployHash, _timestamp, _block_hash, 
             logIndex: $logIndex,
             registryAddress: $registryAddress,
             blockNumber: $blockNumber,
+            eventObjectId: $eventObjectId
             ) {
           result
       }
@@ -145,6 +147,7 @@ transactionHash: transactionHash,
 logIndex: logIndex,
 registryAddress: registryAddress,
 blockNumber: blockNumber,
+eventObjectId :  eventResult._id,
 }
 );
 console.log("handleAddLiquidity Mutation called.")
@@ -198,6 +201,7 @@ console.log("handleAddLiquidity Mutation called.")
           $logIndex: String!,
           $registryAddress: String!,
           $blockNumber: String!,
+          $eventObjectId : String!
           ){
             handleRemoveLiquidity( 
             tokenAmounts: $tokenAmounts,
@@ -211,6 +215,7 @@ console.log("handleAddLiquidity Mutation called.")
             logIndex: $logIndex,
             registryAddress: $registryAddress,
             blockNumber: $blockNumber,
+            eventObjectId: $eventObjectId
             ) {
           result
       }
@@ -228,6 +233,7 @@ transactionHash: transactionHash,
 logIndex: logIndex,
 registryAddress: registryAddress,
 blockNumber: blockNumber,
+eventObjectId :  eventResult._id,
 }
 );
 console.log("handleRemoveLiquidity Mutation called.")
@@ -285,6 +291,7 @@ console.log("handleRemoveLiquidity Mutation called.")
           $logIndex: String!,
           $registryAddress: String!,
           $blockNumber: String!,
+          $eventObjectId :  String!
           ){
             handleRemoveLiquidityImbalance( 
             tokenAmounts: $tokenAmounts,
@@ -299,6 +306,7 @@ console.log("handleRemoveLiquidity Mutation called.")
             logIndex: $logIndex,
             registryAddress: $registryAddress,
             blockNumber: $blockNumber,
+            eventObjectId: $eventObjectId
             ) {
           result
       }
@@ -317,6 +325,7 @@ transactionHash: transactionHash,
 logIndex: logIndex,
 registryAddress: registryAddress,
 blockNumber: blockNumber,
+eventObjectId : eventResult._id
 }
 );
 console.log("handleRemoveLiquidityImbalance Mutation called.")
@@ -366,6 +375,7 @@ console.log("handleRemoveLiquidityImbalance Mutation called.")
           $logIndex: String!,
           $registryAddress: String!,
           $blockNumber: String!,
+          eventObjectId : String!
           ){
             handleRemoveLiquidityOne( 
             tokenAmount: $tokenAmount,
@@ -378,6 +388,7 @@ console.log("handleRemoveLiquidityImbalance Mutation called.")
             logIndex: $logIndex,
             registryAddress: $registryAddress,
             blockNumber: $blockNumber,
+            eventObjectId : $eventObjectId
             ) {
           result
       }
@@ -394,6 +405,7 @@ transactionHash: transactionHash,
 logIndex: logIndex,
 registryAddress: registryAddress,
 blockNumber: blockNumber,
+eventObjectId : eventResult._id,
 }
 );
 console.log("handleRemoveLiquidityOne Mutation called.")
@@ -444,7 +456,8 @@ console.log("handleRemoveLiquidityOne Mutation called.")
           $sold_id: String!,
           $tokens_sold: String!,
           $bought_id: String!,
-          $tokens_bought: String!
+          $tokens_bought: String!,
+          eventObjectId : String!
           ){
               handleTokenExchange( 
             poolId: $poolId,
@@ -456,7 +469,8 @@ console.log("handleRemoveLiquidityOne Mutation called.")
             sold_id: $sold_id,
             tokens_sold: $tokens_sold,
             bought_id: $bought_id,
-            tokens_bought: $tokens_bought
+            tokens_bought: $tokens_bought,
+            eventObjectId : $eventObjectId
             ) {
           result
       }
@@ -472,7 +486,8 @@ console.log("handleRemoveLiquidityOne Mutation called.")
   sold_id: sold_id,
   tokens_sold: tokens_sold,
   bought_id: bought_id,
-  tokens_bought: tokens_bought
+  tokens_bought: tokens_bought,
+  eventObjectId : eventResult._id
 }
 );
 console.log("handleTokenExchange Mutation called.")
@@ -523,7 +538,8 @@ console.log("handleTokenExchange Mutation called.")
           $sold_id: String!,
           $tokens_sold: String!,
           $bought_id: String!,
-          $tokens_bought: String!
+          $tokens_bought: String!,
+          $eventObjectId : String!
           ){
             handleTokenExchangeUnderlying( 
             poolId: $poolId,
@@ -535,7 +551,8 @@ console.log("handleTokenExchange Mutation called.")
             sold_id: $sold_id,
             tokens_sold: $tokens_sold,
             bought_id: $bought_id,
-            tokens_bought: $tokens_bought
+            tokens_bought: $tokens_bought,
+            eventObjectId : $eventObjectId
             ) {
           result
       }
@@ -551,7 +568,8 @@ console.log("handleTokenExchange Mutation called.")
   sold_id: sold_id,
   tokens_sold: tokens_sold,
   bought_id: bought_id,
-  tokens_bought: tokens_bought
+  tokens_bought: tokens_bought,
+  eventObjectId : eventResult._id
 }
 );
 console.log("handleExchangeUnderlying Mutation called.")
@@ -586,6 +604,7 @@ return true;
           $timestamp: String!,
           $logIndex: String!,
           $admin: String!,
+          $eventObjectId : String!
           ){
               handleNewAdmin( 
             poolId: $poolId,
@@ -594,6 +613,7 @@ return true;
             timestamp: $timestamp,
             logIndex: $logIndex,
             admin: $admin,
+            eventObjectId : $eventObjectId
             ) {
           result
       }
@@ -606,6 +626,7 @@ return true;
   timestamp: timestamp,
   logIndex: logIndex,
   admin: admin,
+  eventObjectId : eventResult._id
 }
 );
 console.log("handleNewAdmin Mutation called.")
@@ -644,6 +665,7 @@ return true;
           $logIndex: String!,
           $fee: String!,
           $admin_fee: String!,
+          $eventObjectId :String!
           ){
               handleNewFee( 
             poolId: $poolId,
@@ -653,6 +675,7 @@ return true;
             logIndex: $logIndex,
             fee: $fee,
             admin_fee: $admin_fee,
+            eventObjectId : $eventObjectId
             ) {
           result
       }
@@ -665,7 +688,8 @@ return true;
   timestamp: timestamp,
   logIndex: logIndex,
   fee: fee,
-  admin_fee: admin_fee
+  admin_fee: admin_fee,
+  eventObjectId : eventResult._id
 }
 );
 console.log("handleNewFee Mutation called.")
@@ -708,6 +732,7 @@ return true;
           $logIndex: String!,
           $fee: String!,
           $admin_fee: String!,
+          $eventObjectId : String!
           ){
               handleNewParameters( 
             poolId: $poolId,
@@ -718,6 +743,7 @@ return true;
             logIndex: $logIndex,
             fee: $fee,
             admin_fee: $admin_fee,
+            eventObjectId : $eventObjectId
             ) {
           result
       }
@@ -731,7 +757,8 @@ return true;
   timestamp: timestamp,
   logIndex: logIndex,
   fee: fee,
-  admin_fee: admin_fee
+  admin_fee: admin_fee,
+  eventObjectId : eventResult._id
 }
 );
 console.log("handleNewParameters Mutation called.")
@@ -765,6 +792,7 @@ return true;
           $block: String!,
           $timestamp: String!,
           $logIndex: String!,
+          $eventObjectId : String!
           ){
               handleRampA( 
             poolId: $poolId,
@@ -773,6 +801,7 @@ return true;
             block: $block,
             timestamp: $timestamp,
             logIndex: $logIndex,
+            eventObjectId : $eventObjectId
             ) {
           result
       }
@@ -785,6 +814,7 @@ return true;
   block: block_hash,
   timestamp: timestamp,
   logIndex: logIndex,
+  eventObjectId : eventResult._id
 }
 );
 console.log("handleRampA Mutation called.")
@@ -818,6 +848,7 @@ return true;
           $block: String!,
           $timestamp: String!,
           $logIndex: String!,
+          $eventObjectId : String!
           ){
               handleStopRampA( 
             poolId: $poolId,
@@ -826,6 +857,7 @@ return true;
             block: $block,
             timestamp: $timestamp,
             logIndex: $logIndex,
+            eventObjectId : $eventObjectId
             ) {
           result
       }
@@ -838,6 +870,7 @@ return true;
   block: block_hash,
   timestamp: timestamp,
   logIndex: logIndex,
+  eventObjectId : eventResult._id
 }
 );
 console.log("handleStopRampA Mutation called.")
@@ -868,6 +901,7 @@ return true;
           $block: String!,
           $timestamp: String!,
           $transactionHash: String!,
+          $eventObjectId : String!
           ){
               handleAddressModified( 
             addressProviderContractHash: $addressProviderContractHash,
@@ -875,6 +909,7 @@ return true;
             block: $block,
             timestamp: $timestamp,
             transactionHash: $transactionHash,
+            eventObjectId : $eventObjectId
             ) {
           result
       }
@@ -886,6 +921,7 @@ id: id,
 block: block_hash,
 timestamp: timestamp,
 transactionHash: transactionHash,
+eventObjectId : eventResult._id
 }
 );
 console.log("handleAddressModified Mutation called.")
@@ -916,6 +952,7 @@ return true;
           $block: String!,
           $timestamp: String!,
           $transactionHash: String!,
+          $eventObjectId : String!
           ){
             handleNewAddressIdentifier( 
             addressProviderContractHash: $addressProviderContractHash,
@@ -923,6 +960,7 @@ return true;
             block: $block,
             timestamp: $timestamp,
             transactionHash: $transactionHash,
+            eventObjectId: $eventObjectId
             ) {
           result
       }
@@ -934,6 +972,7 @@ id: id,
 block: block_hash,
 timestamp: timestamp,
 transactionHash: transactionHash,
+eventObjectId : eventResult._id
 }
 );
 console.log("handleNewAddressIdentifier Mutation called.")
@@ -955,8 +994,8 @@ return true;
 
       await request(
         process.env.GRAPHQL,
-        `mutation handlePoolAdded( $poolId: String!,$transactionHash: String!,$block: String!,$timestamp: String!){
-           handlePoolAdded( poolId: $poolId,transactionHash: $transactionHash,block: $block,timestamp: $timestamp) {
+        `mutation handlePoolAdded( $poolId: String!,$transactionHash: String!,$block: String!,$timestamp: String!, $eventObjectId : String!){
+           handlePoolAdded( poolId: $poolId,transactionHash: $transactionHash,block: $block,timestamp: $timestamp, eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -966,6 +1005,7 @@ return true;
  transactionHash: transactionHash,
  block: block_hash,
  timestamp: timestamp,
+ eventObjectId : eventResult._id
 }
 );
 console.log("handlePoolAdded Mutation called.")
@@ -987,8 +1027,8 @@ return true;
 
       await request(
         process.env.GRAPHQL,
-        `mutation handlePoolRemoved( $poolId: String!,$transactionHash: String!,$block: String!,$timestamp: String!){
-          handlePoolRemoved( poolId: $poolId,transactionHash: $transactionHash,block: $block,timestamp: $timestamp) {
+        `mutation handlePoolRemoved( $poolId: String!,$transactionHash: String!,$block: String!,$timestamp: String!, $eventObjectId : String!){
+          handlePoolRemoved( poolId: $poolId,transactionHash: $transactionHash,block: $block,timestamp: $timestamp, eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -998,6 +1038,7 @@ return true;
  transactionHash: transactionHash,
  block: block_hash,
  timestamp: timestamp,
+ eventObjectId : eventResult._id
 }
 );
 console.log("handlePoolRemoved Mutation called.")
@@ -1023,8 +1064,8 @@ return true;
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleNewProxyApp( $appId: String!,$proxy: String!,$context: String!,$transactionHash: String!,$block: String!,$timestamp: String!){
-           handleNewProxyApp( appId: $appId,proxy: $proxy,context: $context,transactionHash: $transactionHash,block: $block,timestamp: $timestamp) {
+        `mutation handleNewProxyApp( $appId: String!,$proxy: String!,$context: String!,$transactionHash: String!,$block: String!,$timestamp: String!, $eventObjectId : String!){
+           handleNewProxyApp( appId: $appId,proxy: $proxy,context: $context,transactionHash: $transactionHash,block: $block,timestamp: $timestamp, eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -1036,6 +1077,7 @@ return true;
  transactionHash: transactionHash,
  block: block_hash,
  timestamp: timestamp,
+ eventObjectId : eventResult._id
 }
 );
 console.log("handleNewProxyApp Mutation called.")
@@ -1080,6 +1122,7 @@ return true;
           $transactionHash: String!,
           $block: String!
           $timestamp: String!,
+          $eventObjectId : String!
           ){
               handleUpdateLiquidityLimit( 
             user: $user,
@@ -1091,6 +1134,7 @@ return true;
             transactionHash: $transactionHash,
             block: $block,
             timestamp: $timestamp,
+            eventObjectId : $eventObjectId
             ) {
           result
       }
@@ -1106,6 +1150,7 @@ return true;
     transactionHash: transactionHash,
     block: block_hash,
     timestamp: timestamp,
+    eventObjectId : eventResult._id
   }
 );
 console.log("handleUpdateLiquidityLimit Mutation called.")
@@ -1134,8 +1179,8 @@ return true;
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleDeposit( $provider: String!,$id: String!,$value: String!,$transactionHash: String!,$logIndex: String!){
-           handleDeposit( provider: $provider,id: $id,value: $value,transactionHash: $transactionHash,logIndex: $logIndex) {
+        `mutation handleDeposit( $provider: String!,$id: String!,$value: String!,$transactionHash: String!,$logIndex: String!, $eventObjectId : String!){
+           handleDeposit( provider: $provider,id: $id,value: $value,transactionHash: $transactionHash,logIndex: $logIndex, eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -1146,6 +1191,7 @@ return true;
  value: value,
  transactionHash: transactionHash,
  logIndex: logIndex,
+ eventObjectId : eventResult._id
 }
 );
 console.log("handleDeposit Mutation called.")
@@ -1174,8 +1220,8 @@ return true;
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleWithdraw( $provider: String!,$id: String!,$value: String!,$transactionHash: String!,$logIndex: String!){
-          handleWithdraw( provider: $provider,id: $id,value: $value,transactionHash: $transactionHash,logIndex: $logIndex) {
+        `mutation handleWithdraw( $provider: String!,$id: String!,$value: String!,$transactionHash: String!,$logIndex: String!, $eventObjectId : String!){
+          handleWithdraw( provider: $provider,id: $id,value: $value,transactionHash: $transactionHash,logIndex: $logIndex, eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -1186,6 +1232,7 @@ return true;
  value: value,
  transactionHash: transactionHash,
  logIndex: logIndex,
+ eventObjectId : eventResult._id
 }
 );
 console.log("handleWithdraw Mutation called.")
@@ -1455,8 +1502,8 @@ return true;
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleAddType( $id: String!,$type_id: String!,$timestamp: String!,$name: String!){
-              handleAddType( id: $id,type_id: $type_id,timestamp: $timestamp,name:$name) {
+        `mutation handleAddType( $id: String!,$type_id: String!,$timestamp: String!,$name: String!, $eventObjectId : String!){
+              handleAddType( id: $id,type_id: $type_id,timestamp: $timestamp,name:$name, eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -1465,7 +1512,8 @@ return true;
 id: id,
 type_id: type_id,
 timestamp: timestamp,
-name:name
+name:name,
+eventObjectId : eventResult._id
 }
 );
 console.log("handleAddType Mutation called.")
@@ -1491,18 +1539,19 @@ return true;
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleNewGauge($gaugeType: String!,$addr: String!,$blockNumber: String!,$transactionHash: String!,$weight: String!,$timestamp: String!,){
-              handleNewGauge(gaugeType: $gaugeType,addr: $addr,blockNumber: $blockNumber,transactionHash: $transactionHash,weight: $weight,timestamp: $timestamp,) {
+        `mutation handleNewGauge($gaugeType: String!,$addr: String!,$blockNumber: String!,$transactionHash: String!,$weight: String!,$timestamp: String!,$eventObjectId : String!){
+              handleNewGauge(gaugeType: $gaugeType,addr: $addr,blockNumber: $blockNumber,transactionHash: $transactionHash,weight: $weight,timestamp: $timestamp,eventObjectId : $eventObjectId) {
           result
       }
       }`,
 {
-gaugeType: gaugeType,
+gaugeType: gauge_type,
 addr: addr,
 blockNumber: blockNumber,
 transactionHash: transactionHash,
 weight: weight,
 timestamp: timestamp,
+eventObjectId : eventResult._id
 }
 );
 console.log("handleNewGauge Mutation called.")
@@ -1528,8 +1577,8 @@ return true;
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleNewGaugeWeight( $id: String!,$time: String!,$weight: String!,$gauge_address: String!,){
-           handleNewGaugeWeight( id: $id,time: $time,weight: $weight,gauge_address: $gauge_address,) {
+        `mutation handleNewGaugeWeight( $id: String!,$time: String!,$weight: String!,$gauge_address: String!,$eventObjectId : String!){
+           handleNewGaugeWeight( id: $id,time: $time,weight: $weight,gauge_address: $gauge_address,eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -1539,6 +1588,7 @@ return true;
  time: time,
  weight: weight,
  gauge_address: gauge_address,
+ eventObjectId : eventResult._id
 }
 );
 console.log("handleNewGaugeWeight Mutation called.")
@@ -1567,8 +1617,8 @@ return true;
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleNewTypeWeight( $id: String!,$time: String!,$weight: String!,$type_id: String!,$total_weight: String!){
-           handleNewTypeWeight( id: $id,time: $time,weight: $weight,type_id: $type_id,total_weight: $total_weight) {
+        `mutation handleNewTypeWeight( $id: String!,$time: String!,$weight: String!,$type_id: String!,$total_weight: String!, $eventObjectId : String!){
+           handleNewTypeWeight( id: $id,time: $time,weight: $weight,type_id: $type_id,total_weight: $total_weight, eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -1579,6 +1629,7 @@ return true;
  weight: weight,
  type_id: type_id,
  total_weight: total_weight,
+ eventObjectId : eventResult._id
 }
 );
 console.log("handleNewTypeWeight Mutation called.")
@@ -1607,8 +1658,8 @@ return true;
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleVoteForGauge( $id: String!,$time: String!,$weight: String!,$gauge_addr: String!,$user: String!){
-           handleVoteForGauge( id: $id,time: $time,weight: $weight,gauge_addr: $gauge_addr,user: $user) {
+        `mutation handleVoteForGauge( $id: String!,$time: String!,$weight: String!,$gauge_addr: String!,$user: String!, $eventObjectId : String!){
+           handleVoteForGauge( id: $id,time: $time,weight: $weight,gauge_addr: $gauge_addr,user: $user, eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -1619,6 +1670,7 @@ return true;
  weight: weight,
  gauge_addr: gauge_addr,
  user: user,
+ eventObjectId : eventResult._id
 }
 );
 console.log("handleVoteForGauge Mutation called.")

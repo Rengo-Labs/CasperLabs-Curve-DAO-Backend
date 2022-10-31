@@ -22,7 +22,7 @@ async function registerContract(id, args, session) {
     value4: "4",
   };
   let contract = await Contract.findOne({ id: id });
-  let state = await getSystemState(args,session);
+  let state = await getSystemState(args);
 
   if (contract == null) {
     let newData = new Contract({

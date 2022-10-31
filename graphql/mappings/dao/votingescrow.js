@@ -7,13 +7,13 @@ const DaoPower = require("../../../models/daopower");
 const VotingPower = require("../../../models/votingPower");
 const UserBalance = require("../../../models/userBalance");
 const VotingEscrow = require("../../../models/votingEscrow");
-// const allcontractsData = require("../../../models/allcontractsData");
+const allcontractsData = require("../../../models/allcontractsData");
 
 let eventsData = require("../../../models/eventsData");
 
 const Response = require("../../../models/response");
 const { responseType } = require("../../types/response");
-// let votingEscrow = require("../../../JsClients/VOTINGESCROW/votingEscrowFunctionsForBackend/functions.ts");
+let votingEscrow = require("../../../JsClients/VOTINGESCROW/votingEscrowFunctionsForBackend/functions");
 
 const transactionOptions = {
   readPreference: "primary",
@@ -56,7 +56,7 @@ const handleVotingDeposit = {
       // let power = await votingEscrow.balanceOf(contractData.contractHash,args.provider);
       // let totalPower = await votingEscrow.totalSupply(contractData.contractHash);
 
-
+      //supposed values
       let power = '1000';
       let totalPower = '10000';
 
@@ -177,7 +177,7 @@ const handleVotingWithdraw = {
       // let power = await votingEscrow.balanceOf(contractData.contractHash,args.provider);
       // let totalPower = await votingEscrow.totalSupply(contractData.contractHash);
 
-
+      //Supposed values 
       let power = '1000';
       let totalPower = '10000';
       
@@ -196,7 +196,6 @@ const handleVotingWithdraw = {
         daopower.timestamp = args.timestamp;
         daopower.totalPower = totalPower;
       }
-
 
       let votingpower = await VotingPower.findOne({id : args.provider});
 
