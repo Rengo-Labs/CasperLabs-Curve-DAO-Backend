@@ -253,6 +253,23 @@ class VOTINGESCROWClient {
     }
   }
 
+  public async balanceOf(account: string) {
+    try {
+
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        account,
+        this.namedKeys.balanceOf
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+
+  }
+
   public async balanceOfAtSessionCode(
     keys: Keys.AsymmetricKey,
     entrypointName:string,
@@ -286,6 +303,15 @@ class VOTINGESCROWClient {
     } else {
       throw Error("Problem with installation");
     }
+  }
+
+  public async totalSupply() {
+    const result = await contractSimpleGetter(
+      this.nodeAddress,
+      this.contractHash,
+      ["total_supply"]
+    );
+    return result.value();
   }
 
   public async totalSupplySessionCode(
