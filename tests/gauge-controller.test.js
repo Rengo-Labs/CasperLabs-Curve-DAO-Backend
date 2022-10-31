@@ -11,7 +11,7 @@ const GaugeVote = require("../models/gaugeVote");
 require("dotenv").config();
 var { request } = require("graphql-request");
 
-async function AddType(id, type_id, timestamp, name) {
+async function AddType(id, type_id, timestamp, name, eventObjectId) {
     console.log("Calling handleAddType mutation...");
     let response = await request(
       process.env.GRAPHQL,
@@ -19,13 +19,15 @@ async function AddType(id, type_id, timestamp, name) {
                   $id: String!,
                   $type_id: String!,
                   $timestamp: String!,
-                  $name: String!
+                  $name: String!,
+                  $eventObjectId : String!
                   ){
                       handleAddType( 
                     id: $id,
                     type_id: $type_id,
                     timestamp: $timestamp,
-                    name:$name
+                    name:$name,
+                    eventObjectId : $eventObjectId
                     ) {
                   result
               }
@@ -35,7 +37,8 @@ async function AddType(id, type_id, timestamp, name) {
         id: id,
         type_id: type_id,
         timestamp: timestamp,
-        name:name
+        name:name,
+        eventObjectId:eventObjectId
       }
     );
     console.log(response);
@@ -48,7 +51,8 @@ async function NewGauge(
     blockNumber,
     transactionHash,
     weight,
-    timestamp
+    timestamp,
+    eventObjectId
   ) {
     console.log("Calling handleNewGauge mutation...");
     let response = await request(
@@ -60,6 +64,7 @@ async function NewGauge(
                   $transactionHash: String!,
                   $weight: String!,
                   $timestamp: String!,
+                  $eventObjectId : String!,
                   ){
                       handleNewGauge(
                         gaugeType: $gaugeType,
@@ -68,6 +73,7 @@ async function NewGauge(
                         transactionHash: $transactionHash,
                         weight: $weight,
                         timestamp: $timestamp,
+                        eventObjectId : $eventObjectId
                     ) {
                   result
               }
@@ -79,13 +85,14 @@ async function NewGauge(
         transactionHash: transactionHash,
         weight: weight,
         timestamp: timestamp,
+        eventObjectId :eventObjectId
       }
     );
     console.log(response);
     return response;
   }
   
-async function NewGaugeWeight(id, time, weight, gauge_address) {
+async function NewGaugeWeight(id, time, weight, gauge_address, eventObjectId) {
     console.log("Calling handleNewGaugeWeight mutation...");
     let response = await request(
       process.env.GRAPHQL,
@@ -94,6 +101,7 @@ async function NewGaugeWeight(id, time, weight, gauge_address) {
                  $time: String!,
                  $weight: String!,
                  $gauge_address: String!,
+                 $eventObjectId : String!
   
                  ){
                   handleNewGaugeWeight( 
@@ -101,6 +109,7 @@ async function NewGaugeWeight(id, time, weight, gauge_address) {
                    time: $time,
                    weight: $weight,
                    gauge_address: $gauge_address,
+                   eventObjectId : $eventObjectId
                    ) {
                  result
              }
@@ -111,13 +120,14 @@ async function NewGaugeWeight(id, time, weight, gauge_address) {
         time: time,
         weight: weight,
         gauge_address: gauge_address,
+        eventObjectId: eventObjectId
       }
     );
     console.log(response);
     return response;
   }
   
-async function NewTypeWeight(id, time, weight, type_id, total_weight) {
+async function NewTypeWeight(id, time, weight, type_id, total_weight, eventObjectId) {
     console.log("Calling handleNewTypeWeight mutation...");
     let response = await request(
       process.env.GRAPHQL,
@@ -127,14 +137,15 @@ async function NewTypeWeight(id, time, weight, type_id, total_weight) {
                  $weight: String!,
                  $type_id: String!,
                  $total_weight: String!
-  
+                 $eventObjectId: String!
                  ){
                   handleNewTypeWeight( 
                    id: $id,
                    time: $time,
                    weight: $weight,
                    type_id: $type_id,
-                   total_weight: $total_weight
+                   total_weight: $total_weight,
+                   eventObjectId : $eventObjectId
                    ) {
                  result
              }
@@ -146,13 +157,14 @@ async function NewTypeWeight(id, time, weight, type_id, total_weight) {
         weight: weight,
         type_id: type_id,
         total_weight: total_weight,
+        eventObjectId : eventObjectId
       }
     );
     console.log(response);
     return response;
   }
   
-async function VoteForGauge(id, time, weight, gauge_addr, user) {
+async function VoteForGauge(id, time, weight, gauge_addr, user, eventObjectId) {
     console.log("Calling handleVoteForGauge mutation...");
     let response = await request(
       process.env.GRAPHQL,
@@ -161,7 +173,8 @@ async function VoteForGauge(id, time, weight, gauge_addr, user) {
                  $time: String!,
                  $weight: String!,
                  $gauge_addr: String!,
-                 $user: String!
+                 $user: String!,
+                 $eventObjectId : String!
   
                  ){
                   handleVoteForGauge( 
@@ -169,7 +182,8 @@ async function VoteForGauge(id, time, weight, gauge_addr, user) {
                    time: $time,
                    weight: $weight,
                    gauge_addr: $gauge_addr,
-                   user: $user
+                   user: $user,
+                   eventObjectId : $eventObjectId
                    ) {
                  result
              }
@@ -181,6 +195,7 @@ async function VoteForGauge(id, time, weight, gauge_addr, user) {
         weight: weight,
         gauge_addr: gauge_addr,
         user: user,
+        eventObjectId : eventObjectId
       }
     );
     console.log(response);
@@ -236,22 +251,23 @@ async function VoteForGauge(id, time, weight, gauge_addr, user) {
 
 module.exports = describe('GraphQL Mutations for guage-controller', () => {     
 
-  it('handleAddType should return true', async () => {
-    const {handleAddType : {result}} = await AddType('01', '22', '6048000', 'type-name');
-    assert.equal(result, true);
-    let gaugeType = await GaugeTypeWeight.findOne({ id: '6652800' });
-    assert.equal(gaugeType.id, '6652800');
-    assert.equal(gaugeType.type, '22');
-    assert.equal(gaugeType.time, '6652800');
+    it('handleAddType should return true', async () => {
+        const {handleAddType : {result}} = await AddType('01', '22', '6048000', 'type-name', "635fb3b4a89eacba3cd149a5");
+        assert.equal(result, true);
+        let gaugeType = await GaugeTypeWeight.findOne({ id: '6652800' });
+        assert.equal(gaugeType.id, '6652800');
+        assert.equal(gaugeType.type, '22');
+        assert.equal(gaugeType.time, '6652800');
 
-    let gaugeTotal = await GaugeTotalWeight.findOne({ id: '6652800' });
-    assert.equal(gaugeTotal.id, '6652800');
-    assert.equal(gaugeTotal.time, '6652800');
-})
+        let gaugeTotal = await GaugeTotalWeight.findOne({ id: '6652800' });
+        assert.equal(gaugeTotal.id, '6652800');
+        assert.equal(gaugeTotal.time, '6652800');
+    })
 
     it('handleNewGauge should return true', async () => {
-        const {handleNewGauge : {result}} = await NewGauge('gaugeType', '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c','399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '1000','604800');
+        const {handleNewGauge : {result}} = await NewGauge('gaugeType', '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c','399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '1000','604800', "635fb3b4a89eacba3cd149a5");
         assert.equal(result, true);
+       
         let gauge = await Gauge.findOne({ id: '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c' });
         assert.equal(gauge.id, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
         assert.equal(gauge.address, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
@@ -272,8 +288,9 @@ module.exports = describe('GraphQL Mutations for guage-controller', () => {
     })
 
     it('handleNewGaugeWeight should return true', async () => {
-        const {handleNewGaugeWeight : {result}} = await NewGaugeWeight('01', '604800', '1000', '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
+        const {handleNewGaugeWeight : {result}} = await NewGaugeWeight('01', '604800', '1000', '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', "635fb3b4a89eacba3cd149a5");
         assert.equal(result, true);
+       
         let gaugeWeight = await GaugeWeight.findOne({ id: '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-1209600' });
         assert.equal(gaugeWeight.id, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-1209600');
         assert.equal(gaugeWeight.gauge, '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
@@ -286,7 +303,7 @@ module.exports = describe('GraphQL Mutations for guage-controller', () => {
     })
     
     it('handleNewTypeWeight should return true', async () => {
-        const {handleNewTypeWeight : {result}} = await NewTypeWeight('id', '604800','1000','22', '2000');
+        const {handleNewTypeWeight : {result}} = await NewTypeWeight('id', '604800','1000','22', '2000',"635fb3b4a89eacba3cd149a5");
         assert.equal(result, true);
         let gaugeType = await GaugeTypeWeight.findOne({ id: '22-604800' });
         assert.equal(gaugeType.id, '22-604800');
@@ -301,8 +318,9 @@ module.exports = describe('GraphQL Mutations for guage-controller', () => {
     })
 
     it('handleVoteForGauge should return true', async () => {
-        const {handleVoteForGauge : {result}} = await VoteForGauge('01', '604800','1000','399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', 'user');
+        const {handleVoteForGauge : {result}} = await VoteForGauge('01', '604800','1000','399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', 'user', "635fb3b4a89eacba3cd149a5");
         assert.equal(result, true);
+       
         let gauge = await Gauge.findOne({ id: '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c'});
         assert.exists(gauge, "Gauge is null or undefined");
 

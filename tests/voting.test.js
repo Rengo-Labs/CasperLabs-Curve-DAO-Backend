@@ -8,18 +8,19 @@ const Vote = require('../models/vote');
 const Voter = require('../models/voter');
 const Cast = require('../models/cast');
 
-async function MinimumBalanceSet(address, minBalance) {
+async function MinimumBalanceSet(address, minBalance, eventObjectId) {
     console.log("Calling handleMinimumBalanceSet mutation...");
     let response = await request(
       process.env.GRAPHQL,
       `mutation handleMinimumBalanceSet( 
                  $address: String!,
                  $minBalance: String!,
-  
+                 $eventObjectId : String!
                  ){
                   handleMinimumBalanceSet( 
                    address: $address,
                    minBalance: $minBalance,
+                   eventObjectId: $eventObjectId
                    ) {
                  result
              }
@@ -28,24 +29,27 @@ async function MinimumBalanceSet(address, minBalance) {
       {
         address: address,
         minBalance: minBalance,
+        eventObjectId:eventObjectId
       }
     );
     console.log(response);
     return response;
   }
   
-async function MinimumTimeSet(address, minTime) {
+async function MinimumTimeSet(address, minTime, eventObjectId) {
     console.log("Calling handleMinimumTimeSet mutation...");
     let response = await request(
       process.env.GRAPHQL,
       `mutation handleMinimumTimeSet( 
                  $address: String!,
                  $minTime: String!,
+                 $eventObjectId : String!
   
                  ){
                   handleMinimumTimeSet( 
                    address: $address,
                    minTime: $minTime,
+                   eventObjectId : $eventObjectId
                    ) {
                  result
              }
@@ -54,24 +58,27 @@ async function MinimumTimeSet(address, minTime) {
       {
         address: address,
         minTime: minTime,
+        eventObjectId:eventObjectId
       }
     );
     console.log(response);
     return response;
   }
   
-async function ChangeMinQuorum(address, minAcceptQuorumPct) {
+async function ChangeMinQuorum(address, minAcceptQuorumPct, eventObjectId) {
     console.log("Calling handleChangeMinQuorum mutation...");
     let response = await request(
       process.env.GRAPHQL,
       `mutation handleChangeMinQuorum( 
                  $address: String!,
                  $minAcceptQuorumPct: String!,
+                 $eventObjectId : String!
   
                  ){
                   handleChangeMinQuorum( 
                    address: $address,
                    minAcceptQuorumPct: $minAcceptQuorumPct,
+                   eventObjectId: $eventObjectId
                    ) {
                  result
              }
@@ -80,24 +87,27 @@ async function ChangeMinQuorum(address, minAcceptQuorumPct) {
       {
         address: address,
         minAcceptQuorumPct: minAcceptQuorumPct,
+        eventObjectId:eventObjectId
       }
     );
     console.log(response);
     return response;
   }
   
-async function ChangeSupportRequired(address, supportRequiredPct) {
+async function ChangeSupportRequired(address, supportRequiredPct,eventObjectId) {
     console.log("Calling handleChangeSupportRequired mutation...");
     let response = await request(
       process.env.GRAPHQL,
       `mutation handleChangeSupportRequired( 
                  $address: String!,
                  $supportRequiredPct: String!,
+                 $eventObjectId: String!
   
                  ){
                   handleChangeSupportRequired( 
                    address: $address,
                    supportRequiredPct: $supportRequiredPct,
+                   eventObjectId: $eventObjectId
                    ) {
                  result
              }
@@ -106,6 +116,7 @@ async function ChangeSupportRequired(address, supportRequiredPct) {
       {
         address: address,
         supportRequiredPct: supportRequiredPct,
+        eventObjectId: eventObjectId
       }
     );
     console.log(response);
@@ -348,7 +359,7 @@ async function votesByVoteId(voteId){
   module.exports = describe('GraphQL Mutations for voting', () => {     
 
       it('handleMinimumBalanceSet should return true', async () => {
-        const {handleMinimumBalanceSet : {result}} = await MinimumBalanceSet('388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '500');
+        const {handleMinimumBalanceSet : {result}} = await MinimumBalanceSet('388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '500', "635fb3b4a89eacba3cd149a5");
         assert.equal(result, true);
         let voting = await VotingApp.findOne({ id: '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c' });
         assert.equal(voting.id, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c');
@@ -357,7 +368,7 @@ async function votesByVoteId(voteId){
       })
   
       it('handleMinimumTimeSet should return true', async () => {
-          const {handleMinimumTimeSet : {result}} = await MinimumTimeSet('388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468v', '604800');
+          const {handleMinimumTimeSet : {result}} = await MinimumTimeSet('388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468v', '604800', "635fb3b4a89eacba3cd149a5");
           assert.equal(result, true);
           let voting = await VotingApp.findOne({ id: '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468v' });
           assert.equal(voting.id, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468v');
@@ -365,7 +376,7 @@ async function votesByVoteId(voteId){
       })
   
       it('handleChangeMinQuorum should return true', async () => {
-          const {handleChangeMinQuorum : {result}} = await ChangeMinQuorum('388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468d', '20');
+          const {handleChangeMinQuorum : {result}} = await ChangeMinQuorum('388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468d', '20', "635fb3b4a89eacba3cd149a5");
           assert.equal(result, true);
           let voting = await VotingApp.findOne({ id: '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468d' });
           assert.equal(voting.id, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468d');
@@ -373,7 +384,7 @@ async function votesByVoteId(voteId){
       })
       
       it('handleChangeSupportRequired should return true', async () => {
-          const {handleChangeSupportRequired : {result}} = await ChangeSupportRequired('388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468f','20');
+          const {handleChangeSupportRequired : {result}} = await ChangeSupportRequired('388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468f','20', "635fb3b4a89eacba3cd149a5");
           assert.equal(result, true);
           let voting = await VotingApp.findOne({ id: '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468f' });
           assert.equal(voting.id, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468f');
@@ -388,7 +399,7 @@ async function votesByVoteId(voteId){
             'voteId',
             'meta', 
             'fromAddress',
-            "eventObjectId"
+            "635fb3b4a89eacba3cd149a5"
             );
           assert.equal(result, true);
           let vote = await Vote.findOne({id : "voteId"});
@@ -407,7 +418,7 @@ async function votesByVoteId(voteId){
           '100', 
           true,
           '604800', 
-          'eventObjectId');
+          '635fb3b4a89eacba3cd149a5');
         assert.equal(result, true);
         let vote = await Vote.findOne({id : "voteId"})
         assert.exists(vote.yea, 'yea is neither null nor undefined');
@@ -428,7 +439,7 @@ async function votesByVoteId(voteId){
           const {handleExecuteVote : {result}} = await ExecuteVote(
             'voteId',
             '604800',
-            "eventObjectId");
+            "635fb3b4a89eacba3cd149a5");
           assert.equal(result, true);
           let vote = await Vote.findOne({id : "voteId"})
           assert.exists(vote.yea, 'yea is neither null nor undefined');

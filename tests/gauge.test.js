@@ -16,7 +16,8 @@ async function UpdateLiquidityLimit(
     working_supply,
     transactionHash,
     block,
-    timestamp
+    timestamp,
+    eventObjectId
   ) {
     console.log("Calling handleUpdateLiquidityLimit mutation...");
     let response = await request(
@@ -31,6 +32,7 @@ async function UpdateLiquidityLimit(
               $transactionHash: String!,
               $block: String!
               $timestamp: String!,
+              $eventObjectId : String!
               ){
                   handleUpdateLiquidityLimit( 
                 user: $user,
@@ -42,6 +44,7 @@ async function UpdateLiquidityLimit(
                 transactionHash: $transactionHash,
                 block: $block,
                 timestamp: $timestamp,
+                eventObjectId : $eventObjectId
                 ) {
               result
           }
@@ -57,13 +60,14 @@ async function UpdateLiquidityLimit(
         transactionHash: transactionHash,
         block: block,
         timestamp: timestamp,
+        eventObjectId: eventObjectId
       }
     );
     console.log(response);
     return response;
   }
   
-async function Deposit(provider, id, value, transactionHash, logIndex) {
+async function Deposit(provider, id, value, transactionHash, logIndex, eventObjectId) {
     console.log("Calling handleDeposit mutation...");
     let response = await request(
       process.env.GRAPHQL,
@@ -72,7 +76,8 @@ async function Deposit(provider, id, value, transactionHash, logIndex) {
                  $id: String!,
                  $value: String!,
                  $transactionHash: String!,
-                 $logIndex: String!
+                 $logIndex: String!,
+                 $eventObjectId: String!
   
                  ){
                   handleDeposit( 
@@ -80,7 +85,8 @@ async function Deposit(provider, id, value, transactionHash, logIndex) {
                    id: $id,
                    value: $value,
                    transactionHash: $transactionHash,
-                   logIndex: $logIndex
+                   logIndex: $logIndex,
+                   eventObjectId: $eventObjectId
                    ) {
                  result
              }
@@ -92,13 +98,14 @@ async function Deposit(provider, id, value, transactionHash, logIndex) {
         value: value,
         transactionHash: transactionHash,
         logIndex: logIndex,
+        eventObjectId: eventObjectId
       }
     );
     console.log(response);
     return response;
   }
   
-async function Withdraw(provider, id, value, transactionHash, logIndex) {
+async function Withdraw(provider, id, value, transactionHash, logIndex, eventObjectId) {
     console.log("Calling handleWithdraw mutation...");
     let response = await request(
       process.env.GRAPHQL,
@@ -107,7 +114,8 @@ async function Withdraw(provider, id, value, transactionHash, logIndex) {
                  $id: String!,
                  $value: String!,
                  $transactionHash: String!,
-                 $logIndex: String!
+                 $logIndex: String!,
+                 $eventObjectId : String!
   
                  ){
                   handleWithdraw( 
@@ -115,7 +123,8 @@ async function Withdraw(provider, id, value, transactionHash, logIndex) {
                    id: $id,
                    value: $value,
                    transactionHash: $transactionHash,
-                   logIndex: $logIndex
+                   logIndex: $logIndex,
+                   eventObjectId: $eventObjectId
                    ) {
                  result
              }
@@ -127,6 +136,7 @@ async function Withdraw(provider, id, value, transactionHash, logIndex) {
         value: value,
         transactionHash: transactionHash,
         logIndex: logIndex,
+        eventObjectId: eventObjectId
       }
     );
     console.log(response);
@@ -153,7 +163,7 @@ async function Withdraw(provider, id, value, transactionHash, logIndex) {
 
 module.exports = describe('GraphQL Mutations for Gauge', () => {     
     it('handleUpdateLiquidityLimit should return true', async () => {
-        const {handleUpdateLiquidityLimit : {result}} = await UpdateLiquidityLimit('user', '01', '1000', '1000','2000','2000','388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '604800');
+        const {handleUpdateLiquidityLimit : {result}} = await UpdateLiquidityLimit('user', '01', '1000', '1000','2000','2000','388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '399c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '604800',"635fb3b4a89eacba3cd149a5");
         assert.equal(result, true);
         
         let gauge = await GaugeLiquidity.findOne({ id: 'user-01' });
@@ -176,7 +186,7 @@ module.exports = describe('GraphQL Mutations for Gauge', () => {
     })
 
     it('handleDeposit should return true', async () => {
-        const {handleDeposit : {result}} = await Deposit('provider', '01', '1000', '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '22');
+        const {handleDeposit : {result}} = await Deposit('provider', '01', '1000', '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '22', "635fb3b4a89eacba3cd149a5");
         assert.equal(result, true);
         let deposit = await GaugeDeposit.findOne({ id: '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-22' });
         assert.equal(deposit.id, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-22');
@@ -186,7 +196,7 @@ module.exports = describe('GraphQL Mutations for Gauge', () => {
     })
 
     it('handleWithdraw should return true', async () => {
-        const {handleWithdraw : {result}} = await Withdraw('provider', '01', '1000', '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '21');
+        const {handleWithdraw : {result}} = await Withdraw('provider', '01', '1000', '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '21', "635fb3b4a89eacba3cd149a5");
         assert.equal(result, true);
         let withdraw = await GaugeWithdraw.findOne({ id: '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-21' });
         assert.equal(withdraw.id, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-21');

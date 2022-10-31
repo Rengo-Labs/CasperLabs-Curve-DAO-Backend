@@ -1,5 +1,5 @@
 /node_modules
-/mongoConnectionString.txt
+/mongoTestConnectionString.txt
 /Scripts/MINTER/keys
 /Scripts/GAUGECONTROLLER/keys
 

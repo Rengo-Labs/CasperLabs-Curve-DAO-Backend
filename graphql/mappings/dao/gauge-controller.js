@@ -26,6 +26,7 @@ var bigdecimal = require("bigdecimal");
 var halfUp = bigdecimal.RoundingMode.HALF_UP();
 const GaugeVote = require("../../../models/gaugeVote");
 const votingEscrow = require("../../../JsClients/VOTINGESCROW/votingEscrowFunctionsForBackend/functions");
+const eventsData = require("../../../models/eventsData");
 
 
 let WEEK = "604800";
@@ -126,6 +127,7 @@ const handleNewGauge = {
     eventObjectId : { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    
     // updating mutation status
     let eventDataResult = await eventsData.findOne({
       _id: args.eventObjectId,
@@ -173,10 +175,11 @@ const handleNewGauge = {
 
       // await lpToken.setContractHash(args.addr).try_lp_token();
       lpToken = "1000000000";
-
+      let token;
       if (lpToken !== null) {
         //let token = await getOrCreateLpToken(lpToken.value);
-        let token = await getOrCreateLpToken('1000000000');
+        
+        token = await getOrCreateLpToken('1000000000');
         token.gauge = gauge.id;
 
         if (token.pool != null) {
@@ -405,6 +408,7 @@ const handleVoteForGauge = {
     const session = await mongoose.startSession();
     
     try {
+      
       //We get contract hash for gauge controller package hash below
       // const contractData = await allcontractsData.findOne({packageHash : process.env.GAUGE_CONTROLLER_PACKAGE_HASH});
 

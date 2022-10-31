@@ -132,7 +132,7 @@ async function VotingWithdraw(provider, value, timestamp, block_hash, eventObjec
     console.log("Calling userBalancesByWeight query...");
     let response = await request(
       process.env.GRAPHQL,
-      `query userBalancesByWeight($first : String, $skip : String){
+      `query userBalancesByWeight($first : String!, $skip : String!){
         userBalancesByWeight(first : $first, skip : $skip){
           id
         }   
@@ -150,7 +150,7 @@ module.exports = describe('GraphQL Mutations for Gauge', () => {
 
     it('handleVotingDeposit should return true', async () => {
         
-        const {handleVotingDeposit : {result}} = await VotingDeposit('provider', 'value', '1000', 'type', '604800', "block", "eventObjectId");
+        const {handleVotingDeposit : {result}} = await VotingDeposit('provider', 'value', '1000', 'type', '604800', "block", "635fb3b4a89eacba3cd149a5");
         
         assert.equal(result, true);
         let daopower = await DaoPower.findOne({id : `block-604800`})
@@ -177,7 +177,7 @@ module.exports = describe('GraphQL Mutations for Gauge', () => {
 
     it('handleVotingWithdraw should return true', async () => {
         
-        const {handleVotingWithdraw : {result}} = await VotingWithdraw('provider', 'value', '604800', "block", "eventObjectId");
+        const {handleVotingWithdraw : {result}} = await VotingWithdraw('provider', 'value', '604800', "block", "635fb3b4a89eacba3cd149a5");
         
         assert.equal(result, true);
         let daopower = await DaoPower.findOne({id : `block-604800`})
@@ -235,7 +235,7 @@ module.exports = describe('GraphQL Mutations for Gauge', () => {
     })
     
     it('userBalancesByWeight Should fetch userBalances sorted by weight', async() => {
-      const result = await userBalancesByWeight(5,0);
+      const result = await userBalancesByWeight("5","0");
       
       result.userBalancesByWeight.forEach(userBalance => {
         assert.exists(userBalance.id, "userBalance id is neither null nor undefined");
