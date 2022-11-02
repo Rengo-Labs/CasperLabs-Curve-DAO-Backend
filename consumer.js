@@ -1,14 +1,11 @@
 //for all env variables imports
 require("dotenv").config();
 
-//importing listener router
-var listenerRouter = require("./routes/listenerroutes");
-
 //setting up kafka
 const kafka=require("./kafka"); 
 
 //creating a consumer
-const consumer = kafka.consumer({ groupId: process.env.TOPIC });
+const consumer = kafka.consumer({ groupId: process.env.TOPIC, retries: Number.MAX_VALUE  });
 
 // import library to serialize Events Data
 var serialize = require('serialize-javascript');
@@ -21,20 +18,32 @@ async function consumeEvent (redis)
         await consumer.connect();
 
         //subcribing the topic to consume data
-        await consumer.subscribe({ topic: process.env.TOPIC, fromBeginning: true });
+        await consumer.subscribe({ topic: process.env.TOPIC});
 
         //consuming data
         await consumer.run({
-        eachMessage: async ({ topic, partition, message }) => {
-            
-          console.log(`Consumed event from topic ${topic}: value = ${message.value}`);
-            
-          let _value = JSON.parse(message.value.toString());
+          eachBatchAutoResolve: false,
+          eachBatch: async ({ batch, resolveOffset, heartbeat, isRunning, isStale }) => {
+              for (let message of batch.messages) {
+                  if (!isRunning() || isStale())
+                  {
+                    break;
+                  } 
 
-          //push event to redis queue
-          redis.client.RPUSH(process.env.GRAPHQLREDISQUEUE,serialize({obj:_value}));
-          console.log("Event pushed to queue...");
-        },
+                  console.log(`Consumed event from topic ${batch.topic}: value = ${message.value}`);
+                  let _value = JSON.parse(message.value.toString());
+
+                  //push event to redis queue
+                  await redis.client.RPUSH(process.env.GRAPHQLREDISQUEUE,serialize({obj:_value}));
+                  console.log("Event pushed to queue...");
+
+                  //committing offset
+                  resolveOffset(message.offset);
+                  await heartbeat();
+                  console.log("Offset Committed...");
+                  console.log("Heartbeat Signaled...");
+              }
+          }
         });
 
         process.on('SIGINT', () => {
@@ -44,7 +53,7 @@ async function consumeEvent (redis)
         });
     } 
     catch (error) {
-        console.error('Error publishing message', error)
+        console.error('Error listening message', error)
     }
 }
 

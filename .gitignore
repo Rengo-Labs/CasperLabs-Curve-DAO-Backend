@@ -2,6 +2,15 @@
 /mongoTestConnectionString.txt
 /Scripts/MINTER/keys
 /Scripts/GAUGECONTROLLER/keys
+/Scripts/CERC20/keys
+/Scripts/CURVE-REWARDS/keys
+/Scripts/ERC20-CRV/keys
+/Scripts/LIQUIDITYGAUGEREWARD/keys
+/Scripts/LIQUIDITYGAUGEV3/keys
+/Scripts/MULTICALL/keys
+/Scripts/VOTING/keys
+/Scripts/VOTINGESCROW/keys
+/Scripts/VOTINGESCROWFACTORY/keys
 
 # Logs
 logs
@@ -74,8 +83,8 @@ typings/
 .yarn-integrity
 
 # # dotenv environment variables file
-# .env
-# .env.test
+.env
+.env.test
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache

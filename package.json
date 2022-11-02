@@ -6,6 +6,7 @@
     "test": "mocha tests/index.test.js --timeout 100000",
     "start-mock-server": "ts-node tests/mock-server/index",
     "start": "ts-node ./bin/www",
+    "stop": "ts-node server.stop.js",
     "deploy:erc20Crv": "ts-node Scripts/ERC20-CRV/deploy/erc20CrvContract.ts",
     "deploy:erc20CrvFunctions": "ts-node Scripts/ERC20-CRV/deploy/erc20CrvContractFunctions.ts",
     "deploy:liquidityGaugeReward": "ts-node Scripts/LIQUIDITYGAUGEREWARD/deploy/liquidityGaugeRewardContract.ts",
@@ -25,7 +26,13 @@
     "deploy:curveRewards": "ts-node Scripts/CURVE-REWARDS/deploy/curveRewardsContract.ts",
     "deploy:curveRewardsFunctions": "ts-node Scripts/CURVE-REWARDS/deploy/curveRewardsContractFunctions.ts",
     "deploy:multicall": "ts-node Scripts/MULTICALL/deploy/multicallContract.ts",
-    "deploy:multicallFunctions": "ts-node Scripts/MULTICALL/deploy/multicallContractFunctions.ts"
+    "deploy:multicallFunctions": "ts-node Scripts/MULTICALL/deploy/multicallContractFunctions.ts",
+    "deploy:voting": "ts-node Scripts/VOTING/deploy/votingContract.ts",
+    "deploy:votingFunctions": "ts-node Scripts/VOTING/deploy/votingContractFunctions.ts"
+  },
+  "engines": {
+    "node": "16.14.0",
+    "npm": "8.10.0"
   },
   "dependencies": {
     "pug": "~3.0.2",
@@ -41,6 +48,7 @@
     "express-graphql": "^0.12.0",
     "graphql": "^15.6.0",
     "graphql-request": "^3.6.1",
+    "socket.io-client": "^4.4.1",
     "http-errors": "~1.6.3",
     "js-big-decimal": "^1.3.5",
     "kafkajs": "^2.1.0",
@@ -49,9 +57,13 @@
     "nodemon": "^2.0.13",
     "prettier": "^2.3.2",
     "redis": "^4.1.0",
+    "jsonwebtoken": "^8.5.1",
     "request": "^2.88.2",
+    "bcrypt": "^5.0.1",
     "request-promise": "^4.2.6",
     "serialize-javascript": "^6.0.0",
+    "passport": "^0.6.0",
+    "passport-jwt": "^4.0.0",
     "ts-node": "^10.1.0",
     "ts-results": "^3.3.0",
     "tslint": "^5.12.1",

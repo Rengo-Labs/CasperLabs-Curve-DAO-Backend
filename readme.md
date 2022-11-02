@@ -8,21 +8,13 @@ npm install to install the require packages
 
 npm start to start the server
 
-Heroku App Link:
-
-Endpoints Documentation Link:  
-
-
-Smart Contract Documentation Link: 
+AWS Link: http://curvegraphqlbackendfinalized-env.eba-fn2jdxgn.us-east-1.elasticbeanstalk.com/
 
 ## Running Testcases 
 
-- Change NODE_MODE to developement (For not mixing the real database)
-- npm install to install the require packages,
-- npm start to start the server
-- open another terminal and node test.js to run the test cases
-
-
+- npm install to install the require packages
+- Run npm run start-mock-server
+- Run npm run test in a seperate terminal once mock server has started successfully
 
 
 ## Deployment of Contracts
@@ -47,6 +39,8 @@ Scripts/MINTER,
 Scripts/VOTINGESCROW,
 Scripts/CURVE-REWARDS
 Scripts/MULTICALL
+Scripts/CERC20
+Scripts/VOTING
 folders.
 
 #### Fund the key
@@ -75,6 +69,10 @@ Use the script file in package.json to perform the deployments
     "deploy:curveRewardsFunctions": "ts-node Scripts/CURVE-REWARDS/deploy/curveRewardsContractFunctions.ts",
     "deploy:multicall": "ts-node Scripts/MULTICALL/deploy/multicallContract.ts",
     "deploy:multicallFunctions": "ts-node Scripts/MULTICALL/deploy/multicallContractFunctions.ts"
+    "deploy:cerc20": "ts-node Scripts/CERC20/deploy/cerc20Contract.ts",
+    "deploy:cerc20Functions": "ts-node Scripts/CERC20/deploy/cerc20ContractFunctions.ts"
+    "deploy:voting": "ts-node Scripts/VOTING/deploy/votingContract.ts",
+    "deploy:votingFunctions": "ts-node Scripts/VOTING/deploy/votingContractFunctions.ts"
   },
 
 Use the following commands to perform deployments
@@ -89,8 +87,8 @@ npm run deploy:liquidityGaugeRewardFunctions
 npm run deploy:liquidityGaugeV3
 npm run deploy:liquidityGaugeV3Functions
 
-npm run test:vestingEscrowFactory
-npm run test:vestingEscrowFactoryFunctions
+npm run deploy:vestingEscrowFactory
+npm run deploy:vestingEscrowFactoryFunctions
 
 npm run deploy:cerc20
 npm run deploy:cerc20Functions
@@ -101,11 +99,14 @@ npm run deploy:gaugeControllerFunctions
 npm run deploy:minter
 npm run deploy:minterFunctions
 
-npm run test:votingEscrow
-npm run test:votingEscrowFunctions
+npm run deploy:votingEscrow
+npm run deploy:votingEscrowFunctions
 
-npm run test:curveRewards
-npm run test:curveRewardsFunctions
+npm run deploy:voting
+npm run deploy:votingFunctions
 
-npm run test:multicall
-npm run test:multicallFunctions
+npm run deploy:curveRewards
+npm run deploy:curveRewardsFunctions
+
+npm run deploy:multicall
+npm run deploy:multicallFunctions

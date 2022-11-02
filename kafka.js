@@ -19,11 +19,10 @@ const kafka = new Kafka({
   connectionTimeout: 5000,
   requestTimeout: 30000,
   retry: {
-    initialRetryTime: 100,
-    retries: 8
-  },
+    initialRetryTime: 300,
+    retries: Number.MAX_VALUE 
+  }
 });
 
 
 module.exports = kafka;
-
