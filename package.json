@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "test": "mocha tests/index.test.js --timeout 100000",
-    "start-mock-server" : "ts-node tests/mock-server/index",
+    "start-mock-server": "ts-node tests/mock-server/index",
     "start": "ts-node ./bin/www",
     "deploy:erc20Crv": "ts-node Scripts/ERC20-CRV/deploy/erc20CrvContract.ts",
     "deploy:erc20CrvFunctions": "ts-node Scripts/ERC20-CRV/deploy/erc20CrvContractFunctions.ts",
@@ -28,6 +28,7 @@
     "deploy:multicallFunctions": "ts-node Scripts/MULTICALL/deploy/multicallContractFunctions.ts"
   },
   "dependencies": {
+    "pug": "~3.0.2",
     "axios": "^0.24.0",
     "bigdecimal": "^0.6.1",
     "blakejs": "^1.1.1",
@@ -41,7 +42,6 @@
     "graphql": "^15.6.0",
     "graphql-request": "^3.6.1",
     "http-errors": "~1.6.3",
-    "jade": "^0.29.0",
     "js-big-decimal": "^1.3.5",
     "kafkajs": "^2.1.0",
     "mongoose": "^6.2.10",
