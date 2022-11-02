@@ -29,19 +29,20 @@ casper-client keygen keys
 ```
 #### Paste the keys
 
-Paste the keys folder created by the above command to 
-Scripts/ERC20-CRV,
-Scripts/LIQUIDITYGAUGEREWARD,
-Scripts/LIQUIDITYGAUGEV3,
-Scripts/VESTINGESCROWFACTORY,
-Scripts/GAUGECONTROLLER,
-Scripts/MINTER,
-Scripts/VOTINGESCROW,
-Scripts/CURVE-REWARDS
-Scripts/MULTICALL
-Scripts/CERC20
-Scripts/VOTING
-folders.
+Paste the keys folder created by the above command to the following folders:
+
+- Scripts/ERC20-CRV
+- Scripts/LIQUIDITYGAUGEREWARD
+- Scripts/LIQUIDITYGAUGEV3
+- Scripts/VESTINGESCROWFACTORY
+- Scripts/GAUGECONTROLLER
+- Scripts/MINTER
+- Scripts/VOTINGESCROW
+- Scripts/CURVE-REWARDS
+- Scripts/MULTICALL
+- Scripts/CERC20
+- Scripts/VOTING
+
 
 #### Fund the key
 
@@ -73,9 +74,12 @@ Use the script file in package.json to perform the deployments
     "deploy:cerc20Functions": "ts-node Scripts/CERC20/deploy/cerc20ContractFunctions.ts"
     "deploy:voting": "ts-node Scripts/VOTING/deploy/votingContract.ts",
     "deploy:votingFunctions": "ts-node Scripts/VOTING/deploy/votingContractFunctions.ts"
-  },
+  }
+
+```
 
 Use the following commands to perform deployments
+
 ```
 
 npm run deploy:erc20Crv
@@ -110,3 +114,7 @@ npm run deploy:curveRewardsFunctions
 
 npm run deploy:multicall
 npm run deploy:multicallFunctions
+
+```
+
+* CONFIGURE .env BEFORE and during DEPLOYMENT
