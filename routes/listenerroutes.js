@@ -2,13 +2,7 @@ require("dotenv").config();
 var express = require("express");
 var router = express.Router();
 var { request } = require("graphql-request");
-// var pairModel = require("../models/pair");
-// var hashesofpairsModel = require("../models/hashesofpairs");
-// var eventsModel = require("../models/events");
-// var pairagainstuser = require("../models/pairagainstuser");
-// var paircontract = require("../JsClients/PAIR/pairFunctionsForBackend/functions");
-// var allcontractsDataModel = require("../models/allcontractsData");
-// var RemoveReservesDataModel = require("../models/removeReservesData");
+var allcontractsDataModel = require("../models/allcontractsData");
 
 function splitdata(data) {
   var temp = data.split("(");
@@ -16,7 +10,44 @@ function splitdata(data) {
   return result[0];
 }
 
-async function geteventsdata(eventResult, _deployHash, _timestamp, _block_hash, _eventname, _eventdata){
+router
+  .route("/getContractHashAgainstPackageHash")
+  .post(async function (req, res, next) {
+    try {
+      if (!req.body.packageHash) {
+        return res.status(400).json({
+          success: false,
+          message: "There is no packageHash specified in the req body.",
+        });
+      }
+
+      let packageHash = req.body.packageHash.toLowerCase();
+      let contractHash = await allcontractsDataModel.findOne({
+        packageHash: packageHash,
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Contract Hash has been Succefully found.",
+        Data: contractHash,
+      });
+    } catch (error) {
+      console.log("error (try-catch) : " + error);
+      return res.status(500).json({
+        success: false,
+        err: error,
+      });
+    }
+  });
+
+async function geteventsdata(
+  eventResult,
+  _deployHash,
+  _timestamp,
+  _block_hash,
+  _eventname,
+  _eventdata
+) {
   try {
     if (!_deployHash) {
       return res.status(400).json({
@@ -36,7 +67,8 @@ async function geteventsdata(eventResult, _deployHash, _timestamp, _block_hash, 
         message: "There is no blockHash specified in the req body.",
       });
     }
-    if (!_eventname) {deserializedHeadValue
+    if (!_eventname) {
+      deserializedHeadValue;
       return res.status(400).json({
         success: false,
         message: "There is no eventname specified in the req body.",
@@ -58,9 +90,8 @@ async function geteventsdata(eventResult, _deployHash, _timestamp, _block_hash, 
     console.log("... Timestamp: ", timestamp);
     console.log("... Block hash: ", block_hash);
     console.log("Event Data: ", newData);
-    
 
-     if(eventName == "addLiquidity") {
+    if (eventName == "addLiquidity") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -75,16 +106,16 @@ async function geteventsdata(eventResult, _deployHash, _timestamp, _block_hash, 
       console.log(newData[10][0].data + " = " + newData[10][1].data);
       console.log(newData[11][0].data + " = " + newData[11][1].data);
 
-      var tokenAmounts = parseInt(newData[0][1].data);
-      var fees = parseInt(newData[1][1].data);
-      var invariant = parseInt(newData[2][1].data);
-      var tokenSupply = parseInt(newData[3][1].data);
-      var poolId = parseInt(newData[4][1].data);
+      var tokenAmounts = newData[0][1].data;
+      var fees = newData[1][1].data;
+      var invariant = newData[2][1].data;
+      var tokenSupply = newData[3][1].data;
+      var poolId = splitdata(newData[4][1].data);
       var providerId = splitdata(newData[5][1].data);
       var transactionHash = splitdata(newData[6][1].data);
-      var logIndex = parseInt(newData[7][1].data);
-      var registryAddress = parseInt(newData[8][1].data);
-      var blockNumber = parseInt(newData[9][1].data);
+      var logIndex = newData[7][1].data;
+      var registryAddress = newData[8][1].data;
+      var blockNumber = newData[9][1].data;
 
       console.log("tokenAmounts: ", tokenAmounts);
       console.log("fees: ", fees);
@@ -97,8 +128,7 @@ async function geteventsdata(eventResult, _deployHash, _timestamp, _block_hash, 
       console.log("registryAddress: ", registryAddress);
       console.log("blockNumber: ", blockNumber);
 
-
-     await request(
+      await request(
         process.env.GRAPHQL,
         `mutation handleAddLiquidity( 
           $tokenAmounts: String!,
@@ -134,25 +164,25 @@ async function geteventsdata(eventResult, _deployHash, _timestamp, _block_hash, 
       }
                 
       }`,
-{
-tokenAmounts: tokenAmounts,
-fees: fees,
-invariant: invariant,
-tokenSupply: tokenSupply,
-block: block_hash,
-timestamp: timestamp,
-poolId: poolId,
-providerId: providerId,
-transactionHash: transactionHash,
-logIndex: logIndex,
-registryAddress: registryAddress,
-blockNumber: blockNumber,
-eventObjectId :  eventResult._id,
-}
-);
-console.log("handleAddLiquidity Mutation called.")
-        return true;
-    }else if(eventName == "removeLiquidity") {
+        {
+          tokenAmounts: tokenAmounts,
+          fees: fees,
+          invariant: invariant,
+          tokenSupply: tokenSupply,
+          block: block_hash,
+          timestamp: timestamp,
+          poolId: poolId,
+          providerId: providerId,
+          transactionHash: transactionHash,
+          logIndex: logIndex,
+          registryAddress: registryAddress,
+          blockNumber: blockNumber,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleAddLiquidity Mutation called.");
+      return true;
+    } else if (eventName == "removeLiquidity") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -166,15 +196,15 @@ console.log("handleAddLiquidity Mutation called.")
       console.log(newData[9][0].data + " = " + newData[9][1].data);
       console.log(newData[10][0].data + " = " + newData[10][1].data);
 
-      var tokenAmounts = parseInt(newData[0][1].data);
-      var fees = parseInt(newData[1][1].data);
-      var tokenSupply = parseInt(newData[2][1].data);
-      var poolId = parseInt(newData[3][1].data);
+      var tokenAmounts = newData[0][1].data;
+      var fees = newData[1][1].data;
+      var tokenSupply = newData[2][1].data;
+      var poolId = splitdata(newData[3][1].data);
       var providerId = splitdata(newData[4][1].data);
       var transactionHash = splitdata(newData[5][1].data);
-      var logIndex = parseInt(newData[6][1].data);
-      var registryAddress = parseInt(newData[7][1].data);
-      var blockNumber = parseInt(newData[8][1].data);
+      var logIndex = newData[6][1].data;
+      var registryAddress = newData[7][1].data;
+      var blockNumber = newData[8][1].data;
 
       console.log("tokenAmounts: ", tokenAmounts);
       console.log("fees: ", fees);
@@ -185,7 +215,6 @@ console.log("handleAddLiquidity Mutation called.")
       console.log("logIndex: ", logIndex);
       console.log("registryAddress: ", registryAddress);
       console.log("blockNumber: ", blockNumber);
-
 
       await request(
         process.env.GRAPHQL,
@@ -221,24 +250,24 @@ console.log("handleAddLiquidity Mutation called.")
       }
                 
       }`,
-{
-tokenAmounts: tokenAmounts,
-fees: fees,
-tokenSupply: tokenSupply,
-block: block_hash,
-timestamp: timestamp,
-poolId: poolId,
-providerId: providerId,
-transactionHash: transactionHash,
-logIndex: logIndex,
-registryAddress: registryAddress,
-blockNumber: blockNumber,
-eventObjectId :  eventResult._id,
-}
-);
-console.log("handleRemoveLiquidity Mutation called.")
-        return true;
-    }else if(eventName == "removeLiquidityImbalance") {
+        {
+          tokenAmounts: tokenAmounts,
+          fees: fees,
+          tokenSupply: tokenSupply,
+          block: block_hash,
+          timestamp: timestamp,
+          poolId: poolId,
+          providerId: providerId,
+          transactionHash: transactionHash,
+          logIndex: logIndex,
+          registryAddress: registryAddress,
+          blockNumber: blockNumber,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleRemoveLiquidity Mutation called.");
+      return true;
+    } else if (eventName == "removeLiquidityImbalance") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -253,16 +282,16 @@ console.log("handleRemoveLiquidity Mutation called.")
       console.log(newData[10][0].data + " = " + newData[10][1].data);
       console.log(newData[11][0].data + " = " + newData[11][1].data);
 
-      var tokenAmounts = parseInt(newData[0][1].data);
-      var fees = parseInt(newData[1][1].data);
-      var invariant = parseInt(newData[2][1].data);
-      var tokenSupply = parseInt(newData[3][1].data);
-      var poolId = parseInt(newData[4][1].data);
+      var tokenAmounts = newData[0][1].data;
+      var fees = newData[1][1].data;
+      var invariant = newData[2][1].data;
+      var tokenSupply = newData[3][1].data;
+      var poolId = splitdata(newData[4][1].data);
       var providerId = splitdata(newData[5][1].data);
       var transactionHash = splitdata(newData[6][1].data);
-      var logIndex = parseInt(newData[7][1].data);
-      var registryAddress = parseInt(newData[8][1].data);
-      var blockNumber = parseInt(newData[9][1].data);
+      var logIndex = newData[7][1].data;
+      var registryAddress = newData[8][1].data;
+      var blockNumber = newData[9][1].data;
 
       console.log("tokenAmounts: ", tokenAmounts);
       console.log("fees: ", fees);
@@ -274,7 +303,6 @@ console.log("handleRemoveLiquidity Mutation called.")
       console.log("logIndex: ", logIndex);
       console.log("registryAddress: ", registryAddress);
       console.log("blockNumber: ", blockNumber);
-
 
       await request(
         process.env.GRAPHQL,
@@ -312,25 +340,25 @@ console.log("handleRemoveLiquidity Mutation called.")
       }
                 
       }`,
-{
-tokenAmounts: tokenAmounts,
-fees: fees,
-invariant: invariant,
-tokenSupply: tokenSupply,
-block: block_hash,
-timestamp: timestamp,
-poolId: poolId,
-providerId: providerId,
-transactionHash: transactionHash,
-logIndex: logIndex,
-registryAddress: registryAddress,
-blockNumber: blockNumber,
-eventObjectId : eventResult._id
-}
-);
-console.log("handleRemoveLiquidityImbalance Mutation called.")
-        return true;
-    }else if(eventName == "removeLiquidityOne") {
+        {
+          tokenAmounts: tokenAmounts,
+          fees: fees,
+          invariant: invariant,
+          tokenSupply: tokenSupply,
+          block: block_hash,
+          timestamp: timestamp,
+          poolId: poolId,
+          providerId: providerId,
+          transactionHash: transactionHash,
+          logIndex: logIndex,
+          registryAddress: registryAddress,
+          blockNumber: blockNumber,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleRemoveLiquidityImbalance Mutation called.");
+      return true;
+    } else if (eventName == "removeLiquidityOne") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -343,14 +371,14 @@ console.log("handleRemoveLiquidityImbalance Mutation called.")
       console.log(newData[8][0].data + " = " + newData[8][1].data);
       console.log(newData[9][0].data + " = " + newData[9][1].data);
 
-      var tokenAmount = parseInt(newData[0][1].data);
-      var coinAmount = parseInt(newData[1][1].data);
-      var poolId = parseInt(newData[2][1].data);
+      var tokenAmount = newData[0][1].data;
+      var coinAmount = newData[1][1].data;
+      var poolId = splitdata(newData[2][1].data);
       var providerId = splitdata(newData[3][1].data);
       var transactionHash = splitdata(newData[4][1].data);
-      var logIndex = parseInt(newData[5][1].data);
-      var registryAddress = parseInt(newData[6][1].data);
-      var blockNumber = parseInt(newData[7][1].data);
+      var logIndex = newData[5][1].data;
+      var registryAddress = newData[6][1].data;
+      var blockNumber = newData[7][1].data;
 
       console.log("tokenAmounts: ", tokenAmount);
       console.log("coinAmmount: ", coinAmount);
@@ -360,7 +388,6 @@ console.log("handleRemoveLiquidityImbalance Mutation called.")
       console.log("logIndex: ", logIndex);
       console.log("registryAddress: ", registryAddress);
       console.log("blockNumber: ", blockNumber);
-
 
       await request(
         process.env.GRAPHQL,
@@ -394,23 +421,23 @@ console.log("handleRemoveLiquidityImbalance Mutation called.")
       }
                 
       }`,
-{
-tokenAmount: tokenAmount,
-coinAmount: coinAmount,
-block: block_hash,
-timestamp: timestamp,
-poolId: poolId,
-providerId: providerId,
-transactionHash: transactionHash,
-logIndex: logIndex,
-registryAddress: registryAddress,
-blockNumber: blockNumber,
-eventObjectId : eventResult._id,
-}
-);
-console.log("handleRemoveLiquidityOne Mutation called.")
-        return true;
-    }else if(eventName == "tokenExchange") {
+        {
+          tokenAmount: tokenAmount,
+          coinAmount: coinAmount,
+          block: block_hash,
+          timestamp: timestamp,
+          poolId: poolId,
+          providerId: providerId,
+          transactionHash: transactionHash,
+          logIndex: logIndex,
+          registryAddress: registryAddress,
+          blockNumber: blockNumber,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleRemoveLiquidityOne Mutation called.");
+      return true;
+    } else if (eventName == "tokenExchange") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -423,16 +450,14 @@ console.log("handleRemoveLiquidityOne Mutation called.")
       console.log(newData[8][0].data + " = " + newData[8][1].data);
       console.log(newData[9][0].data + " = " + newData[9][1].data);
 
-     
-      var poolId = splitdata(newData[2][1].data);      
+      var poolId = splitdata(newData[2][1].data);
       var transactionHash = splitdata(newData[4][1].data);
-      var logIndex = parseInt(newData[5][1].data);
+      var logIndex = newData[5][1].data;
       var buyer = splitdata(newData[3][1].data);
       var sold_id = splitdata(newData[0][1].data);
-      var tokens_sold = parseInt(newData[1][1].data);
+      var tokens_sold = newData[1][1].data;
       var bought_id = splitdata(newData[6][1].data);
-      var tokens_bought = parseInt(newData[7][1].data);
-
+      var tokens_bought = newData[7][1].data;
 
       console.log("poolId: ", poolId);
       console.log("transactionHash: ", transactionHash);
@@ -442,7 +467,6 @@ console.log("handleRemoveLiquidityOne Mutation called.")
       console.log("token_sold: ", tokens_sold);
       console.log("bought_id: ", bought_id);
       console.log("tokens_bought: ", tokens_bought);
-
 
       await request(
         process.env.GRAPHQL,
@@ -476,23 +500,23 @@ console.log("handleRemoveLiquidityOne Mutation called.")
       }
                 
       }`,
-{
-  poolId: poolId,
-  transactionHash: transactionHash,
-  block: block_hash,
-  timestamp: timestamp,
-  logIndex: logIndex,
-  buyer: buyer,
-  sold_id: sold_id,
-  tokens_sold: tokens_sold,
-  bought_id: bought_id,
-  tokens_bought: tokens_bought,
-  eventObjectId : eventResult._id
-}
-);
-console.log("handleTokenExchange Mutation called.")
-        return true;
-    }else if(eventName == "exchangeUnderlying") {
+        {
+          poolId: poolId,
+          transactionHash: transactionHash,
+          block: block_hash,
+          timestamp: timestamp,
+          logIndex: logIndex,
+          buyer: buyer,
+          sold_id: sold_id,
+          tokens_sold: tokens_sold,
+          bought_id: bought_id,
+          tokens_bought: tokens_bought,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleTokenExchange Mutation called.");
+      return true;
+    } else if (eventName == "exchangeUnderlying") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -505,16 +529,14 @@ console.log("handleTokenExchange Mutation called.")
       console.log(newData[8][0].data + " = " + newData[8][1].data);
       console.log(newData[9][0].data + " = " + newData[9][1].data);
 
-     
-      var poolId = splitdata(newData[2][1].data);      
+      var poolId = splitdata(newData[2][1].data);
       var transactionHash = splitdata(newData[4][1].data);
-      var logIndex = parseInt(newData[5][1].data);
+      var logIndex = newData[5][1].data;
       var buyer = splitdata(newData[3][1].data);
       var sold_id = splitdata(newData[0][1].data);
-      var tokens_sold = parseInt(newData[1][1].data);
+      var tokens_sold = newData[1][1].data;
       var bought_id = splitdata(newData[6][1].data);
-      var tokens_bought = parseInt(newData[7][1].data);;
-
+      var tokens_bought = newData[7][1].data;
 
       console.log("poolId: ", poolId);
       console.log("transactionHash: ", transactionHash);
@@ -524,7 +546,6 @@ console.log("handleTokenExchange Mutation called.")
       console.log("tokens_sold: ", tokens_sold);
       console.log("bought_id: ", bought_id);
       console.log("tokens_bought: ", tokens_bought);
-
 
       await request(
         process.env.GRAPHQL,
@@ -558,23 +579,23 @@ console.log("handleTokenExchange Mutation called.")
       }
                 
       }`,
-{
-  poolId: poolId,
-  transactionHash: transactionHash,
-  block: block_hash,
-  timestamp: timestamp,
-  logIndex: logIndex,
-  buyer: buyer,
-  sold_id: sold_id,
-  tokens_sold: tokens_sold,
-  bought_id: bought_id,
-  tokens_bought: tokens_bought,
-  eventObjectId : eventResult._id
-}
-);
-console.log("handleExchangeUnderlying Mutation called.")
-return true;
-    }else if(eventName == "newAdmin") {
+        {
+          poolId: poolId,
+          transactionHash: transactionHash,
+          block: block_hash,
+          timestamp: timestamp,
+          logIndex: logIndex,
+          buyer: buyer,
+          sold_id: sold_id,
+          tokens_sold: tokens_sold,
+          bought_id: bought_id,
+          tokens_bought: tokens_bought,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleExchangeUnderlying Mutation called.");
+      return true;
+    } else if (eventName == "newAdmin") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -583,12 +604,10 @@ return true;
       console.log(newData[4][0].data + " = " + newData[4][1].data);
       console.log(newData[5][0].data + " = " + newData[5][1].data);
 
-     
-      var poolId = splitdata(newData[0][1].data);      
+      var poolId = splitdata(newData[0][1].data);
       var transactionHash = splitdata(newData[1][1].data);
-      var logIndex = parseInt(newData[2][1].data);
+      var logIndex = newData[2][1].data;
       var admin = splitdata(newData[3][1].data);
-
 
       console.log("poolId: ", poolId);
       console.log("transactionHash: ", transactionHash);
@@ -619,19 +638,19 @@ return true;
       }
                 
       }`,
-{
-  poolId: poolId,
-  transactionHash: transactionHash,
-  block: block_hash,
-  timestamp: timestamp,
-  logIndex: logIndex,
-  admin: admin,
-  eventObjectId : eventResult._id
-}
-);
-console.log("handleNewAdmin Mutation called.")
-return true;
-    }else if(eventName == "newFee") {
+        {
+          poolId: poolId,
+          transactionHash: transactionHash,
+          block: block_hash,
+          timestamp: timestamp,
+          logIndex: logIndex,
+          admin: admin,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleNewAdmin Mutation called.");
+      return true;
+    } else if (eventName == "newFee") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -641,13 +660,11 @@ return true;
       console.log(newData[5][0].data + " = " + newData[5][1].data);
       console.log(newData[6][0].data + " = " + newData[6][1].data);
 
-     
-      var poolId = splitdata(newData[0][1].data);      
+      var poolId = splitdata(newData[0][1].data);
       var transactionHash = splitdata(newData[1][1].data);
-      var logIndex = parseInt(newData[2][1].data);
-      var fee = parseInt(newData[3][1].data);
-      var admin_fee = splitdata(newData[4][1].data);
-
+      var logIndex = newData[2][1].data;
+      var fee = newData[3][1].data;
+      var admin_fee = newData[4][1].data;
 
       console.log("poolId: ", poolId);
       console.log("transactionHash: ", transactionHash);
@@ -681,20 +698,20 @@ return true;
       }
                 
       }`,
-{
-  poolId: poolId,
-  transactionHash: transactionHash,
-  block: block_hash,
-  timestamp: timestamp,
-  logIndex: logIndex,
-  fee: fee,
-  admin_fee: admin_fee,
-  eventObjectId : eventResult._id
-}
-);
-console.log("handleNewFee Mutation called.")
-return true;
-    }else if(eventName == "newParameters") {
+        {
+          poolId: poolId,
+          transactionHash: transactionHash,
+          block: block_hash,
+          timestamp: timestamp,
+          logIndex: logIndex,
+          fee: fee,
+          admin_fee: admin_fee,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleNewFee Mutation called.");
+      return true;
+    } else if (eventName == "newParameters") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -705,14 +722,12 @@ return true;
       console.log(newData[6][0].data + " = " + newData[6][1].data);
       console.log(newData[7][0].data + " = " + newData[7][1].data);
 
-     
       var poolId = splitdata(newData[0][1].data);
-      var A = splitdata(newData[4][1].data)      
+      var A = newData[4][1].data;
       var transactionHash = splitdata(newData[1][1].data);
-      var logIndex = parseInt(newData[2][1].data);
-      var fee = parseInt(newData[3][1].data);
-      var admin_fee = splitdata(newData[4][1].data);
-
+      var logIndex = newData[2][1].data;
+      var fee = newData[3][1].data;
+      var admin_fee = newData[4][1].data;
 
       console.log("poolId: ", poolId);
       console.log("A: ", A);
@@ -749,21 +764,21 @@ return true;
       }
                 
       }`,
-{
-  poolId: poolId,
-  A: A,
-  transactionHash: transactionHash,
-  block: block_hash,
-  timestamp: timestamp,
-  logIndex: logIndex,
-  fee: fee,
-  admin_fee: admin_fee,
-  eventObjectId : eventResult._id
-}
-);
-console.log("handleNewParameters Mutation called.")
-return true;
-    }else if(eventName == "RampA") {
+        {
+          poolId: poolId,
+          A: A,
+          transactionHash: transactionHash,
+          block: block_hash,
+          timestamp: timestamp,
+          logIndex: logIndex,
+          fee: fee,
+          admin_fee: admin_fee,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleNewParameters Mutation called.");
+      return true;
+    } else if (eventName == "RampA") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -772,12 +787,10 @@ return true;
       console.log(newData[4][0].data + " = " + newData[4][1].data);
       console.log(newData[5][0].data + " = " + newData[5][1].data);
 
-     
       var poolId = splitdata(newData[0][1].data);
-      var new_A = splitdata(newData[1][1].data)      
+      var new_A = newData[1][1].data;
       var transactionHash = splitdata(newData[2][1].data);
-      var logIndex = parseInt(newData[3][1].data);
-
+      var logIndex = newData[3][1].data;
 
       console.log("poolId: ", poolId);
       console.log("newA: ", new_A);
@@ -807,19 +820,19 @@ return true;
       }
                 
       }`,
-{
-  poolId: poolId,
-  new_A: new_A,
-  transactionHash: transactionHash,
-  block: block_hash,
-  timestamp: timestamp,
-  logIndex: logIndex,
-  eventObjectId : eventResult._id
-}
-);
-console.log("handleRampA Mutation called.")
-return true;
-    }else if(eventName == "stopRampA") {
+        {
+          poolId: poolId,
+          new_A: new_A,
+          transactionHash: transactionHash,
+          block: block_hash,
+          timestamp: timestamp,
+          logIndex: logIndex,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleRampA Mutation called.");
+      return true;
+    } else if (eventName == "stopRampA") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -828,12 +841,10 @@ return true;
       console.log(newData[4][0].data + " = " + newData[4][1].data);
       console.log(newData[5][0].data + " = " + newData[5][1].data);
 
-     
       var poolId = splitdata(newData[0][1].data);
-      var A = splitdata(newData[1][1].data)      
+      var A = newData[1][1].data;
       var transactionHash = splitdata(newData[2][1].data);
-      var logIndex = parseInt(newData[3][1].data);
-
+      var logIndex = newData[3][1].data;
 
       console.log("poolId: ", poolId);
       console.log("A: ", A);
@@ -863,19 +874,19 @@ return true;
       }
                 
       }`,
-{
-  poolId: poolId,
-  A: A,
-  transactionHash: transactionHash,
-  block: block_hash,
-  timestamp: timestamp,
-  logIndex: logIndex,
-  eventObjectId : eventResult._id
-}
-);
-console.log("handleStopRampA Mutation called.")
-return true;
-    }else if(eventName == "addressModified") {
+        {
+          poolId: poolId,
+          A: A,
+          transactionHash: transactionHash,
+          block: block_hash,
+          timestamp: timestamp,
+          logIndex: logIndex,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleStopRampA Mutation called.");
+      return true;
+    } else if (eventName == "addressModified") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -883,11 +894,9 @@ return true;
       console.log(newData[3][0].data + " = " + newData[3][1].data);
       console.log(newData[4][0].data + " = " + newData[4][1].data);
 
-     
       var addressProviderContractHash = splitdata(newData[0][1].data);
-      var id = splitdata(newData[1][1].data)      
+      var id = splitdata(newData[1][1].data);
       var transactionHash = splitdata(newData[2][1].data);
-
 
       console.log("addressProviderContractHash: ", addressProviderContractHash);
       console.log("id: ", id);
@@ -915,18 +924,18 @@ return true;
       }
                 
       }`,
-{
-addressProviderContractHash: addressProviderContractHash,
-id: id,
-block: block_hash,
-timestamp: timestamp,
-transactionHash: transactionHash,
-eventObjectId : eventResult._id
-}
-);
-console.log("handleAddressModified Mutation called.")
-return true;
-    }else if(eventName == "newAddressIdentifier") {
+        {
+          addressProviderContractHash: addressProviderContractHash,
+          id: id,
+          block: block_hash,
+          timestamp: timestamp,
+          transactionHash: transactionHash,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleAddressModified Mutation called.");
+      return true;
+    } else if (eventName == "newAddressIdentifier") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -934,11 +943,9 @@ return true;
       console.log(newData[3][0].data + " = " + newData[3][1].data);
       console.log(newData[4][0].data + " = " + newData[4][1].data);
 
-     
       var addressProviderContractHash = splitdata(newData[0][1].data);
-      var id = splitdata(newData[1][1].data)      
+      var id = splitdata(newData[1][1].data);
       var transactionHash = splitdata(newData[2][1].data);
-
 
       console.log("addressProviderContractHash: ", addressProviderContractHash);
       console.log("id: ", id);
@@ -966,28 +973,26 @@ return true;
       }
                 
       }`,
-{
-addressProviderContractHash: addressProviderContractHash,
-id: id,
-block: block_hash,
-timestamp: timestamp,
-transactionHash: transactionHash,
-eventObjectId : eventResult._id
-}
-);
-console.log("handleNewAddressIdentifier Mutation called.")
-return true;
-    }else if(eventName == "poolAdded") {
+        {
+          addressProviderContractHash: addressProviderContractHash,
+          id: id,
+          block: block_hash,
+          timestamp: timestamp,
+          transactionHash: transactionHash,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleNewAddressIdentifier Mutation called.");
+      return true;
+    } else if (eventName == "poolAdded") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
       console.log(newData[2][0].data + " = " + newData[2][1].data);
       console.log(newData[3][0].data + " = " + newData[3][1].data);
 
-     
-      var poolId = splitdata(newData[1][1].data)      
+      var poolId = splitdata(newData[1][1].data);
       var transactionHash = splitdata(newData[2][1].data);
-
 
       console.log("poolId: ", poolId);
       console.log("transactionHash: ", transactionHash);
@@ -1000,27 +1005,25 @@ return true;
       }
                 
       }`,
-{
- poolId: poolId,
- transactionHash: transactionHash,
- block: block_hash,
- timestamp: timestamp,
- eventObjectId : eventResult._id
-}
-);
-console.log("handlePoolAdded Mutation called.")
-return true;
-    }else if(eventName == "poolRemoved") {
+        {
+          poolId: poolId,
+          transactionHash: transactionHash,
+          block: block_hash,
+          timestamp: timestamp,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handlePoolAdded Mutation called.");
+      return true;
+    } else if (eventName == "poolRemoved") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
       console.log(newData[2][0].data + " = " + newData[2][1].data);
       console.log(newData[3][0].data + " = " + newData[3][1].data);
 
-     
-      var poolId = splitdata(newData[1][1].data)      
+      var poolId = splitdata(newData[1][1].data);
       var transactionHash = splitdata(newData[2][1].data);
-
 
       console.log("poolId: ", poolId);
       console.log("transactionHash: ", transactionHash);
@@ -1033,17 +1036,17 @@ return true;
       }
                 
       }`,
-{
- poolId: poolId,
- transactionHash: transactionHash,
- block: block_hash,
- timestamp: timestamp,
- eventObjectId : eventResult._id
-}
-);
-console.log("handlePoolRemoved Mutation called.")
-return true;
-    }else if(eventName == "newProxyApp") {
+        {
+          poolId: poolId,
+          transactionHash: transactionHash,
+          block: block_hash,
+          timestamp: timestamp,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handlePoolRemoved Mutation called.");
+      return true;
+    } else if (eventName == "newProxyApp") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -1052,10 +1055,10 @@ return true;
       console.log(newData[4][0].data + " = " + newData[4][1].data);
       console.log(newData[5][0].data + " = " + newData[5][1].data);
 
-      var appId = splitdata(newData[0][1].data)      
+      var appId = splitdata(newData[0][1].data);
       var proxy = splitdata(newData[1][1].data);
-      var context = parseInt(newData[2][1].data)      
-      var transactionHash = splitdata(newData[3][1].data)
+      var context = newData[2][1].data;
+      var transactionHash = splitdata(newData[3][1].data);
 
       console.log("appId: ", appId);
       console.log("proxy: ", proxy);
@@ -1070,19 +1073,19 @@ return true;
       }
                 
       }`,
-{
- appId: appId,
- proxy: proxy,
- context: context,
- transactionHash: transactionHash,
- block: block_hash,
- timestamp: timestamp,
- eventObjectId : eventResult._id
-}
-);
-console.log("handleNewProxyApp Mutation called.")
-return true;
-    }else if(eventName == "updateLiquidityLimit") {
+        {
+          appId: appId,
+          proxy: proxy,
+          context: context,
+          transactionHash: transactionHash,
+          block: block_hash,
+          timestamp: timestamp,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleNewProxyApp Mutation called.");
+      return true;
+    } else if (eventName == "updateLiquidityLimit") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -1094,13 +1097,13 @@ return true;
       console.log(newData[7][0].data + " = " + newData[7][1].data);
       console.log(newData[8][0].data + " = " + newData[8][1].data);
 
-      var user = splitdata(newData[0][1].data);      
+      var user = splitdata(newData[0][1].data);
       var id = splitdata(newData[1][1].data);
-      var original_balance = parseInt(newData[2][1].data);      
-      var original_supply = parseInt(newData[3][1].data);
-      var working_balance = parseInt(newData[4][1].data);
-      var working_supply = parseInt(newData[5][1].data)      
-      var transactionHash = splitdata(newData[6][1].data)
+      var original_balance = newData[2][1].data;
+      var original_supply = newData[3][1].data;
+      var working_balance = newData[4][1].data;
+      var working_supply = newData[5][1].data;
+      var transactionHash = splitdata(newData[6][1].data);
 
       console.log("user: ", user);
       console.log("id: ", id);
@@ -1140,22 +1143,22 @@ return true;
       }
                 
       }`,
-  {
-    user: user,
-    id: id,
-    original_balance: original_balance,
-    original_supply: original_supply,
-    working_balance: working_balance,
-    working_supply: working_supply,
-    transactionHash: transactionHash,
-    block: block_hash,
-    timestamp: timestamp,
-    eventObjectId : eventResult._id
-  }
-);
-console.log("handleUpdateLiquidityLimit Mutation called.")
-return true;
-    }else if(eventName == "deposit") {
+        {
+          user: user,
+          id: id,
+          original_balance: original_balance,
+          original_supply: original_supply,
+          working_balance: working_balance,
+          working_supply: working_supply,
+          transactionHash: transactionHash,
+          block: block_hash,
+          timestamp: timestamp,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleUpdateLiquidityLimit Mutation called.");
+      return true;
+    } else if (eventName == "deposit") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -1165,11 +1168,11 @@ return true;
       console.log(newData[5][0].data + " = " + newData[5][1].data);
       console.log(newData[6][0].data + " = " + newData[6][1].data);
 
-      var provider = splitdata(newData[0][1].data);      
+      var provider = splitdata(newData[0][1].data);
       var id = splitdata(newData[1][1].data);
-      var value = parseInt(newData[2][1].data);      
+      var value = newData[2][1].data;
       var transactionHash = splitdata(newData[3][1].data);
-      var logIndex = splitdata(newData[4][1].data);
+      var logIndex = newData[4][1].data;
 
       console.log("provider: ", provider);
       console.log("id: ", id);
@@ -1185,18 +1188,18 @@ return true;
       }
                 
       }`,
-{
- provider: provider,
- id: id,
- value: value,
- transactionHash: transactionHash,
- logIndex: logIndex,
- eventObjectId : eventResult._id
-}
-);
-console.log("handleDeposit Mutation called.")
-return true;
-    }else if(eventName == "withdraw") {
+        {
+          provider: provider,
+          id: id,
+          value: value,
+          transactionHash: transactionHash,
+          logIndex: logIndex,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleDeposit Mutation called.");
+      return true;
+    } else if (eventName == "withdraw") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -1206,11 +1209,11 @@ return true;
       console.log(newData[5][0].data + " = " + newData[5][1].data);
       console.log(newData[6][0].data + " = " + newData[6][1].data);
 
-      var provider = splitdata(newData[0][1].data);      
+      var provider = splitdata(newData[0][1].data);
       var id = splitdata(newData[1][1].data);
-      var value = parseInt(newData[2][1].data);      
+      var value = newData[2][1].data;
       var transactionHash = splitdata(newData[3][1].data);
-      var logIndex = splitdata(newData[4][1].data);
+      var logIndex = newData[4][1].data;
 
       console.log("provider: ", provider);
       console.log("id: ", id);
@@ -1226,134 +1229,134 @@ return true;
       }
                 
       }`,
-{
- provider: provider,
- id: id,
- value: value,
- transactionHash: transactionHash,
- logIndex: logIndex,
- eventObjectId : eventResult._id
-}
-);
-console.log("handleWithdraw Mutation called.")
-return true;
-    }else if(eventName == "minimumBalanceSet") {
+        {
+          provider: provider,
+          id: id,
+          value: value,
+          transactionHash: transactionHash,
+          logIndex: logIndex,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleWithdraw Mutation called.");
+      return true;
+    } else if (eventName == "minimumBalanceSet") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
       console.log(newData[2][0].data + " = " + newData[2][1].data);
       console.log(newData[3][0].data + " = " + newData[3][1].data);
 
-      var address = splitdata(newData[0][1].data);      
-      var minBalance = parseInt(newData[1][1].data);
+      var address = splitdata(newData[0][1].data);
+      var minBalance = newData[1][1].data;
 
       console.log("address: ", address);
       console.log("minBalance: ", minBalance);
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleMinimumBalanceSet( $address: String!,$minBalance: String!, $eventObjectId: String!,){
+        `mutation handleMinimumBalanceSet( $address: String!,$minBalance: String!, $eventObjectId: String!){
            handleMinimumBalanceSet( address: $address,minBalance: $minBalance, eventObjectId : $eventObjectId) {
           result
       }
                 
       }`,
-{
- address: address,
- minBalance: minBalance,
- eventObjectId: eventResult._id,
-}
-);
-console.log("handleMinimumBalanceSet Mutation called.")
-return true;
-    }else if(eventName == "minimumTimeSet") {
+        {
+          address: address,
+          minBalance: minBalance,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleMinimumBalanceSet Mutation called.");
+      return true;
+    } else if (eventName == "minimumTimeSet") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
       console.log(newData[2][0].data + " = " + newData[2][1].data);
       console.log(newData[3][0].data + " = " + newData[3][1].data);
 
-      var address = splitdata(newData[0][1].data);      
-      var minTime = parseInt(newData[1][1].data);
+      var address = splitdata(newData[0][1].data);
+      var minTime = newData[1][1].data;
 
       console.log("address: ", address);
       console.log("minTime: ", minTime);
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleMinimumTimeSet( $address: String!,$minTime: String!, $eventObjectId: String!,){
+        `mutation handleMinimumTimeSet( $address: String!,$minTime: String!, $eventObjectId: String!){
           handleMinimumTimeSet( address: $address,minTime: $minTime, eventObjectId : $eventObjectId) {
           result
       }
                 
       }`,
-{
- address: address,
- minTime: minTime,
- eventObjectId: eventResult._id,
-}
-);
-console.log("handleMinimumTimeSet Mutation called.")
-return true;
-    }else if(eventName == "changeMinQuorum") {
+        {
+          address: address,
+          minTime: minTime,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleMinimumTimeSet Mutation called.");
+      return true;
+    } else if (eventName == "changeMinQuorum") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
       console.log(newData[2][0].data + " = " + newData[2][1].data);
       console.log(newData[3][0].data + " = " + newData[3][1].data);
 
-      var address = splitdata(newData[0][1].data);      
-      var minAcceptQuorumPct = parseInt(newData[1][1].data);
+      var address = splitdata(newData[0][1].data);
+      var minAcceptQuorumPct = newData[1][1].data;
 
       console.log("address: ", address);
       console.log("minAcceptQuorumPct: ", minAcceptQuorumPct);
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleChangeMinQuorum( $address: String!,$minAcceptQuorumPct: String!, $eventObjectId: String!,){
+        `mutation handleChangeMinQuorum( $address: String!,$minAcceptQuorumPct: String!, $eventObjectId: String!){
           handleChangeMinQuorum( address: $address,minAcceptQuorumPct: $minAcceptQuorumPct, eventObjectId : $eventObjectId) {
           result
       }
                 
       }`,
-{
- address: address,
- minAcceptQuorumPct: minAcceptQuorumPct,
- eventObjectId: eventResult._id,
-}
-);
-console.log("handleChangeMinQuorum Mutation called.")
-return true;
-    }else if(eventName == "changeSupportRequired") {
+        {
+          address: address,
+          minAcceptQuorumPct: minAcceptQuorumPct,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleChangeMinQuorum Mutation called.");
+      return true;
+    } else if (eventName == "changeSupportRequired") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
       console.log(newData[2][0].data + " = " + newData[2][1].data);
       console.log(newData[3][0].data + " = " + newData[3][1].data);
 
-      var address = splitdata(newData[0][1].data);      
-      var supportRequiredPct = parseInt(newData[1][1].data);
+      var address = splitdata(newData[0][1].data);
+      var supportRequiredPct = newData[1][1].data;
 
       console.log("address: ", address);
       console.log("supportRequiredPct: ", supportRequiredPct);
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleChangeSupportRequired( $address: String!,$supportRequiredPct: String!,$eventObjectId: String!,){
+        `mutation handleChangeSupportRequired( $address: String!,$supportRequiredPct: String!,$eventObjectId: String!){
           handleChangeSupportRequired( address: $address,supportRequiredPct: $supportRequiredPct, eventObjectId : $eventObjectId) {
           result
       }
                 
       }`,
-{
- address: address,
- supportRequiredPct: supportRequiredPct,
- eventObjectId: eventResult._id,
-}
-);
-console.log("handleChangeSupportRequired Mutation called.")
-return true;
-    }else if(eventName == "startVote") {
+        {
+          address: address,
+          supportRequiredPct: supportRequiredPct,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleChangeSupportRequired Mutation called.");
+      return true;
+    } else if (eventName == "startVote") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -1361,10 +1364,10 @@ return true;
       console.log(newData[3][0].data + " = " + newData[3][1].data);
       console.log(newData[4][0].data + " = " + newData[4][1].data);
       console.log(newData[5][0].data + " = " + newData[5][1].data);
-      
+
       var creator = splitdata(newData[0][1].data);
-      var voteId = parseInt(newData[1][1].data);
-      var metadata = splitdata(newData[2][1].data);   
+      var voteId = newData[1][1].data;
+      var metadata = newData[2][1].data;
       var transactionFrom = splitdata(newData[3][1].data);
 
       console.log("creator: ", creator);
@@ -1392,16 +1395,17 @@ return true;
       }
                 
       }`,
-{
-creator: creator,
-voteId: voteId,
-metadata: metadata,
-transactionFrom : transactionFrom,
-eventObjectId: eventResult._id,
-});
-console.log("handleStartVote Mutation called.");
-return true;
-    }else if(eventName == "castVote") {
+        {
+          creator: creator,
+          voteId: voteId,
+          metadata: metadata,
+          transactionFrom: transactionFrom,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleStartVote Mutation called.");
+      return true;
+    } else if (eventName == "castVote") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -1410,10 +1414,10 @@ return true;
       console.log(newData[4][0].data + " = " + newData[4][1].data);
       console.log(newData[5][0].data + " = " + newData[5][1].data);
 
-      var voteId = splitdata(newData[0][1].data);
-      var voter = parseInt(newData[1][1].data);
+      var voteId = newData[0][1].data;
+      var voter = splitdata(newData[1][1].data);
       var stake = splitdata(newData[2][1].data);
-      var supports = parseInt(newData[3][1].data);  
+      var supports = newData[3][1].data;
 
       console.log("voteId: ", voteId);
       console.log("voter: ", voter);
@@ -1426,7 +1430,7 @@ return true;
           $voteId: String!,
           $voter: String!,
           $stake: String!,
-          $supports: String!,
+          $supports: Boolean!,
           $timestamp: String!,
           $eventObjectId: String!,
           ){
@@ -1442,24 +1446,24 @@ return true;
       }
                 
       }`,
-{
-voteId: voteId,
-voter: voter,
-stake: stake,
-supports: supports,
-timestamp: timestamp,
-eventObjectId: eventResult._id,
-});
-console.log("handleCastVote Mutation called.");
-return true;
-    }else if(eventName == "executeVote") {
+        {
+          voteId: voteId,
+          voter: voter,
+          stake: stake,
+          supports: supports,
+          timestamp: timestamp,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleCastVote Mutation called.");
+      return true;
+    } else if (eventName == "executeVote") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
       console.log(newData[2][0].data + " = " + newData[2][1].data);
-      
-      var voteId = splitdata(newData[0][1].data);
 
+      var voteId = newData[0][1].data;
       console.log("voteId: ", voteId);
 
       await request(
@@ -1477,14 +1481,15 @@ return true;
       }
                 
       }`,
-{
-voteId: voteId,
-timestamp: timestamp,
-eventObjectId: eventResult._id,
-});
-console.log("handleExecuteVote Mutation called.");
-return true;
-    }else if(eventName == "addType") {
+        {
+          voteId: voteId,
+          timestamp: timestamp,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleExecuteVote Mutation called.");
+      return true;
+    } else if (eventName == "addType") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -1492,9 +1497,9 @@ return true;
       console.log(newData[3][0].data + " = " + newData[3][1].data);
       console.log(newData[4][0].data + " = " + newData[4][1].data);
 
-      var id = splitdata(newData[0][1].data);      
-      var type_id = splitdata(newData[1][1].data);
-      var name = splitdata(newData[3][1].data);
+      var id = splitdata(newData[0][1].data);
+      var type_id = newData[1][1].data;
+      var name = newData[3][1].data;
 
       console.log("id: ", id);
       console.log("type_id: ", type_id);
@@ -1508,17 +1513,17 @@ return true;
       }
                 
       }`,
-{
-id: id,
-type_id: type_id,
-timestamp: timestamp,
-name:name,
-eventObjectId : eventResult._id
-}
-);
-console.log("handleAddType Mutation called.")
-return true;
-    }else if(eventName == "newGauge") {
+        {
+          id: id,
+          type_id: type_id,
+          timestamp: timestamp,
+          name: name,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleAddType Mutation called.");
+      return true;
+    } else if (eventName == "newGauge") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -1527,10 +1532,10 @@ return true;
       console.log(newData[4][0].data + " = " + newData[4][1].data);
       console.log(newData[5][0].data + " = " + newData[5][1].data);
 
-      var gauge_type = splitdata(newData[0][1].data);      
+      var gauge_type = newData[0][1].data;
       var addr = splitdata(newData[1][1].data);
       var transactionHash = splitdata(newData[2][1].data);
-      var weight = splitdata(newData[3][1].data);
+      var weight = newData[3][1].data;
 
       console.log("gauge_type: ", gauge_type);
       console.log("addr: ", addr);
@@ -1544,19 +1549,19 @@ return true;
           result
       }
       }`,
-{
-gaugeType: gauge_type,
-addr: addr,
-blockNumber: blockNumber,
-transactionHash: transactionHash,
-weight: weight,
-timestamp: timestamp,
-eventObjectId : eventResult._id
-}
-);
-console.log("handleNewGauge Mutation called.")
-return true;
-    }else if(eventName == "newGaugeWeight") {
+        {
+          gaugeType: gauge_type,
+          addr: addr,
+          blockNumber: blockNumber,
+          transactionHash: transactionHash,
+          weight: weight,
+          timestamp: timestamp,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleNewGauge Mutation called.");
+      return true;
+    } else if (eventName == "newGaugeWeight") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -1565,9 +1570,9 @@ return true;
       console.log(newData[4][0].data + " = " + newData[4][1].data);
       console.log(newData[5][0].data + " = " + newData[5][1].data);
 
-      var id = splitdata(newData[0][1].data);      
-      var time = parseInt(newData[1][1].data);
-      var weight = parseInt(newData[2][1].data);
+      var id = splitdata(newData[0][1].data);
+      var time = newData[1][1].data;
+      var weight = newData[2][1].data;
       var gauge_address = splitdata(newData[3][1].data);
 
       console.log("id: ", id);
@@ -1583,17 +1588,17 @@ return true;
       }
                 
       }`,
-{
- id: id,
- time: time,
- weight: weight,
- gauge_address: gauge_address,
- eventObjectId : eventResult._id
-}
-);
-console.log("handleNewGaugeWeight Mutation called.")
-return true;
-    }else if(eventName == "newTypeWeight") {
+        {
+          id: id,
+          time: time,
+          weight: weight,
+          gauge_address: gauge_address,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleNewGaugeWeight Mutation called.");
+      return true;
+    } else if (eventName == "newTypeWeight") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -1603,11 +1608,11 @@ return true;
       console.log(newData[5][0].data + " = " + newData[5][1].data);
       console.log(newData[6][0].data + " = " + newData[6][1].data);
 
-      var id = splitdata(newData[0][1].data);      
-      var time = parseInt(newData[1][1].data);
-      var weight = parseInt(newData[2][1].data);
-      var type_id = splitdata(newData[3][1].data);
-      var total_weight = splitdata(newData[4][1].data);
+      var id = splitdata(newData[0][1].data);
+      var time = newData[1][1].data;
+      var weight = newData[2][1].data;
+      var type_id = newData[3][1].data;
+      var total_weight = newData[4][1].data;
 
       console.log("id: ", id);
       console.log("time: ", time);
@@ -1623,18 +1628,18 @@ return true;
       }
                 
       }`,
-{
- id: id,
- time: time,
- weight: weight,
- type_id: type_id,
- total_weight: total_weight,
- eventObjectId : eventResult._id
-}
-);
-console.log("handleNewTypeWeight Mutation called.")
-return true;
-    }else if(eventName == "voteForGauge") {
+        {
+          id: id,
+          time: time,
+          weight: weight,
+          type_id: type_id,
+          total_weight: total_weight,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleNewTypeWeight Mutation called.");
+      return true;
+    } else if (eventName == "voteForGauge") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -1644,11 +1649,11 @@ return true;
       console.log(newData[5][0].data + " = " + newData[5][1].data);
       console.log(newData[6][0].data + " = " + newData[6][1].data);
 
-      var id = splitdata(newData[0][1].data);      
-      var time = parseInt(newData[1][1].data);
-      var weight = parseInt(newData[2][1].data);
+      var id = splitdata(newData[0][1].data);
+      var time = newData[1][1].data;
+      var weight = newData[2][1].data;
       var gauge_addr = splitdata(newData[3][1].data);
-      var user = parseInt(newData[4][1].data);
+      var user = newData[4][1].data;
 
       console.log("id: ", id);
       console.log("time: ", time);
@@ -1664,18 +1669,18 @@ return true;
       }
                 
       }`,
-{
- id: id,
- time: time,
- weight: weight,
- gauge_addr: gauge_addr,
- user: user,
- eventObjectId : eventResult._id
-}
-);
-console.log("handleVoteForGauge Mutation called.")
-return true;
-    } else if(eventName == "Deposit") {
+        {
+          id: id,
+          time: time,
+          weight: weight,
+          gauge_addr: gauge_addr,
+          user: user,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleVoteForGauge Mutation called.");
+      return true;
+    } else if (eventName == "Deposit") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -1685,11 +1690,11 @@ return true;
       console.log(newData[5][0].data + " = " + newData[5][1].data);
       console.log(newData[6][0].data + " = " + newData[6][1].data);
 
-      var provider = splitdata(newData[0][1].data);      
-      var value = parseInt(newData[1][1].data);
-      var locktime = parseInt(newData[2][1].data);
-      var _type = splitdata(newData[3][1].data);
-      var ts = parseInt(newData[4][1].data);
+      var provider = splitdata(newData[0][1].data);
+      var value = newData[1][1].data;
+      var locktime = newData[2][1].data;
+      var _type = newData[3][1].data;
+      var ts = newData[4][1].data;
 
       console.log("provider: ", provider);
       console.log("value: ", value);
@@ -1705,19 +1710,19 @@ return true;
       }
                 
       }`,
-{
- provider: provider,
- value: value,
- locktime: locktime,
- type: _type,
- timestamp: ts,
- block: block_hash,
- eventObjectId: eventResult._id,
-}
-);
-console.log("handleVotingDeposit Mutation called.")
-return true;
-    } else if(eventName == "Withdraw") {
+        {
+          provider: provider,
+          value: value,
+          locktime: locktime,
+          type: _type,
+          timestamp: ts,
+          block: block_hash,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleVotingDeposit Mutation called.");
+      return true;
+    } else if (eventName == "Withdraw") {
       console.log(eventName + " Event result: ");
       console.log(newData[0][0].data + " = " + newData[0][1].data);
       console.log(newData[1][0].data + " = " + newData[1][1].data);
@@ -1725,9 +1730,9 @@ return true;
       console.log(newData[3][0].data + " = " + newData[3][1].data);
       console.log(newData[4][0].data + " = " + newData[4][1].data);
 
-      var provider = splitdata(newData[0][1].data);      
-      var value = parseInt(newData[1][1].data);
-      var ts = parseInt(newData[2][1].data);
+      var provider = splitdata(newData[0][1].data);
+      var value = newData[1][1].data;
+      var ts = newData[2][1].data;
 
       console.log("provider: ", provider);
       console.log("value: ", value);
@@ -1741,17 +1746,22 @@ return true;
       }
                 
       }`,
-{
- provider: provider,
- value: value,
- timestamp: ts,
- block: block_hash,
- eventObjectId: eventResult._id,
-}
-);
-console.log("handleVotingWithdraw Mutation called.")
-return true;
-    }                             
+        {
+          provider: provider,
+          value: value,
+          timestamp: ts,
+          block: block_hash,
+          eventObjectId: eventResult._id,
+        }
+      );
+      console.log("handleVotingWithdraw Mutation called.");
+      return true;
+    } else {
+      console.log("There is no mutation for the event: ", eventName);
+      eventResult.status = "completed";
+      await eventResult.save();
+      return true;
+    }
   } catch (error) {
     console.log("error (try-catch) : " + error);
     return res.status(500).json({
@@ -1761,40 +1771,4 @@ return true;
   }
 }
 
-router
-  .route("/getContractHashAgainstPackageHash")
-  .post(async function (req, res, next) {
-    try {
-      if (!req.body.packageHash) {
-        return res.status(400).json({
-          success: false,
-          message: "There is no packageHash specified in the req body.",
-        });
-      }
-
-      let packageHash = req.body.packageHash.toLowerCase();
-      // let contractHash = await allcontractsDataModel.findOne({
-      //   packageHash: packageHash,
-      // });
-
-      return res.status(200).json({
-        success: true,
-        message: "Contract Hash has been Succefully found.",
-        Data: contractHash,
-      });
-    } catch (error) {
-      console.log("error (try-catch) : " + error);
-      return res.status(500).json({
-        success: false,
-        err: error,
-      });
-    }
-});
-
-
-router.route("/geteventsdata").post(async function (req, res, next) {
-  const {eventResult, deployHash, timestamp, blockhash, eventname, eventdata} = req.body;
-  await geteventsdata(eventResult, deployHash, timestamp, blockhash, eventname, eventdata);
-});
-
-module.exports = {router, geteventsdata};
+module.exports = { router, geteventsdata };

@@ -222,9 +222,7 @@ module.exports = describe('GraphQL Mutations for Gauge', () => {
 
     it('votingPower Should fetch votingPowers filtered by id', async() => {
       const result = await votingPower("provider");
-      result.votingPower.forEach(votingPower => {
-        assert.equal(votingPower.id, "provider");
-      });
+      assert.equal(result.votingPower.id, "provider");
     })
 
     it('userBalancesByUnlockTime Should fetch userBalances sorted by Unlock time', async() => {

@@ -73,7 +73,7 @@ const test = async () => {
   console.log(`... Package Hash: ${packageHash}`);
 };
 
-test();
+//test();
 
 const startEpochTimeWritesessioncode = async () => {
   const erc20Crv = new ERC20CRVClient(

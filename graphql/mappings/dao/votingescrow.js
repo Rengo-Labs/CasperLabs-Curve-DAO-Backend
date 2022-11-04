@@ -102,11 +102,8 @@ const handleVotingDeposit = {
         userbalance.unlock_time = args.locktime;
         userbalance.CRVLocked = args.value;
       }
-
-      let votingescrow = await VotingEscrow.findOne({id : args.provider});
        
-      if(!votingescrow)
-       votingescrow = new VotingEscrow({
+      let votingescrow = new VotingEscrow({
         id : args.provider,
         provider : args.provider,
         value : args.value,
@@ -115,14 +112,6 @@ const handleVotingDeposit = {
         timestamp : args.timestamp,
         totalPower : totalPower
       });
-
-      else{
-        votingescrow.value = args.value;
-        votingescrow.locktime = args.locktime;
-        votingescrow.type = args.type;
-        votingescrow.timestamp = args.timestamp;
-        votingescrow.totalPower = totalPower;
-      }
 
       await session.withTransaction(async () => {
         await daopower.save({session});
@@ -220,23 +209,13 @@ const handleVotingWithdraw = {
       else
         userbalance.CRVLocked = args.value;
       
-
-      let votingescrow = await VotingEscrow.findOne({id : args.provider});
-       
-      if(!votingescrow)
-       votingescrow = new VotingEscrow({
+      let votingescrow = new VotingEscrow({
         id : args.provider,
         provider : args.provider,
         value : args.value,
         timestamp : args.timestamp,
         totalPower : totalPower
       });
-
-      else{
-        votingescrow.value = args.value;
-        votingescrow.timestamp = args.timestamp;
-        votingescrow.totalPower = totalPower;
-      }
 
       await session.withTransaction(async () => {
         await daopower.save({session});

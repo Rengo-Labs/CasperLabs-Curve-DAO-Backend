@@ -178,8 +178,7 @@ const votingEscrows =  {
 const daoPowersByBlock =  {
   type: GraphQLList(daoPowerType),
   description: "Retrieves daopowers",
-  args: {
-  },
+  args: {},
   async resolve(parent, args, context) {
     try {
       let daoPowers = await daoPower.find().sort({timestamp : 1});
@@ -193,8 +192,7 @@ const daoPowersByBlock =  {
 const daoPowersByTimestamp =  {
   type: GraphQLList(daoPowerType),
   description: "Retrieves daopowers",
- args: {
-  },
+ args: {},
   async resolve(parent, args, context) {
     try {
       let daoPowers = await daoPower.find().sort({timestamp : -1}).limit(1);
@@ -285,14 +283,14 @@ const votesByVoteId =  {
 
 
 const votingPower =  {
-  type: GraphQLList(votingPowerType),
+  type: votingPowerType,
   description: "Retrieves votingPower against id",
   args: {
     id: {type : GraphQLString},
   },
   async resolve(parent, args, context) {
     try {
-      let votingPower = await votingPowerModel.find({id : args.id});
+      let votingPower = await votingPowerModel.findOne({id : args.id});
       return votingPower;
     } catch (error) {
       throw new Error(error);
@@ -317,7 +315,7 @@ const userBalancesByUnlockTime = {
 
 const gauges =  {
   type: GraphQLList(gaugeLiquidityType),
-  description: "Retrieves gauges",
+  description: "Retrieves gauges against user",
   args: {
     user: { type: GraphQLString },
   },

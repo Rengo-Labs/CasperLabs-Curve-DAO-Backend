@@ -10,6 +10,7 @@ const voterSchema = new Schema({
     address: {
         type: String
     },
+    // Not used by queries
     // castVotes: [{
     //     type: Schema.Types.ObjectId, ref: 'cast' 
     // }]

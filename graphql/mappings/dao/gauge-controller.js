@@ -411,9 +411,15 @@ const handleVoteForGauge = {
       
       //We get contract hash for gauge controller package hash below
       // const contractData = await allcontractsData.findOne({packageHash : process.env.GAUGE_CONTROLLER_PACKAGE_HASH});
+      console.log("Entered in handleVoteForGauge: \n");
+      console.log(".");
+      console.log(".");
+      console.log(".");
+      console.log(".");
 
       let gauge = await Gauge.findOne({ id: args.gauge_addr });
       //let gauge = '1000000000';
+      console.log("gauge: ",gauge);
 
       let gaugeWeight, gaugeTotalWeight, user, gaugeWeightVote, gaugeVote;
 
@@ -429,6 +435,7 @@ const handleVoteForGauge = {
           // ),
           weight: "1000000000"
         });
+        console.log("gaugeWeight: ",gaugeWeight);
 
         gaugeTotalWeight = new GaugeTotalWeight({
           id: nextWeek.toString(),
@@ -439,6 +446,7 @@ const handleVoteForGauge = {
             parseFloat(GAUGE_TOTAL_WEIGHT_PRECISION)), //issue fixed
           // weight: "1000000000"
         });
+        console.log("gaugeTotalWeight: ",gaugeTotalWeight);
 
         user = await getOrRegisterAccount(args.user);
 
@@ -447,10 +455,11 @@ const handleVoteForGauge = {
           gauge: gauge.id,
           user: user.id,
           time: args.time,
+          // weight: new bigdecimal.BigDecimal(args.weight),
           weight: new bigdecimal.BigDecimal(args.weight),
         //weight:"1000000000"
         });
-
+        console.log("gaugeWeightVote: ",gaugeWeightVote);
         // let veCRV = await votingEscrow.balanceOf(contractData.contractHash, user.id);
         // let totalveCRV = await votingEscrow.totalSupply(contractData.contractHash);
 
@@ -463,12 +472,13 @@ const handleVoteForGauge = {
           gauge: gauge.id,
           user: user.id,
           time: args.time,
-          weight: BigInt(args.weight),
+          weight: new bigdecimal.BigDecimal(args.weight),
           total_weight : gaugeTotalWeight.weight,
           veCRV : veCRV,
           totalveCRV : totalveCRV,
           gaugeWeights : [gaugeWeight._id]
         });
+        console.log("gaugeVote: ",gaugeVote);
       }
         
       await session.withTransaction(async () => {

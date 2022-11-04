@@ -80,6 +80,7 @@ const voteSchema = new Schema({
         type:String
     },
     
+    // Not used by queries
     // castVotes: [{
     //     type: Schema.Types.ObjectId, ref: 'cast' 
     // }]
