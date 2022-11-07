@@ -16,9 +16,8 @@ const {
   VOTING_ESCROW_NAME,
   VOTING_ESCROW_SYMBOL,
   VOTING_ESCROW_VERSION,
-  VOTING_ESCROW_TOKEN_ADDR,
+  ERC20CRV_PACKAGE_HASH,
   VOTING_ESCROW_CONTRACT_NAME,
-
   VOTING_ESCROW_PACKAGE_HASH,
   VOTING_ESCROW_PROXY_WASM_PATH,
   VOTING_ESCROW_T,
@@ -40,14 +39,13 @@ const deploy = async () => {
 
   const installDeployHash = await votingEscrow.install(
     KEYS,
-    VOTING_ESCROW_TOKEN_ADDR!,
+    ERC20CRV_PACKAGE_HASH!,
     VOTING_ESCROW_NAME!,
     VOTING_ESCROW_SYMBOL!,
     VOTING_ESCROW_VERSION!,
     VOTING_ESCROW_CONTRACT_NAME!,
     VOTING_ESCROW_INSTALL_PAYMENT_AMOUNT!,
     VOTING_ESCROW_WASM_PATH!
-
   );
 
   console.log(`... Contract installation deployHash: ${installDeployHash}`);
@@ -76,7 +74,7 @@ const deploy = async () => {
   console.log(`... Package Hash: ${packageHash}`);
 };
 
-deploy();
+//deploy();
 
 const getLastUserSlopeSessionCode = async () => {
   const votingEscrow = new VOTINGESCROWClient(
