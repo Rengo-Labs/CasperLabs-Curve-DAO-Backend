@@ -33,6 +33,7 @@ class VOTINGESCROWClient {
     metadata: string;
     nonces: string;
     allowances: string;
+    locked: string,
     ownedTokens: string;
     owners: string;
     paused: string;
@@ -64,6 +65,7 @@ class VOTINGESCROWClient {
       metadata: "null",
       nonces: "null",
       allowances: "null",
+      locked: "null",
       ownedTokens: "null",
       owners: "null",
       paused: "null",
@@ -184,7 +186,22 @@ class VOTINGESCROWClient {
       throw Error("Problem with installation");
     }
   }
+  public async lockedEnd(account: string) {
+    try {
 
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        account,
+        this.namedKeys.locked
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+
+  }
   public async lockedEndSessionCode(
     keys: Keys.AsymmetricKey,
     entrypointName:string,
@@ -396,9 +413,10 @@ class VOTINGESCROWClient {
       ""
     );
     const LIST_OF_NAMED_KEYS = [
-      'balance_of',
+      'balances',
       'nonces',
       'allowances',
+      'locked',
       'minBalance',
       'minAcceptQuorumPct',
       'minTime',

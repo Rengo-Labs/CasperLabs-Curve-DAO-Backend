@@ -15,6 +15,7 @@ var adminRouter = require("./routes/adminroutes");
 var afterDeploymentRouter = require("./routes/afterDeploymentRoutes");
 var listenerRouter = require("./routes/listenerroutes");
 var erc20CrvRouter = require("./routes/erc20CrvRoutes");
+var votingEscrowRouter = require("./routes/votingEscrowRoutes");
 var readWasmRouter = require("./routes/readWasm");
 
 var eventsDataModel = require("./models/eventsData");
@@ -67,6 +68,7 @@ app.use((req, res, next) => {
 app.use('/', indexRouter);
 app.use("/", listenerRouter.router);
 app.use("/", erc20CrvRouter);
+app.use("/votingEscrow", votingEscrowRouter);
 app.use("/", readWasmRouter);
 
 app.use(

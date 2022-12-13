@@ -5,8 +5,7 @@ import { GaugeControllerClient} from "../src";
 const {
   NODE_ADDRESS,
   EVENT_STREAM_ADDRESS,
-  CHAIN_NAME,
-  GAUGE_CONTROLLER_CONTRACT
+  CHAIN_NAME
 } = process.env;
 
 const gaugeController = new GaugeControllerClient(
@@ -22,7 +21,7 @@ export const points_type_weight = async (contractHash : string ,owner : string, 
 
  //pointsTypeWeight
  const pointsTypeWeight = await gaugeController.points_type_weight(owner ,  spender);
- console.log(GAUGE_CONTROLLER_CONTRACT +` =... Points type weight: ${pointsTypeWeight}`);
+ console.log(`... Points type weight: ${pointsTypeWeight}`);
 
  return pointsTypeWeight;
 }
@@ -34,7 +33,7 @@ export const points_weight = async (contractHash : string ,owner : string, spend
 
  //pointsWeight
  const pointsWeight = await gaugeController.points_type_weight(owner ,  spender);
- console.log(GAUGE_CONTROLLER_CONTRACT +` =... Points type weight: ${pointsWeight}`);
+ console.log(`... Points type weight: ${pointsWeight}`);
 
  return pointsWeight;
 }
@@ -45,7 +44,7 @@ export const points_total = async (contractHash : string, owner : string) => {
 
   //pointsTotal
   const pointsTotal = await gaugeController.points_total(owner);
-  console.log(GAUGE_CONTROLLER_CONTRACT +` =... Points total: ${pointsTotal}`);
+  console.log(`... Points total: ${pointsTotal}`);
  
   return pointsTotal;
 }
@@ -56,7 +55,7 @@ export const gauge_type_names = async (contractHash : string,owner : string) => 
 
   //gaugeTypeNames
   const gaugeTypeNames = await gaugeController.gauge_type_names(owner);
-  console.log(GAUGE_CONTROLLER_CONTRACT +` =... Points total: ${gaugeTypeNames}`);
+  console.log(`... Points total: ${gaugeTypeNames}`);
  
   return gaugeTypeNames;
 }

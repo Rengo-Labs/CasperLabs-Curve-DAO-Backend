@@ -34,31 +34,30 @@ const handleVotingDeposit = {
     eventObjectId: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
-     // updating mutation status
-     let eventDataResult = await eventsData.findOne({
-      _id: args.eventObjectId,
-    });
-    eventDataResult.status = "completed";
-
-    let response = await Response.findOne({ id: "1" });
-    if (response === null) {
-      // create new response
-      response = new Response({
-        id: "1",
-      });
-      response.result = true;
-    }
-    
-    const session = await mongoose.startSession();
     try {
-      // const contractData = await allcontractsData.findOne({packageHash : process.env.VOTING_ESCROW_PACKAGE_HASH});
+      // updating mutation status
+      let eventDataResult = await eventsData.findOne({
+        _id: args.eventObjectId,
+      });
+      eventDataResult.status = "completed";
 
-      // let power = await votingEscrow.balanceOf(contractData.contractHash,args.provider);
-      // let totalPower = await votingEscrow.totalSupply(contractData.contractHash);
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+        });
+        response.result = true;
+      }
+    
+      const contractData = await allcontractsData.findOne({packageHash : process.env.VOTING_ESCROW_PACKAGE_HASH});
+
+      let power = await votingEscrow.balanceOf(contractData.contractHash,args.provider);
+      let totalPower = await votingEscrow.totalSupply(contractData.contractHash);
 
       //supposed values
-      let power = '1000';
-      let totalPower = '10000';
+      //let power = '1000';
+      //let totalPower = '10000';
 
       let daopower = await DaoPower.findOne({id : `${args.block}-${args.timestamp}`});
       if(!daopower){
@@ -75,7 +74,6 @@ const handleVotingDeposit = {
         daopower.timestamp = args.timestamp;
         daopower.totalPower = totalPower;
       }
-
 
       let votingpower = await VotingPower.findOne({id : args.provider});
 
@@ -113,6 +111,7 @@ const handleVotingDeposit = {
         totalPower : totalPower
       });
 
+      const session = await mongoose.startSession();
       await session.withTransaction(async () => {
         await daopower.save({session});
         await votingpower.save({session});
@@ -143,32 +142,30 @@ const handleVotingWithdraw = {
     eventObjectId: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
-
-     // updating mutation status
-     let eventDataResult = await eventsData.findOne({
-      _id: args.eventObjectId,
-    });
-    eventDataResult.status = "completed";
-
-    let response = await Response.findOne({ id: "1" });
-    if (response === null) {
-      // create new response
-      response = new Response({
-        id: "1",
-      });
-      response.result = true;
-    }
-    
-    const session = await mongoose.startSession();
     try {
-      // const contractData = await allcontractsData.findOne({packageHash : process.env.VOTING_ESCROW_PACKAGE_HASH});
+      // updating mutation status
+      let eventDataResult = await eventsData.findOne({
+        _id: args.eventObjectId,
+      });
+      eventDataResult.status = "completed";
 
-      // let power = await votingEscrow.balanceOf(contractData.contractHash,args.provider);
-      // let totalPower = await votingEscrow.totalSupply(contractData.contractHash);
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+        });
+        response.result = true;
+      }
+    
+      const contractData = await allcontractsData.findOne({packageHash : process.env.VOTING_ESCROW_PACKAGE_HASH});
+
+      let power = await votingEscrow.balanceOf(contractData.contractHash,args.provider);
+      let totalPower = await votingEscrow.totalSupply(contractData.contractHash);
 
       //Supposed values 
-      let power = '1000';
-      let totalPower = '10000';
+      //let power = '1000';
+      //let totalPower = '10000';
       
       let daopower = await DaoPower.findOne({id : `${args.block}-${args.timestamp}`});
       if(!daopower){
@@ -217,6 +214,7 @@ const handleVotingWithdraw = {
         totalPower : totalPower
       });
 
+      const session = await mongoose.startSession();
       await session.withTransaction(async () => {
         await daopower.save({session});
         await votingpower.save({session});

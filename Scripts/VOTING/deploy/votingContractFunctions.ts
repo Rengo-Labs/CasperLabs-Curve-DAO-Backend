@@ -9,8 +9,8 @@ const {
 	NODE_ADDRESS,
 	EVENT_STREAM_ADDRESS,
 	MASTER_KEY_PAIR_PATH,
-	CONTRACT_HASH,
-	PACKAGE_HASH,
+	VOTING_CONTRACT_HASH,
+	VOTING_PACKAGE_HASH,
 	SESSION_WASM_PATH,
 	CHANGE_SUPPORT_REQUIRED_PCT_PAYMENT_AMOUNT,
 	CHANGE_MIN_ACCEPT_QUORUM_PCT_PAYMENT_AMOUNT,
@@ -53,8 +53,8 @@ const voting = new VOTINGClient(
 
 const test = async () => {
 	// We don't need hash- prefix so i'm removing it
-	await voting.setContractHash(CONTRACT_HASH!);
-	console.log("Voting contract Hash: ", CONTRACT_HASH!);
+	await voting.setContractHash(VOTING_CONTRACT_HASH!);
+	console.log("Voting contract Hash: ", VOTING_CONTRACT_HASH!);
 
 	/* Change Support Required Pct */
 	const changeSupportRequiredPct = await voting.changeSupportRequiredPct(
@@ -151,7 +151,7 @@ const test = async () => {
 	/* Has Role */
 	const hasRole = await voting.hasRole(
 		KEYS,
-		PACKAGE_HASH!,
+		VOTING_PACKAGE_HASH!,
 		SESSION_WASM_PATH!,
 		HAS_ROLE_PAYMENT_AMOUNT!,
 		USER!,
@@ -164,7 +164,7 @@ const test = async () => {
 	/* Get Role */
 	const getRole = await voting.getRole(
 		KEYS,
-		PACKAGE_HASH!,
+		VOTING_PACKAGE_HASH!,
 		SESSION_WASM_PATH!,
 		GET_ROLE_PAYMENT_AMOUNT!,
 		USER!
@@ -176,7 +176,7 @@ const test = async () => {
 	/* Can Execute */
 	const canExecute = await voting.canExecute(
 		KEYS,
-		PACKAGE_HASH!,
+		VOTING_PACKAGE_HASH!,
 		SESSION_WASM_PATH!,
 		CAN_EXECUTE_PAYMENT_AMOUNT!,
 		VOTE_ID!
@@ -188,7 +188,7 @@ const test = async () => {
 	/* Can Create New Vote */
 	const canCreateNewVote = await voting.canCreateNewVote(
 		KEYS,
-		PACKAGE_HASH!,
+		VOTING_PACKAGE_HASH!,
 		SESSION_WASM_PATH!,
 		CAN_CREATE_NEW_VOTE_PAYMENT_AMOUNT!,
 		SENDER!
@@ -200,7 +200,7 @@ const test = async () => {
 	/* Can Vote */
 	const canVote = await voting.canVote(
 		KEYS,
-		PACKAGE_HASH!,
+		VOTING_PACKAGE_HASH!,
 		SESSION_WASM_PATH!,
 		CAN_VOTE_PAYMENT_AMOUNT!,
 		VOTE_ID!,
@@ -213,7 +213,7 @@ const test = async () => {
 	/* New Vote */
 	const newVote = await voting.newVote(
 		KEYS,
-		PACKAGE_HASH!,
+		VOTING_PACKAGE_HASH!,
 		SESSION_WASM_PATH!,
 		CAN_VOTE_PAYMENT_AMOUNT!,
 		EXECUTION_SCRIPT_ENTRYPOINT!,
@@ -236,7 +236,7 @@ const test = async () => {
 	/* New Vote _ */
 	const newVote_ = await voting.newVote_(
 		KEYS,
-		PACKAGE_HASH!,
+		VOTING_PACKAGE_HASH!,
 		SESSION_WASM_PATH!,
 		CAN_VOTE_PAYMENT_AMOUNT!,
 		EXECUTION_SCRIPT_ENTRYPOINT!,
@@ -261,7 +261,7 @@ const test = async () => {
 	/* Get Vote */
 	const getVote = await voting.getVote(
 		KEYS,
-		PACKAGE_HASH!,
+		VOTING_PACKAGE_HASH!,
 		SESSION_WASM_PATH!,
 		CAN_VOTE_PAYMENT_AMOUNT!,
 		VOTE_ID!
@@ -273,7 +273,7 @@ const test = async () => {
 	/* Get Voter State */
 	const getVoterState = await voting.getVoterState(
 		KEYS,
-		PACKAGE_HASH!,
+		VOTING_PACKAGE_HASH!,
 		SESSION_WASM_PATH!,
 		CAN_VOTE_PAYMENT_AMOUNT!,
 		VOTE_ID!,

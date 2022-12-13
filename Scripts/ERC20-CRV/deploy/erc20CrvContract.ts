@@ -18,7 +18,7 @@ const {
   ERC20CRV_TOKEN_SYMBOL,
   ERC20CRV_DECIMALS,
   ERC20CRV_CONTRACT_NAME,
-  ERC20CRV_PACKAGE_HASH,
+  ERC20_CRV_PACKAGE_HASH,
   ERC20CRV_PROXY_WASM_PATH,
   ERC20CRV_START,
   ERC20CRV_END,
@@ -85,7 +85,7 @@ const startEpochTimeWritesessioncode = async () => {
   const startEpochTimeWritesessioncodeDeployHash = await erc20Crv.startEpochTimeWritesessioncode(
     KEYS,
     "start_epoch_time_write",
-    ERC20CRV_PACKAGE_HASH!,
+    ERC20_CRV_PACKAGE_HASH!,
     ERC20CRV_INSTALL_PAYMENT_AMOUNT!,
     ERC20CRV_PROXY_WASM_PATH!
   );
@@ -109,7 +109,7 @@ const futureEpochTimeWritesessioncode = async () => {
   const futureEpochTimeWritesessioncodeDeployHash = await erc20Crv.futureEpochTimeWritesessioncode(
     KEYS,
     "future_epoch_time_write",
-    ERC20CRV_PACKAGE_HASH!,
+    ERC20_CRV_PACKAGE_HASH!,
     ERC20CRV_INSTALL_PAYMENT_AMOUNT!,
     ERC20CRV_PROXY_WASM_PATH!
   );
@@ -133,7 +133,7 @@ const availableSupplysessioncode = async () => {
   const availableSupplysessioncodeDeployHash = await erc20Crv.availableSupplysessioncode(
     KEYS,
     "available_supply",
-    ERC20CRV_PACKAGE_HASH!,
+    ERC20_CRV_PACKAGE_HASH!,
     ERC20CRV_INSTALL_PAYMENT_AMOUNT!,
     ERC20CRV_PROXY_WASM_PATH!
   );
@@ -157,7 +157,7 @@ const mintableInTimeframesessioncode = async () => {
   const mintableInTimeframesessioncodeDeployHash = await erc20Crv.mintableInTimeframesessioncode(
     KEYS,
     "mintable_in_timeframe",
-    ERC20CRV_PACKAGE_HASH!,
+    ERC20_CRV_PACKAGE_HASH!,
     ERC20CRV_START!,
     ERC20CRV_END!,
     ERC20CRV_INSTALL_PAYMENT_AMOUNT!,
@@ -183,7 +183,7 @@ const mintsessioncode = async () => {
   const mintsessioncodeDeployHash = await erc20Crv.mintsessioncode(
     KEYS,
     "mint",
-    ERC20CRV_PACKAGE_HASH!,
+    ERC20_CRV_PACKAGE_HASH!,
     KEYS.publicKey!,
     ERC20CRV_AMOUNT!,
     ERC20CRV_INSTALL_PAYMENT_AMOUNT!,

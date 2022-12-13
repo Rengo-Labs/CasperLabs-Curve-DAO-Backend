@@ -22,7 +22,7 @@ const {
   ERC20CRV_MASTER_KEY_PAIR_PATH,
   ERC20CRV_PAYMENT_AMOUNT,
   ERC20CRV_VALUE,
-  ERC20CRV_CONTRACT_HASH,
+  ERC20_CRV_CONTRACT_HASH,
   ERC20CRV_SPENDER,
   ERC20CRV_AMOUNT,
   ERC20CRV_START,
@@ -59,8 +59,7 @@ const erc20Crv = new ERC20CRVClient(
 
 const test = async () => {
 
-  await erc20Crv.setContractHash(ERC20CRV_CONTRACT_HASH!);
-
+  await erc20Crv.setContractHash(ERC20_CRV_CONTRACT_HASH!);
 
  //  // // //name
  const name = await erc20Crv.name();
@@ -173,7 +172,6 @@ const test = async () => {
 
 //  await getDeploy(NODE_ADDRESS!, transferDeployHash);
 //  console.log("... transfer function called successfully.");
-
 
 
 };

@@ -6,13 +6,12 @@ async function getGaugeType(id) {
 }
 
 async function registerGaugeType(id, name) {
-  console.log("gaugename", name);
+  
   let gaugetype = new GaugeType({
     id: id,
     name: name,
     gaugeCount: "0",
   });
-  console.log("gaugename", name);
   return gaugetype;
 }
 

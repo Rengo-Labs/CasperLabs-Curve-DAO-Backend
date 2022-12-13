@@ -23,7 +23,7 @@ const {
   LIQUIDITY_GAUGE_V3_PAYMENT_AMOUNT,
   LIQUIDITY_GAUGE_V3_ADDRESS,
   LIQUIDITY_GAUGE_V3_VALUE,
-  LIQUIDITYGAUGEV3_CONTRACT_HASH,
+  LIQUIDITY_GAUGE_V3_CONTRACT_HASH,
   LIQUIDITY_GAUGE_V3_TOKEN,
   LIQUIDITY_GAUGE_V3_RECEIVER,
   LIQUIDITY_GAUGE_V3_TO,
@@ -61,7 +61,7 @@ const liquidityGaugeV3 = new LIQUIDITYGAUGEV3Client(
 
 const test = async () => {
 
-  await liquidityGaugeV3.setContractHash(LIQUIDITYGAUGEV3_CONTRACT_HASH!);
+  await liquidityGaugeV3.setContractHash(LIQUIDITY_GAUGE_V3_CONTRACT_HASH!);
 
  // // //decimals
  const decimals = await liquidityGaugeV3.decimals();

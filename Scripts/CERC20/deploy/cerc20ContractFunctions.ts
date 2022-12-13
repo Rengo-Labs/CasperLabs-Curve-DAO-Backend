@@ -17,6 +17,7 @@ const {
   NODE_ADDRESS,
   EVENT_STREAM_ADDRESS,
   CHAIN_NAME,
+  CERC20_CONTRACT_HASH,
   CERC20_MASTER_KEY_PAIR_PATH,
   MINT_AMOUNT,
   CERC20_PAYMENT_AMOUNT,
@@ -51,7 +52,7 @@ const cerc20 = new CERC20Client(
 
 const deploy = async () => {
 
-  await cerc20.setContractHash('5b42d00171eed2a1ef13c2df4a58860c4dfb979e7291b7cbcc98f582f9c43bc9');
+  await cerc20.setContractHash(CERC20_CONTRACT_HASH!);
 
  
   //mint

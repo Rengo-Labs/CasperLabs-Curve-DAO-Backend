@@ -28,7 +28,6 @@ const GaugeVote = require("../../../models/gaugeVote");
 const votingEscrow = require("../../../JsClients/VOTINGESCROW/votingEscrowFunctionsForBackend/functions");
 const eventsData = require("../../../models/eventsData");
 
-
 let WEEK = "604800";
 
 const transactionOptions = {
@@ -48,53 +47,54 @@ const handleAddType = {
     eventObjectId : { type: GraphQLString },
   },
   async resolve(parent, args, context) {
-    // updating mutation status
-    let eventDataResult = await eventsData.findOne({
-      _id: args.eventObjectId,
-    });
-    eventDataResult.status = "completed";
-
-    let response = await Response.findOne({ id: "1" });
-    if (response === null) {
-      // create new response
-      response = new Response({
-        id: "1",
-      });
-      response.result = true;
-    }
-    
-    const session = await mongoose.startSession();
-
     try {
-      // const contractData = await allcontractsData.findOne({packageHash : process.env.GAUGE_CONTROLLER_PACKAGE_HASH});
+      // updating mutation status
+      let eventDataResult = await eventsData.findOne({
+        _id: args.eventObjectId,
+      });
+      eventDataResult.status = "completed";
+
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+        });
+        response.result = true;
+      }
+    
+      const contractData = await allcontractsData.findOne({packageHash : process.env.GAUGE_CONTROLLER_PACKAGE_HASH});
 
       let nextWeek = nextPeriod(args.timestamp, WEEK);
       console.log("args-name", args);
 
       let gaugeType = await registerGaugeType(args.type_id, args.name);
 
+      let gaugeControllerPointsTypeWeight = await gaugeController.points_type_weight(contractData.contractHash, args.type_id, nextWeek);
+
       let newData = new GaugeTypeWeight({
         id: nextWeek.toString(),
         type: gaugeType.id,
         time: nextWeek.toString(),
-        weight: 
-          // await gaugeController.points_type_weight(contractData.contractHash, args.type_id, nextWeek)
-         '1000000000'
-        
+        //weight: '1000000000',
+        weight: gaugeControllerPointsTypeWeight
       });
+
+      let gaugeControllerPointsTotal = await gaugeController.points_total(contractData.contractHash, nextWeek);
 
       let data = new GaugeTotalWeight({
         id: nextWeek.toString(),
         time: nextWeek.toString(),
         weight : bigDecimal.round(
-          //  parseFloat(await gaugeController.points_total(contractData.contractHash, nextWeek)),
-          '1000000000',
+          parseFloat(gaugeControllerPointsTotal),
+          // '1000000000',
           parseFloat(GAUGE_TOTAL_WEIGHT_PRECISION)), //issue fixed
       });
 
       let state = await getSystemState(args);
       state.gaugeTypeCount = ((new bigdecimal.BigDecimal(state.gaugeTypeCount)).add(new bigdecimal.BigDecimal('1'))).toString();
-
+      
+      const session = await mongoose.startSession();
       await session.withTransaction(async () => {
         await GaugeType.create([gaugeType], {session});
         await GaugeTypeWeight.create([newData],{session});
@@ -127,35 +127,35 @@ const handleNewGauge = {
     eventObjectId : { type: GraphQLString },
   },
   async resolve(parent, args, context) {
-    
-    // updating mutation status
-    let eventDataResult = await eventsData.findOne({
-      _id: args.eventObjectId,
-    });
-    eventDataResult.status = "completed";
-
-    let response = await Response.findOne({ id: "1" });
-    if (response === null) {
-      // create new response
-      response = new Response({
-        id: "1",
-      });
-      response.result = true;
-    }
-    
-    const session = await mongoose.startSession();
-
     try {
-      // const contractData = await allcontractsData.findOne({packageHash : process.env.GAUGE_CONTROLLER_PACKAGE_HASH});
+
+      // updating mutation status
+      let eventDataResult = await eventsData.findOne({
+        _id: args.eventObjectId,
+      });
+      eventDataResult.status = "completed";
+
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+        });
+        response.result = true;
+      }
+
+      const contractData = await allcontractsData.findOne({packageHash : process.env.GAUGE_CONTROLLER_PACKAGE_HASH});
 
       let nextWeek = nextPeriod(args.timestamp, WEEK);
       let gaugeType = await getGaugeType((args.gaugeType).toString());
 
+      let gaugeControllerGaugeTypeNames= await gaugeController.gauge_type_names(contractData.contractHash ,args.gauge_type);
+
       if (gaugeType === null) {
         gaugeType = await registerGaugeType(
           (args.gaugeType).toString(),
-          // await gaugeController.gauge_type_names(contractData.contractHash ,args.gauge_type),
-          '1000000000',
+          gaugeControllerGaugeTypeNames,
+          //'1000000000',
         );
       }
 
@@ -173,20 +173,20 @@ const handleNewGauge = {
 
       console.log(gauge);
 
-      // await lpToken.setContractHash(args.addr).try_lp_token();
-      lpToken = "1000000000";
-      let token;
-      if (lpToken !== null) {
-        //let token = await getOrCreateLpToken(lpToken.value);
+      // // await lpToken.setContractHash(args.addr).try_lp_token();
+      // let lpToken = "1000000000";
+      // let token;
+      // if (lpToken !== null) {
+      //   //let token = await getOrCreateLpToken(lpToken.value);
         
-        token = await getOrCreateLpToken('1000000000');
-        token.gauge = gauge.id;
+      //   token = await getOrCreateLpToken('1000000000');
+      //   token.gauge = gauge.id;
 
-        if (token.pool != null) {
-          let pool = await Pool.findOne(token.pool);
-          gauge.pool = pool.id;
-        }
-      }
+      //   if (token.pool != null) {
+      //     let pool = await Pool.findOne(token.pool);
+      //     gauge.pool = pool.id;
+      //   }
+      // }
 
       let data = new GaugeWeight({
         id: gauge.id + "-" + nextWeek.toString(),
@@ -196,12 +196,14 @@ const handleNewGauge = {
         //weight: '1000000000'
       });
 
+      let gaugeControllerPointsTotal= await gaugeController.points_total(contractData.contractHash, nextWeek);
+
       let dataWeight = new GaugeTotalWeight({
         id: nextWeek.toString(),
         time: nextWeek.toString(),
         weight : bigDecimal.round(
-          // parseFloat(await gaugeController.points_total(contractData.contractHash, nextWeek)),
-          '1000000000',
+          parseFloat(gaugeControllerPointsTotal),
+          //'1000000000',
           parseFloat(GAUGE_TOTAL_WEIGHT_PRECISION)), //issue fixed 
         // weight: '1000000000'
       });
@@ -210,6 +212,7 @@ const handleNewGauge = {
       state.gaugeCount = ((new bigdecimal.BigDecimal(state.gaugeCount)).add(new bigdecimal.BigDecimal('1'))).toString();
       //state.gaugeCount = '1000000000'
 
+      const session = await mongoose.startSession();
       await session.withTransaction(async () => {
         await gaugeType.save({session});
         await gauge.save({session});
@@ -242,25 +245,23 @@ const handleNewGaugeWeight = {
     eventObjectId : { type: GraphQLString },
   },
   async resolve(parent, args, context) {
-    // updating mutation status
-    let eventDataResult = await eventsData.findOne({
-      _id: args.eventObjectId,
-    });
-    eventDataResult.status = "completed";
-
-    let response = await Response.findOne({ id: "1" });
-    if (response === null) {
-      // create new response
-      response = new Response({
-        id: "1",
-      });
-      response.result = true;
-    }
-    
-    const session = await mongoose.startSession();
-    
     try {
-      // const contractData = await allcontractsData.findOne({packageHash : process.env.GAUGE_CONTROLLER_PACKAGE_HASH});
+      // updating mutation status
+      let eventDataResult = await eventsData.findOne({
+        _id: args.eventObjectId,
+      });
+      eventDataResult.status = "completed";
+
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+        });
+        response.result = true;
+      }
+    
+      const contractData = await allcontractsData.findOne({packageHash : process.env.GAUGE_CONTROLLER_PACKAGE_HASH});
 
       let gauge = await Gauge.findOne({ id: args.gauge_address });
       //let gauge = '1000000000';
@@ -275,17 +276,20 @@ const handleNewGaugeWeight = {
         // weight: '1000000000'
         });
 
+        let gaugeControllerPointsTotal= await gaugeController.points_total(contractData.contractHash, nextWeek);
+
         data = new GaugeTotalWeight({
           id: nextWeek.toString(),
           time: nextWeek,
           weight : bigDecimal.round(
-            // parseFloat(await gaugeController.points_total(contractData.contractHash,nextWeek)),
-            '1000000000',
+            parseFloat(gaugeControllerPointsTotal),
+            //'1000000000',
             parseFloat(GAUGE_TOTAL_WEIGHT_PRECISION)), //issue fixed
           // weight: '1000000000'
         });
       }
-     
+
+      const session = await mongoose.startSession();
       await session.withTransaction(async () => {
         if(gauge != null){
           await GaugeWeight.create([newData],{session});
@@ -317,24 +321,22 @@ const handleNewTypeWeight = {
     eventObjectId : { type: GraphQLString },
   },
   async resolve(parent, args, context) {
-    // updating mutation status
-    let eventDataResult = await eventsData.findOne({
-      _id: args.eventObjectId,
-    });
-    eventDataResult.status = "completed";
-
-    let response = await Response.findOne({ id: "1" });
-    if (response === null) {
-      // create new response
-      response = new Response({
-        id: "1",
-      });
-      response.result = true;
-    }
-    
-    const session = await mongoose.startSession();
-
     try {
+        // updating mutation status
+        let eventDataResult = await eventsData.findOne({
+          _id: args.eventObjectId,
+        });
+        eventDataResult.status = "completed";
+
+        let response = await Response.findOne({ id: "1" });
+        if (response === null) {
+          // create new response
+          response = new Response({
+            id: "1",
+          });
+          response.result = true;
+        }
+    
         let gaugeType = await GaugeType.findOne({ id: (args.type_id.toString()) });
         //let gaugeType = '1000000000';
         let gaugeTypeWeight, gaugeTotalWeight;
@@ -358,6 +360,7 @@ const handleNewTypeWeight = {
           });
         }
 
+        const session = await mongoose.startSession();
         await session.withTransaction(async () => {
           if(gaugeType !== null){
             await GaugeTypeWeight.create([gaugeTypeWeight],{session});
@@ -389,33 +392,23 @@ const handleVoteForGauge = {
     eventObjectId : { type: GraphQLString },
   },
   async resolve(parent, args, context) {
-    
-      // updating mutation status
-    let eventDataResult = await eventsData.findOne({
-      _id: args.eventObjectId,
-    });
-    eventDataResult.status = "completed";
-
-    let response = await Response.findOne({ id: "1" });
-    if (response === null) {
-      // create new response
-      response = new Response({
-        id: "1",
-      });
-      response.result = true;
-    }
-    
-    const session = await mongoose.startSession();
-    
     try {
+      // updating mutation status
+      let eventDataResult = await eventsData.findOne({
+        _id: args.eventObjectId,
+      });
+      eventDataResult.status = "completed";
+
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+        });
+        response.result = true;
+      }
       
-      //We get contract hash for gauge controller package hash below
-      // const contractData = await allcontractsData.findOne({packageHash : process.env.GAUGE_CONTROLLER_PACKAGE_HASH});
-      console.log("Entered in handleVoteForGauge: \n");
-      console.log(".");
-      console.log(".");
-      console.log(".");
-      console.log(".");
+      let contractData = await allcontractsData.findOne({packageHash : process.env.GAUGE_CONTROLLER_PACKAGE_HASH});
 
       let gauge = await Gauge.findOne({ id: args.gauge_addr });
       //let gauge = '1000000000';
@@ -426,23 +419,25 @@ const handleVoteForGauge = {
       if (gauge !== null) {
         let nextWeek = nextPeriod(args.time, WEEK);
 
+        let gaugeControllerPointsWeight= (await gaugeController.points_weight(contractData.contractHash, args.gauge_addr, nextWeek)).value0;
+
         gaugeWeight = new GaugeWeight({
           id: gauge.id + "-" + nextWeek.toString(),
           gauge: gauge.id,
           time: nextWeek,
-          // weight: new bigdecimal.BigDecimal(
-          //   await gaugeController.points_weight(contractData.contractHash, args.gauge_addr, nextWeek).value0
-          // ),
-          weight: "1000000000"
+          weight: new bigdecimal.BigDecimal(gaugeControllerPointsWeight),
+          //weight: "1000000000"
         });
         console.log("gaugeWeight: ",gaugeWeight);
+
+        let gaugeControllerPointsTotal= await gaugeController.points_total(contractData.contractHash,nextWeek);
 
         gaugeTotalWeight = new GaugeTotalWeight({
           id: nextWeek.toString(),
           time: nextWeek,
           weight : bigDecimal.round(
-            // parseFloat(await gaugeController.points_total(contractData.contractHash,nextWeek)),
-            '1000000000',
+            parseFloat(gaugeControllerPointsTotal),
+            //'1000000000',
             parseFloat(GAUGE_TOTAL_WEIGHT_PRECISION)), //issue fixed
           // weight: "1000000000"
         });
@@ -455,17 +450,20 @@ const handleVoteForGauge = {
           gauge: gauge.id,
           user: user.id,
           time: args.time,
-          // weight: new bigdecimal.BigDecimal(args.weight),
           weight: new bigdecimal.BigDecimal(args.weight),
-        //weight:"1000000000"
+          //weight:"1000000000"
         });
         console.log("gaugeWeightVote: ",gaugeWeightVote);
-        // let veCRV = await votingEscrow.balanceOf(contractData.contractHash, user.id);
-        // let totalveCRV = await votingEscrow.totalSupply(contractData.contractHash);
+
+        
+        contractData = await allcontractsData.findOne({packageHash : process.env.VOTING_ESCROW_PACKAGE_HASH});
+        
+        let veCRV = await votingEscrow.balanceOf(contractData.contractHash, user.id);
+        let totalveCRV = await votingEscrow.totalSupply(contractData.contractHash);
 
         // suppossed values
-        let veCRV = '1000';
-        let totalveCRV = '10000';
+        //let veCRV = '1000';
+        //let totalveCRV = '10000';
 
         gaugeVote = new GaugeVote({
           id: gauge.id + "-" + user.id + "-" + args.time.toString(),
@@ -480,7 +478,8 @@ const handleVoteForGauge = {
         });
         console.log("gaugeVote: ",gaugeVote);
       }
-        
+
+      const session = await mongoose.startSession();
       await session.withTransaction(async () => {
         if(gauge !== null){
           await GaugeWeight.create([gaugeWeight],{ session });

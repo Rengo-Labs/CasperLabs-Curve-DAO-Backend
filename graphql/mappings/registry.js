@@ -16,7 +16,7 @@ var bigdecimal = require("bigdecimal");
 
 
 // let registryContract= require('../JsClients/Registry/test/installed.ts')
-// let poolContract= require('../JsClients/Registry/test/installed.ts')
+// let poolContract= require('../JsClients/Pool/test/installed.ts')
 
 const handlePoolAdded = {
   type: responseType,

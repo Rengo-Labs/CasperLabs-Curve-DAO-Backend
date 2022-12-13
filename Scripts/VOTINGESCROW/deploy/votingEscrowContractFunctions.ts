@@ -25,7 +25,7 @@ const {
   VOTING_ESCROW_VALUE,
   VOTING_ESCROW_UNLOCK_TIME,
   VOTING_ESCROW_BLOCK,
-  VOTINGESCROW_CONTRACT_HASH,
+  VOTING_ESCROW_CONTRACT_HASH,
   VOTING_ESCROW_EPOCH,
   VOTING_ESCROW_USER,
   VOTING_ESCROW_USER_EPOCH,
@@ -53,7 +53,7 @@ const votingEscrow = new VOTINGESCROWClient(
 
 const test = async () => {
 
-  await votingEscrow.setContractHash(VOTINGESCROW_CONTRACT_HASH!);
+  await votingEscrow.setContractHash(VOTING_ESCROW_CONTRACT_HASH!);
 
   // // token 
   const token = await votingEscrow.token();

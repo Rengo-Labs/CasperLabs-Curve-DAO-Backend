@@ -1,7 +1,6 @@
 const SystemState = require("../../models/systemState");
 
 async function getSystemState(args) {
-  console.log("getSystemState");
   let state = await SystemState.findOne({ id: "current" });
 
   if (state === null) {

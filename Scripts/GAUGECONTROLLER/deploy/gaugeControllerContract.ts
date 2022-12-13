@@ -16,8 +16,8 @@ const {
   GAUGE_CONTROLLER_INSTALL_PAYMENT_AMOUNT,
   GAUGE_CONTROLLER_CONTRACT_NAME,
   GAUGE_CONTROLLER_TOKEN,
-  GAUGE_CONTROLLER_VOTING_ESCROW,
-  GAUGE_CONTROLLER_CONTRACT_PACKAGE,
+  VOTING_ESCROW_PACKAGE_HASH,
+  GAUGE_CONTROLLER_PACKAGE_HASH,
   GAUGE_CONTROLLER_PAYMENT_AMOUNT,
   GAUGE_CONTROLLER_PURSE_PROXY_WASM_PATH
 } = process.env;
@@ -39,7 +39,7 @@ const deploy = async () => {
   const installDeployHash = await gaugeController.install(
     KEYS,
     GAUGE_CONTROLLER_TOKEN!,
-    GAUGE_CONTROLLER_VOTING_ESCROW!,
+    VOTING_ESCROW_PACKAGE_HASH!,
     GAUGE_CONTROLLER_CONTRACT_NAME!,
     GAUGE_CONTROLLER_INSTALL_PAYMENT_AMOUNT!,
     GAUGE_CONTROLLER_WASM_PATH!
@@ -78,7 +78,7 @@ const get_gauge_weight_session_code = async (addr : string) => {
 
   const installDeployHash = await gaugeController.installSessionCodeParamKeyAddr(
     KEYS,
-    GAUGE_CONTROLLER_CONTRACT_PACKAGE!,
+    GAUGE_CONTROLLER_PACKAGE_HASH!,
     "get_gauge_weight",
     addr,
     GAUGE_CONTROLLER_PAYMENT_AMOUNT!,
@@ -98,7 +98,7 @@ const gauge_types_session_code = async (addr : string) => {
 
   const installDeployHash = await gaugeController.installSessionCodeParamKeyAddr(
     KEYS,
-    GAUGE_CONTROLLER_CONTRACT_PACKAGE!,
+    GAUGE_CONTROLLER_PACKAGE_HASH!,
     "gauge_types",
     addr,
     GAUGE_CONTROLLER_PAYMENT_AMOUNT!,
@@ -117,7 +117,7 @@ const gauge_relative_weight_session_code = async (addr : string) => {
 
   const installDeployHash = await gaugeController.installSessionCodeParamKeyAddr(
     KEYS,
-    GAUGE_CONTROLLER_CONTRACT_PACKAGE!,
+    GAUGE_CONTROLLER_PACKAGE_HASH!,
     "gauge_relative_weight",
     addr,
     GAUGE_CONTROLLER_PAYMENT_AMOUNT!,
@@ -137,7 +137,7 @@ const gauge_relative_weight_write_session_code = async (addr : string) => {
 
   const installDeployHash = await gaugeController.installSessionCodeParamKeyAddr(
     KEYS,
-    GAUGE_CONTROLLER_CONTRACT_PACKAGE!,
+    GAUGE_CONTROLLER_PACKAGE_HASH!,
     "gauge_relative_weight_write",
     addr,
     GAUGE_CONTROLLER_PAYMENT_AMOUNT!,
@@ -157,7 +157,7 @@ const get_type_weight_session_code = async (type_id : string) => {
 
   const installDeployHash = await gaugeController.installSessionCodeParamU128TypeId(
     KEYS,
-    GAUGE_CONTROLLER_CONTRACT_PACKAGE!,
+    GAUGE_CONTROLLER_PACKAGE_HASH!,
     "get_type_weight",
     type_id,
     GAUGE_CONTROLLER_PAYMENT_AMOUNT!,
@@ -176,7 +176,7 @@ const get_weights_sum_per_type_session_code = async (type_id : string) => {
 
   const installDeployHash = await gaugeController.installSessionCodeParamU128TypeId(
     KEYS,
-    GAUGE_CONTROLLER_CONTRACT_PACKAGE!,
+    GAUGE_CONTROLLER_PACKAGE_HASH!,
     "get_weights_sum_per_type",
     type_id,
     GAUGE_CONTROLLER_PAYMENT_AMOUNT!,
@@ -195,7 +195,7 @@ const get_total_weight_session_code = async () => {
 
   const installDeployHash = await gaugeController.installSessionCodeNoParam(
     KEYS,
-    GAUGE_CONTROLLER_CONTRACT_PACKAGE!,
+    GAUGE_CONTROLLER_PACKAGE_HASH!,
     "get_total_weight",
     GAUGE_CONTROLLER_PAYMENT_AMOUNT!,
     GAUGE_CONTROLLER_PURSE_PROXY_WASM_PATH!

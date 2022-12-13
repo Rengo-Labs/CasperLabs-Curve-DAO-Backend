@@ -29,15 +29,29 @@ export const balanceOf = async (contractHash:string,account:string) => {
 
 export const totalSupply = async (contractHash:string) => {
 
-// We don't need hash- prefix so i'm removing it
-await votingEscrow.setContractHash(contractHash);
+  // We don't need hash- prefix so i'm removing it
+  await votingEscrow.setContractHash(contractHash);
 
-//totalSupply
-const totalSupply = await votingEscrow.totalSupply();
-console.log(contractHash +` =... totalSupply : ${totalSupply}`);
+  //totalSupply
+  const totalSupply = await votingEscrow.totalSupply();
+  console.log(contractHash +` =... totalSupply : ${totalSupply}`);
 
-return totalSupply;
+  return totalSupply;
 
+};
+
+export const lockedEnd = async (contractHash:string,account:string ) => {
+
+  // We don't need hash- prefix so i'm removing it
+  await votingEscrow.setContractHash(contractHash);
+  
+  //lockedEnd
+  const lockedEnd = await votingEscrow.lockedEnd(account);
+  console.log("locked End successfully");
+  console.log("locked End: ", lockedEnd.end);
+  
+  return lockedEnd.end;
+  
 };
 
 // export const minBalance = async (contractHash:string,addr:string) => {

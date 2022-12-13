@@ -12,7 +12,7 @@ const {
   EVENT_STREAM_ADDRESS,
   CHAIN_NAME,
   MINTER_MASTER_KEY_PAIR_PATH,
-  MINTER_CONTRACT,
+  MINTER_CONTRACT_HASH,
   MINTER_PAYMENT_AMOUNT
 } = process.env;
 
@@ -31,7 +31,7 @@ const minter = new MINTERClient(
 
 const deploy = async () => {
 
-  await minter.setContractHash(MINTER_CONTRACT!);
+  await minter.setContractHash(MINTER_CONTRACT_HASH!);
 
   //token
   const token = await minter.token();
