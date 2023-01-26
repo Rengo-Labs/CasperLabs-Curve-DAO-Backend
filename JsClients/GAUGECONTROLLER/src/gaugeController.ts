@@ -570,28 +570,79 @@ class GaugeControllerClient {
 
   public async vote_user_slopes(owner:string, spender:string) {
     try {
-      const _spender = new CLByteArray(
-        Uint8Array.from(Buffer.from(spender, "hex"))
-      );
+      let votedSlope = {
+        slope : 0,
+        power : 0,
+        end : 0
+      }
 
-      const _owner=new CLKey(new CLAccountHash(Uint8Array.from(Buffer.from(owner, "hex"))));
-      const key_spender = createRecipientAddress(_spender);
-      const finalBytes = concat([CLValueParsers.toBytes(_owner).unwrap(), CLValueParsers.toBytes(key_spender).unwrap()]);
-      const blaked = blake.blake2b(finalBytes, undefined, 32);
-      const encodedBytes = Buffer.from(blaked).toString("hex");
+      votedSlope.slope = await this.voteUserSlopeSlope(owner, spender);
+      votedSlope.power = await this.voteUserSlopePower(owner, spender);
+      votedSlope.end = await this.voteUserSlopeEnd(owner, spender);
+
+      return votedSlope;
+    } catch (error) {
+      return {
+        slope : 0,
+        power : 0,
+        end : 0
+      };
+    }
+
+  }
+
+  async voteUserSlopeSlope(owner:string, spender:string) {
+    try {
+      
+      const formattedString = "vote_user_slopes" + "_slope_" + owner + "_" + spender;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
 
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
-        encodedBytes,
+        hash,
         this.namedKeys.voteUserSlopes
       );
-
-      const maybeValue = result.value().unwrap();
-      return maybeValue.value().toString();
+        
+      return parseInt(result.data.val.data._hex);
     } catch (error) {
-      return "0";
+      return 0;
     }
+  }
 
+  async voteUserSlopePower(owner:string, spender:string) {
+    try {
+      
+      const formattedString = "vote_user_slopes" + "_power_" + owner + "_" + spender;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        hash,
+        this.namedKeys.voteUserSlopes
+      );
+        
+      return parseInt(result.data.val.data._hex);
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  async voteUserSlopeEnd(owner:string, spender:string) {
+    try {
+      
+      const formattedString = "vote_user_slopes" + "_end_" + owner + "_" + spender;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        hash,
+        this.namedKeys.voteUserSlopes
+      );
+        
+      return parseInt(result.data.val.data._hex);
+    } catch (error) {
+      return 0;
+    }
   }
 
   public get_blocktime(){
@@ -692,7 +743,7 @@ class GaugeControllerClient {
 
   }
 
-  public async pointsWeightBias(owner:string, spender:string) {
+  async pointsWeightBias(owner:string, spender:string) {
     try {
       
       const formattedString = "points_weight" + "_bias_" + owner + "_" + spender;
@@ -704,13 +755,13 @@ class GaugeControllerClient {
         this.namedKeys.pointsWeight
       );
 
-      return parseInt(result.data.val.data[1].data._hex);
+      return parseInt(result.data.val.data._hex);
     } catch (error) {
       return 0;
     }
   }
 
-  public async pointsWeightSlope(owner:string, spender:string) {
+  async pointsWeightSlope(owner:string, spender:string) {
     try {
       
       const formattedString = "points_weight" + "_slope_" + owner + "_" + spender;
@@ -722,7 +773,7 @@ class GaugeControllerClient {
         this.namedKeys.pointsWeight
       );
 
-      return parseInt(result.data.val.data[1].data._hex);
+      return parseInt(result.data.val.data._hex);
     } catch (error) {
       return 0;
     }

@@ -3,7 +3,7 @@ var express = require("express");
 var router = express.Router();
 var votingEscrow = require("../JsClients/VOTINGESCROW/votingEscrowFunctionsForBackend/functions");
 
-router.route("/balanceagainstuser/:contractHash/:user").get(async function (req, res, next) {
+router.route("/balanceagainstuser/:contractHash/:user").post(async function (req, res, next) {
   try {
     if (!req.params.contractHash) {
       return res.status(400).json({
@@ -34,7 +34,7 @@ router.route("/balanceagainstuser/:contractHash/:user").get(async function (req,
   }
 });
 
-router.route("/totalSupply/:contractHash").get(async function (req, res, next) {
+router.route("/totalSupply/:contractHash").post(async function (req, res, next) {
   try {
     
     if (!req.params.contractHash) {
@@ -81,9 +81,9 @@ router.route("/totalSupply/:contractHash").get(async function (req, res, next) {
   }
 });
 
-router.route("/totalSupplyAt/:contractHash").get(async function (req, res, next) {
+router.route("/totalSupplyAt/:contractHash").post(async function (req, res, next) {
   try {
-    debugger;
+    
     if (!req.params.contractHash) {
       return res.status(400).json({
         success: false,
@@ -129,7 +129,7 @@ router.route("/totalSupplyAt/:contractHash").get(async function (req, res, next)
   }
 });
 
-router.route("/balanceOf/:contractHash").get(async function (req, res, next) {
+router.route("/balanceOf/:contractHash").post(async function (req, res, next) {
   try {
     
     if (!req.params.contractHash) {
@@ -142,7 +142,7 @@ router.route("/balanceOf/:contractHash").get(async function (req, res, next) {
     if(!req.body.account){
       return res.status(400).json({
         success: false,
-        message: "account not found in request params",
+        message: "account not found in request body",
       });
     }
 
@@ -182,7 +182,7 @@ router.route("/balanceOf/:contractHash").get(async function (req, res, next) {
   }
 });
 
-router.route("/balanceOfAt/:contractHash").get(async function (req, res, next) {
+router.route("/balanceOfAt/:contractHash").post(async function (req, res, next) {
   try {
     
     if (!req.params.contractHash) {
@@ -195,7 +195,7 @@ router.route("/balanceOfAt/:contractHash").get(async function (req, res, next) {
     if(!req.body.account){
       return res.status(400).json({
         success: false,
-        message: "account not found in request params",
+        message: "account not found in request body",
       });
     }
 
@@ -236,7 +236,39 @@ router.route("/balanceOfAt/:contractHash").get(async function (req, res, next) {
   }
 });
 
-router.route("/CRVStats/:contractHash/:user").get(async function (req, res, next) {
+router.route("/getlastUserSlope/:contractHash").post(async function (req, res, next) {
+  try {
+    
+    if (!req.params.contractHash) {
+      return res.status(400).json({
+        success: false,
+        message: "contractHash not found in request params",
+      });
+    }
+
+    if(!req.body.address){
+      return res.status(400).json({
+        success: false,
+        message: "address not found in request body",
+      });
+    }
+    
+    let lastUserSlope = await votingEscrow.getLastUserSlope(req.params.contractHash,req.body.address);
+    return res.status(200).json({
+      success: true,
+      lastUserSlope: lastUserSlope,
+    });
+    
+  } catch (error) {
+    console.log("error (try-catch) : " + error);
+    return res.status(500).json({
+      success: false,
+      err: error,
+    });
+  }
+});
+
+router.route("/CRVStats/:contractHash/:user").post(async function (req, res, next) {
     try {
 
       if (!req.params.contractHash) {
@@ -270,7 +302,7 @@ router.route("/CRVStats/:contractHash/:user").get(async function (req, res, next
     }
 });
 
-router.route("/lockedEnd/:contractHash").get(async function (req, res, next) {
+router.route("/lockedEnd/:contractHash").post(async function (req, res, next) {
     try {
       if (!req.params.contractHash) {
         return res.status(400).json({

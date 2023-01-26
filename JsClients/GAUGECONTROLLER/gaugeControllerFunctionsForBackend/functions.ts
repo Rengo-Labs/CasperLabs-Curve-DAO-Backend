@@ -32,8 +32,8 @@ export const points_weight = async (contractHash : string ,owner : string, spend
   await gaugeController.setContractHash(contractHash);
 
  //pointsWeight
- const pointsWeight = await gaugeController.points_type_weight(owner ,  spender);
- console.log(`... Points type weight: ${pointsWeight}`);
+ const pointsWeight = await gaugeController.points_weight(owner ,  spender);
+ console.log(`... Points weight: ${pointsWeight}`);
 
  return pointsWeight;
 }
@@ -92,5 +92,18 @@ export const get_total_weight = async (contractHash : string) => {
  
   return guageTotalWeight;
 }
+
+export const vote_user_slopes = async (contractHash : string, owner : string, spender : string) => {
+  // We don't need hash- prefix so i'm removing it
+  await gaugeController.setContractHash(contractHash);
+
+  //gaugeTypeNames
+  const voteUserSlopes = await gaugeController.vote_user_slopes(owner, spender);
+  console.log(`... voteUserSlopes: ${voteUserSlopes}`);
+ 
+  return voteUserSlopes;
+}
+
+
 
 

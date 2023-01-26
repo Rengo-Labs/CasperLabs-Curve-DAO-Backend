@@ -66,6 +66,19 @@ export const totalSupplyAt = async (contractHash:string, block : number) => {
 
 };
 
+export const getLastUserSlope = async (contractHash:string, addr : string) => {
+
+  // We don't need hash- prefix so i'm removing it
+  await votingEscrow.setContractHash(contractHash);
+
+  //getLastUserSlope
+  const lastUserSlope = await votingEscrow.getLastUserSlope(addr);
+  console.log(contractHash +` =... lastUserSlopeAt : ${lastUserSlope}`);
+
+  return lastUserSlope;
+
+};
+
 export const lockedEnd = async (contractHash:string,account:string ) => {
 
   // We don't need hash- prefix so i'm removing it

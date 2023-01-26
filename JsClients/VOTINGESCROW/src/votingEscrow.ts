@@ -84,6 +84,15 @@ class VOTINGESCROWClient {
     }
   }
 
+  public async getLastUserSlope(addr : string){
+  try{
+    let uepoch = await this.userPointEpoch(addr);
+    return await this.userPointHistory(addr, uepoch);
+  }catch(error){
+    return 0;
+  }
+  }
+  
   public async getLastUserSlopeSessionCode(
     keys: Keys.AsymmetricKey,
     entrypointName:string,
@@ -605,7 +614,7 @@ class VOTINGESCROWClient {
     return result.value();
   }
 
-  public async pointHistoryBias(epoch: number) {
+  async pointHistoryBias(epoch: number) {
     try {
 
       const formattedString = "point_history" + "_bias_" + epoch;
@@ -623,7 +632,7 @@ class VOTINGESCROWClient {
     }
   }
 
-  public async pointHistorySlope(epoch: number) {
+  async pointHistorySlope(epoch: number) {
     try {
 
       const formattedString = "point_history" + "_slope_" + epoch;
@@ -641,7 +650,7 @@ class VOTINGESCROWClient {
     }
   }
 
-  public async pointHistoryTs(epoch: number) {
+  async pointHistoryTs(epoch: number) {
     try {
 
       const formattedString = "point_history" + "_ts_" + epoch;
@@ -659,7 +668,7 @@ class VOTINGESCROWClient {
     }
   }
 
-  public async pointHistoryBlk(epoch: number) {
+  async pointHistoryBlk(epoch: number) {
     try {
 
       const formattedString = "point_history" + "_blk_" + epoch;
@@ -703,7 +712,7 @@ class VOTINGESCROWClient {
   }
   
 
-  public async userPointHistoryBias(user:string, userEpoch:string) {
+  async userPointHistoryBias(user:string, userEpoch:string) {
     try {
       
       const formattedString = "user_point_history" + "_bias_account-hash-" + user + "_" + userEpoch;
@@ -724,7 +733,7 @@ class VOTINGESCROWClient {
     }
   }
 
-  public async userPointHistorySlope(user:string, userEpoch:string) {
+  async userPointHistorySlope(user:string, userEpoch:string) {
     try {
       const formattedString = "user_point_history" + "_slope_account-hash-" + user + "_" + userEpoch;
       const hash = keccak('keccak256').update(formattedString).digest('hex');
@@ -744,7 +753,7 @@ class VOTINGESCROWClient {
     }
   }
 
-  public async userPointHistoryTs(user:string, userEpoch:string) {
+  async userPointHistoryTs(user:string, userEpoch:string) {
     try {
       const formattedString = "user_point_history" + "_ts_account-hash-" + user + "_" + userEpoch;
       const hash = keccak('keccak256').update(formattedString).digest('hex');
@@ -764,7 +773,7 @@ class VOTINGESCROWClient {
     }
   }
 
-  public async userPointHistoryBlk(user:string, userEpoch:string) {
+  async userPointHistoryBlk(user:string, userEpoch:string) {
     try {
       const formattedString = "user_point_history" + "_blk_account-hash-" + user + "_" + userEpoch;
       const hash = keccak('keccak256').update(formattedString).digest('hex');

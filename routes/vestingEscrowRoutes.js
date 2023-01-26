@@ -3,9 +3,9 @@ var express = require("express");
 var router = express.Router();
 var vestingEscrow = require("../JsClients/VESTINGESCROWFACTORY/vestingEscrowFunctionsForBackend/functions");
 
-router.route("/balanceOf/:contractHash").get(async function (req, res, next) {
+router.route("/balanceOf/:contractHash").post(async function (req, res, next) {
   try {
-    debugger;
+    
     if (!req.params.contractHash) {
       return res.status(400).json({
         success: false,
@@ -16,7 +16,7 @@ router.route("/balanceOf/:contractHash").get(async function (req, res, next) {
     if (!req.body.account) {
       return res.status(400).json({
         success: false,
-        message: "account not found in request params",
+        message: "account not found in request body",
       });
     }
 
@@ -38,7 +38,7 @@ router.route("/balanceOf/:contractHash").get(async function (req, res, next) {
   }
 });
 
-router.route("/vestedOf/:contractHash").get(async function (req, res, next) {
+router.route("/vestedOf/:contractHash").post(async function (req, res, next) {
   try {
 
     if (!req.params.contractHash) {
@@ -51,7 +51,7 @@ router.route("/vestedOf/:contractHash").get(async function (req, res, next) {
     if (!req.body.account) {
       return res.status(400).json({
         success: false,
-        message: "account not found in request params",
+        message: "account not found in request body",
       });
     }
 
@@ -73,7 +73,7 @@ router.route("/vestedOf/:contractHash").get(async function (req, res, next) {
   }
 });
 
-router.route("/lockedOf/:contractHash").get(async function (req, res, next) {
+router.route("/lockedOf/:contractHash").post(async function (req, res, next) {
     try {
 
       if (!req.params.contractHash) {
@@ -86,7 +86,7 @@ router.route("/lockedOf/:contractHash").get(async function (req, res, next) {
       if (!req.body.account) {
         return res.status(400).json({
           success: false,
-          message: "account not found in request params",
+          message: "account not found in request body",
         });
       }
 

@@ -5,7 +5,7 @@ var gaugeController = require("../JsClients/GAUGECONTROLLER/gaugeControllerFunct
 
 router
   .route("/gaugeRelativeWeight/:contractHash")
-  .get(async function (req, res, next) {
+  .post(async function (req, res, next) {
     try {
       if (!req.params.contractHash) {
         return res.status(400).json({
@@ -17,7 +17,7 @@ router
       if (!req.body.address) {
         return res.status(400).json({
           success: false,
-          message: "address not found in request params",
+          message: "address not found in request body",
         });
       }
 
@@ -72,9 +72,9 @@ router
 
 router
   .route("/getGaugeWeight/:contractHash")
-  .get(async function (req, res, next) {
+  .post(async function (req, res, next) {
     try {
-      debugger
+      
       if (!req.params.contractHash) {
         return res.status(400).json({
           success: false,
@@ -85,7 +85,7 @@ router
       if (!req.body.address) {
         return res.status(400).json({
           success: false,
-          message: "address not found in request params",
+          message: "address not found in request body",
         });
       }
 
@@ -109,7 +109,7 @@ router
 
 router
   .route("/getTotalWeight/:contractHash")
-  .get(async function (req, res, next) {
+  .post(async function (req, res, next) {
     try {
       
       if (!req.params.contractHash) {
@@ -126,6 +126,78 @@ router
       return res.status(200).json({
         success: true,
         totalWeight: totalWeight,
+      });
+    } catch (error) {
+      console.log("error (try-catch) : " + error);
+      return res.status(500).json({
+        success: false,
+        err: error,
+      });
+    }
+  });
+
+  router
+  .route("/voteUserSlopes/:contractHash")
+  .post(async function (req, res, next) {
+    try {
+      
+      if (!req.params.contractHash) {
+        return res.status(400).json({
+          success: false,
+          message: "contractHash not found in request params",
+        });
+      }
+
+      if (!req.body.owner || !req.body.spender) {
+        return res.status(400).json({
+          success: false,
+          message: `${!req.body.owner ? "owner" : "spender"} not found in request body`,
+        });
+      }
+
+      let voteUserSlopes = await gaugeController.vote_user_slopes(
+        req.params.contractHash, req.body.owner, req.body.spender
+      );
+      
+      return res.status(200).json({
+        success: true,
+        voteUserSlope: voteUserSlopes,
+      });
+    } catch (error) {
+      console.log("error (try-catch) : " + error);
+      return res.status(500).json({
+        success: false,
+        err: error,
+      });
+    }
+  });
+
+  router
+  .route("/pointsWeight/:contractHash")
+  .post(async function (req, res, next) {
+    try {
+      
+      if (!req.params.contractHash) {
+        return res.status(400).json({
+          success: false,
+          message: "contractHash not found in request params",
+        });
+      }
+
+      if (!req.body.owner || !req.body.spender) {
+        return res.status(400).json({
+          success: false,
+          message: `${!req.body.owner ? "owner" : "spender"} not found in request body`,
+        });
+      }
+
+      let pointsWeight = await gaugeController.points_weight(
+        req.params.contractHash, req.body.owner, req.body.spender
+      );
+      
+      return res.status(200).json({
+        success: true,
+        pointsWeight: pointsWeight,
       });
     } catch (error) {
       console.log("error (try-catch) : " + error);
