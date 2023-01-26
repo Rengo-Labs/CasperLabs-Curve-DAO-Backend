@@ -1,52 +1,30 @@
 import {
   CasperClient,
   CLPublicKey,
-  CLAccountHash,
   CLByteArray,
-  CLKey,
   CLString,
   CLTypeBuilder,
   CLValue,
   CLValueBuilder,
-  CLValueParsers,
-  CLMap,
   DeployUtil,
-  EventName,
-  EventStream,
   Keys,
   RuntimeArgs,
-  CLOption
 } from "casper-js-sdk";
-import { Some, None } from "ts-results";
-import * as blake from "blakejs";
-import { concat } from "@ethersproject/bytes";
+
+const keccak = require('keccak');
 import * as utils from "./utils";
 import { RecipientType, IPendingDeploy } from "./types";
-import {createRecipientAddress } from "./utils";
 
 class VOTINGESCROWClient {
   private contractName: string = "votingescrow";
   private contractHash: string= "votingescrow";
   private contractPackageHash: string= "votingescrow";
   private namedKeys: {
-    balanceOf:string
-    metadata: string;
-    nonces: string;
-    allowances: string;
     locked: string,
-    ownedTokens: string;
-    owners: string;
-    paused: string;
-    minBalance: string;
-    minAcceptQuorumPct: string;
-    minTime:string;
-    supportRequiredPct: string;
-    voteTime: string;
-    token: string;
-    point_history: string;
-    user_point_history: string;
-    user_point_epoch: string;
-    slope_changes: string;
+    pointHistory: string;
+    slopeChanges: string;
+    userPointHistory: string;
+    userPointEpoch: string;
   };
 
   private isListening = false;
@@ -61,24 +39,11 @@ class VOTINGESCROWClient {
   ) 
   {
     this.namedKeys= {
-      balanceOf:"null",
-      metadata: "null",
-      nonces: "null",
-      allowances: "null",
       locked: "null",
-      ownedTokens: "null",
-      owners: "null",
-      paused: "null",
-      minBalance: "null",
-      minAcceptQuorumPct: "null",
-      minTime: "null",
-      supportRequiredPct: "null",
-      voteTime: "null",
-      token: "null",
-      point_history: "null",
-      user_point_history: "null",
-      user_point_epoch: "null",
-      slope_changes: "null",
+      pointHistory: "null",
+      slopeChanges: "null",
+      userPointHistory: "null",
+      userPointEpoch: "null",
     }; 
   }
 
@@ -270,21 +235,203 @@ class VOTINGESCROWClient {
     }
   }
 
-  public async balanceOf(account: string) {
+  public async balanceOf(account: string, t: number) {
     try {
-
-      const result = await utils.contractDictionaryGetter(
-        this.nodeAddress,
-        account,
-        this.namedKeys.balanceOf
-      );
-      const maybeValue = result.value().unwrap();
-      return maybeValue.value().toString();
-
+      
+      if(t == null)
+      {
+        t = (new Date().getTime());
+      }
+      console.log("account: ",account);
+      console.log("t: ",t);
+      let epoch = await this.userPointEpoch(account);
+      console.log("epoch: ",epoch);
+      if(epoch == 0)
+      {
+        return "0";
+      }
+      else{
+        let lastPoint  = await this.userPointHistory(account,epoch);
+        console.log("lastPoint: ",lastPoint);
+        lastPoint.bias = (lastPoint.bias -(lastPoint.slope * (t-lastPoint.ts)));
+        if (lastPoint.bias < 0) {
+            lastPoint.bias = 0;
+        }
+        return lastPoint.bias;
+      }
+   
     } catch (error) {
       return "0";
     }
 
+  }
+
+  async findBlockEpoch(block:number,max_epoch:number){
+     let min = 0;
+     let max = max_epoch;
+
+     for(let i = 0; i < 128; i++){
+      if(min >= max)
+        break;
+      let mid = Math.floor((min + max + 1) / 2);
+      let pointHistory = await this.pointHistory(mid);
+      if(pointHistory.blk <= block)
+        min = mid;
+      else
+        max = mid - 1;  
+     }
+     return min;
+  }
+
+  convert(a : number, b : number) {
+    if (a > b) {
+        return parseInt((a - b).toString());
+    } else {
+        return -parseInt((b - a).toString());
+    }
+  }
+
+  public async balanceOfAt(addr : string, block : number){
+    try{
+      
+      if(block > this.block_number()) {
+        throw new Error("Invalid block number");
+      }
+  
+      let min = 0;
+      let max = parseFloat(await this.userPointEpoch(addr));
+  
+      for(let i = 0; i < 128; i++){
+        if(min >= max)
+          break;
+        let mid = Math.floor((min + max + 1) / 2 );
+        let pointHistory = await this.userPointHistory(addr,mid.toString());
+      
+        if(pointHistory.blk <= block)
+          min = mid
+        else
+          max = mid - 1;  
+      }
+  
+      let upoint = await this.userPointHistory(addr, min.toString());
+      let max_epoch = await this.epoch();
+      let epoch = await this.findBlockEpoch(block,max_epoch);
+      let point_0 = await this.pointHistory(epoch);
+      let d_block = 0;
+      let d_t = 0;
+  
+      if (epoch < max_epoch ){
+        let point_1 = await this.pointHistory(epoch + 1);
+        d_block = point_1.blk - point_0.blk;
+        d_t = point_1.ts - point_0.ts
+           
+    } else {
+        d_block = this.block_number() - point_0.blk; 
+        d_t = this.get_blocktime() - point_0.ts; 
+    }
+  
+    let block_time = point_0.ts;
+    if (d_block != 0) {
+      block_time = block_time + Math.floor((d_t * (block - point_0.blk)) / d_block);
+      }
+      upoint.bias = upoint.bias - (upoint.slope * this.convert(block_time, upoint.ts))
+      
+    if (upoint.bias >= 0) {
+        return upoint.bias
+    } else {
+        return 0
+    }
+    }catch(error){
+      return "0";
+    }  
+  }
+
+  public async totalSupply(t: number) {
+    try {
+
+      if(t == null)
+      {
+        t = (new Date().getTime());
+      }
+      console.log("t: ",t);
+      let epoch = await this.epoch();
+      console.log("epoch: ",parseInt(epoch._hex));
+     
+      let lastPoint = await this.pointHistory(epoch);
+      return await this.supplyAt(lastPoint, t);
+
+    } catch (error) {
+      
+      return "0";
+    }
+
+  }
+
+  public block_number(){
+    const AVG_BLOCK_TIME_IN_MS = 45000;
+    return Math.floor((new Date().getTime()) / AVG_BLOCK_TIME_IN_MS);
+  }
+
+  public get_blocktime(){
+    return (new Date().getTime());
+  }
+
+  public async totalSupplyAt(block : number){
+    try{
+      
+      if(block > this.block_number()){
+        console.log("Invalid block number")
+      }
+  
+      let epoch = await this.epoch();
+      let target_epoch = await this.findBlockEpoch(block, epoch);
+      let point = await this.pointHistory(target_epoch);
+      let dt= 0;
+      
+      if (target_epoch < epoch){
+        let point_next = await this.pointHistory(target_epoch + 1);
+  
+        if (point.blk != point_next.blk){
+          dt = Math.floor(((block - point.blk) * (point_next.ts - point.ts)) / (point_next.blk - point.blk));
+        } 
+      }else if(point.blk != this.block_number()){
+        dt = Math.floor(((block - point.blk ) * (this.get_blocktime() - point.ts)) / (this.block_number() - point.blk));
+      }
+      return await this.supplyAt(point,point.ts + dt)
+    
+    }catch(error){
+      return "0";
+    }
+    }
+
+  public async supplyAt(point:{ts : number, bias : number, slope: number} , t: number) {   
+      const WEEK = 604800000;
+      let last_point = point;
+
+      let t_i = Math.floor((last_point.ts / WEEK ) * WEEK);
+
+      for (let i=0; i < 255; i++){
+        t_i = t_i + WEEK;
+        let d_slope = 0;
+
+        if (t_i > t){
+          t_i = t;
+        } else {
+            d_slope = await this.slopeChanges(t_i.toString());
+        }
+
+        last_point.bias = last_point.bias - (last_point.slope * this.convert(t_i, last_point.ts))
+
+        if(t_i == t){
+          break;
+        }
+        last_point.slope = last_point.slope + d_slope;
+        last_point.ts = t_i;
+      }
+      if (last_point.bias < 0){
+        last_point.bias = 0;
+      }
+      return last_point.bias;
   }
 
   public async balanceOfAtSessionCode(
@@ -320,15 +467,6 @@ class VOTINGESCROWClient {
     } else {
       throw Error("Problem with installation");
     }
-  }
-
-  public async totalSupply() {
-    const result = await contractSimpleGetter(
-      this.nodeAddress,
-      this.contractHash,
-      ["total_supply"]
-    );
-    return result.value();
   }
 
   public async totalSupplySessionCode(
@@ -397,7 +535,6 @@ class VOTINGESCROWClient {
     }
   }
 
-
   public async setContractHash(hash: string) {
     const stateRootHash = await utils.getStateRootHash(this.nodeAddress);
     const contractData = await utils.getContractData(
@@ -412,25 +549,13 @@ class VOTINGESCROWClient {
       "contract-package-wasm",
       ""
     );
+   
     const LIST_OF_NAMED_KEYS = [
-      'balances',
-      'nonces',
-      'allowances',
       'locked',
-      'minBalance',
-      'minAcceptQuorumPct',
-      'minTime',
-      'supportRequiredPct',
-      'voteTime',
-      'token',
       'point_history',
+      'slope_changes',
       'user_point_history',
-      'user_point_epoch',
-      `${this.contractName}_package_hash`,
-      `${this.contractName}_package_hash_wrapped`,
-      `${this.contractName}_contract_hash`,
-      `${this.contractName}_contract_hash_wrapped`,
-      `${this.contractName}_package_access_token`,
+      'user_point_epoch'
     ];
     // @ts-ignore
     this.namedKeys = namedKeys.reduce((acc, val) => {
@@ -440,7 +565,6 @@ class VOTINGESCROWClient {
       return acc;
     }, {});
   }
-
 
   //VOTING_ESCROW FUNCTIONS
 
@@ -477,57 +601,225 @@ class VOTINGESCROWClient {
       this.contractHash,
       ["epoch"]
     );
+
     return result.value();
   }
 
-  public async pointHistory(epoch: string) {
+  public async pointHistoryBias(epoch: number) {
     try {
+
+      const formattedString = "point_history" + "_bias_" + epoch;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
 
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
-        epoch,
-        this.namedKeys.point_history
+        hash,
+        this.namedKeys.pointHistory
       );
-      const maybeValue = result.value().unwrap();
-      return maybeValue.value().toString();
+      return parseInt(result.data.val.data[1].data._hex);
 
     } catch (error) {
-      return "0";
+      return 0;
     }
   }
 
-  public async userPointHistory(user:string, userEpoch:string) {
+  public async pointHistorySlope(epoch: number) {
     try {
-      const _user=new CLKey(new CLAccountHash(Uint8Array.from(Buffer.from(user, "hex"))));
-      const user_epoch = CLValueBuilder.u256(userEpoch);
-      const finalBytes = concat([CLValueParsers.toBytes(_user).unwrap(), CLValueParsers.toBytes(user_epoch).unwrap()]);
-      const blaked = blake.blake2b(finalBytes, undefined, 32);
-      const encodedBytes = Buffer.from(blaked).toString("hex");
+
+      const formattedString = "point_history" + "_slope_" + epoch;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
 
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
-        encodedBytes,
-        this.namedKeys.user_point_history
+        hash,
+        this.namedKeys.pointHistory
+      );
+      return parseInt(result.data.val.data[1].data._hex);
+
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  public async pointHistoryTs(epoch: number) {
+    try {
+
+      const formattedString = "point_history" + "_ts_" + epoch;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        hash,
+        this.namedKeys.pointHistory
+      );
+      return parseInt(result.data.val.data._hex);
+
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  public async pointHistoryBlk(epoch: number) {
+    try {
+
+      const formattedString = "point_history" + "_blk_" + epoch;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        hash,
+        this.namedKeys.pointHistory
+      );
+      return parseInt(result.data.val.data._hex);
+
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  public async pointHistory(epoch: number) {
+    try {
+      let pointHistory = {
+        bias : 0,
+        slope : 0,
+        ts : 0,
+        blk : 0
+      }
+
+      pointHistory.bias = await this.pointHistoryBias(epoch);
+      pointHistory.slope = await this.pointHistorySlope(epoch);
+      pointHistory.ts = await this.pointHistoryTs(epoch);
+      pointHistory.blk = await this.pointHistoryBlk(epoch);
+      
+      return pointHistory;
+    } catch (error) {
+      return {
+        bias : 0,
+        slope : 0,
+        ts : 0,
+        blk : 0
+      };
+    }
+  }
+  
+
+  public async userPointHistoryBias(user:string, userEpoch:string) {
+    try {
+      
+      const formattedString = "user_point_history" + "_bias_account-hash-" + user + "_" + userEpoch;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      console.log("bias hash", hash);
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        hash,
+        this.namedKeys.userPointHistory
       );
 
-      const maybeValue = result.value().unwrap();
-      return maybeValue.value().toString();
+      console.log("bias value",parseInt(result.data.val.data[1].data._hex))
+     
+      return parseInt(result.data.val.data[1].data._hex);
     } catch (error) {
-      return "0";
+      return error;
+    }
+  }
+
+  public async userPointHistorySlope(user:string, userEpoch:string) {
+    try {
+      const formattedString = "user_point_history" + "_slope_account-hash-" + user + "_" + userEpoch;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      console.log("slope hash", hash);
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        hash,
+        this.namedKeys.userPointHistory
+      );
+
+      console.log("slope value",parseInt(result.data.val.data[1].data._hex))
+     
+      return parseInt(result.data.val.data[1].data._hex);
+    } catch (error) {
+      return error;
+    }
+  }
+
+  public async userPointHistoryTs(user:string, userEpoch:string) {
+    try {
+      const formattedString = "user_point_history" + "_ts_account-hash-" + user + "_" + userEpoch;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      console.log("ts hash", hash);
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        hash,
+        this.namedKeys.userPointHistory
+      );
+
+      console.log("ts value",parseInt(result.data.val.data._hex))
+     
+      return parseInt(result.data.val.data._hex);
+    } catch (error) {
+      return error;
+    }
+  }
+
+  public async userPointHistoryBlk(user:string, userEpoch:string) {
+    try {
+      const formattedString = "user_point_history" + "_blk_account-hash-" + user + "_" + userEpoch;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      console.log("blk hash", hash);
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        hash,
+        this.namedKeys.userPointHistory
+      );
+
+      console.log("blk value",parseInt(result.data.val.data._hex))
+     
+      return parseInt(result.data.val.data._hex);
+    } catch (error) {
+      return error;
+    }
+  }
+
+
+  public async userPointHistory(user:string, userEpoch:string) {
+    try {
+      let userPointHistory = {
+        bias : 0,
+        slope : 0,
+        ts : 0,
+        blk : 0
+    };
+      userPointHistory.bias = await this.userPointHistoryBias(user, userEpoch); 
+      userPointHistory.slope = await this.userPointHistorySlope(user, userEpoch); 
+      userPointHistory.ts = await this.userPointHistoryTs(user, userEpoch); 
+      userPointHistory.blk = await this.userPointHistoryBlk(user, userEpoch); 
+
+      return userPointHistory;
+    } catch (error) {
+      return {
+        bias : 0,
+        slope : 0,
+        ts : 0,
+        blk : 0
+    };
     }
   }
 
   public async userPointEpoch(user: string) {
     try {
-
+      
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
         user,
-        this.namedKeys.user_point_epoch
+        this.namedKeys.userPointEpoch
       );
       const maybeValue = result.value().unwrap();
       return maybeValue.value().toString();
-
+      
     } catch (error) {
       return "0";
     }
@@ -539,7 +831,7 @@ class VOTINGESCROWClient {
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
         time,
-        this.namedKeys.slope_changes
+        this.namedKeys.slopeChanges
       );
       const maybeValue = result.value().unwrap();
       return maybeValue.value().toString();

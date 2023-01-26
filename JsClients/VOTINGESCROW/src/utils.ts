@@ -98,24 +98,42 @@ export const contractDictionaryGetter = async (
   nodeAddress: string,
   dictionaryItemKey: string,
   seedUref: string,
-) => {
+) => { 
   const stateRootHash = await getStateRootHash(nodeAddress);
 
+  console.log("nodeAddress: ",nodeAddress);
+  console.log("dictionaryItemKey: ",dictionaryItemKey);
+  console.log("seedUref: ",seedUref);
   const client = new CasperServiceByJsonRPC(nodeAddress);
-
   const storedValue = await client.getDictionaryItemByURef(
     stateRootHash,
     dictionaryItemKey,
     seedUref
   );
-
-  if (storedValue && storedValue.CLValue instanceof CLValue) {
-    return storedValue.CLValue!;
-  } else {
-    throw Error("Invalid stored value");
-  }
+  console.log("storedValue: ",storedValue);
+  return storedValue.CLValue!;
 };
 
+export const contractDictionaryGetterRawData = async (
+  nodeAddress: string,
+  dictionaryItemKey: string,
+  seedUref: string,
+) => {
+  const stateRootHash = await getStateRootHash(nodeAddress);
+  console.log("nodeAddress: ",nodeAddress);
+  console.log("dictionaryItemKey: ",dictionaryItemKey);
+  console.log("seedUref: ",seedUref);
+  const client = new CasperServiceByJsonRPC(nodeAddress);
+  const storedValue = await client.getDictionaryItemByURef(
+    stateRootHash,
+    dictionaryItemKey,
+    seedUref,
+    {rawData: true}
+  );
+
+  console.log("storedValue: ",storedValue);
+  return storedValue.CLValue!;
+};
 
 export const contractHashToByteArray = (contractHash: string) =>
   Uint8Array.from(Buffer.from(contractHash, "hex"));

@@ -6,7 +6,7 @@ const {
   NODE_ADDRESS,
   EVENT_STREAM_ADDRESS,
   CHAIN_NAME,
-} = process.env;
+} = process.env; 
 
 const votingEscrow = new VOTINGESCROWClient(
   NODE_ADDRESS!,
@@ -14,27 +14,53 @@ const votingEscrow = new VOTINGESCROWClient(
   EVENT_STREAM_ADDRESS!,
 );
 
-export const balanceOf = async (contractHash:string,account:string) => {
+export const balanceOf = async (contractHash:string,account:string,t:number) => {
 
   // We don't need hash- prefix so i'm removing it
   await votingEscrow.setContractHash(contractHash);
 
   //balanceof
-  const balance = await votingEscrow.balanceOf(account);
+  const balance = await votingEscrow.balanceOf(account,t);
   console.log(contractHash +` =... balanceof : ${balance}`);
 
   return balance;
 
 };
 
-export const totalSupply = async (contractHash:string) => {
+export const balanceOfAt = async (contractHash:string,addr:string,block:number) => {
+
+  // We don't need hash- prefix so i'm removing it
+  await votingEscrow.setContractHash(contractHash);
+
+  //balanceof
+  const balance = await votingEscrow.balanceOfAt(addr,block);
+  console.log(contractHash +` =... balanceof : ${balance}`);
+
+  return balance;
+
+};
+
+export const totalSupply = async (contractHash:string, t : number) => {
 
   // We don't need hash- prefix so i'm removing it
   await votingEscrow.setContractHash(contractHash);
 
   //totalSupply
-  const totalSupply = await votingEscrow.totalSupply();
+  const totalSupply = await votingEscrow.totalSupply(t);
   console.log(contractHash +` =... totalSupply : ${totalSupply}`);
+
+  return totalSupply;
+
+};
+
+export const totalSupplyAt = async (contractHash:string, block : number) => {
+
+  // We don't need hash- prefix so i'm removing it
+  await votingEscrow.setContractHash(contractHash);
+
+  //totalSupply
+  const totalSupply = await votingEscrow.totalSupplyAt(block);
+  console.log(contractHash +` =... totalSupplyAt : ${totalSupply}`);
 
   return totalSupply;
 

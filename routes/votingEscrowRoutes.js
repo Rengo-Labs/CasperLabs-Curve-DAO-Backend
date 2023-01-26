@@ -34,6 +34,208 @@ router.route("/balanceagainstuser/:contractHash/:user").get(async function (req,
   }
 });
 
+router.route("/totalSupply/:contractHash").get(async function (req, res, next) {
+  try {
+    
+    if (!req.params.contractHash) {
+      return res.status(400).json({
+        success: false,
+        message: "contractHash not found in request params",
+      });
+    }
+
+    if(!req.body.unlockTimes){
+      let t = new Date().getTime();
+      let totalSupply = await votingEscrow.totalSupply(req.params.contractHash,t);
+      return res.status(200).json({
+        success: true,
+        totalSupplies: [totalSupply],
+      });
+    }
+
+    if(req.body.unlockTimes){
+      if(!Array.isArray(req.body.unlockTimes)){
+        return res.status(400).json({
+          success: false,
+          message: "Send unlock times in array.",
+        });
+      }else{
+        let fetchTotalSupplyPromisesArray = [];
+        req.body.unlockTimes.forEach(unlockTime => {
+          fetchTotalSupplyPromisesArray.push(votingEscrow.totalSupply(req.params.contractHash, unlockTime));
+        });
+
+        let totalSupplies = await Promise.all(fetchTotalSupplyPromisesArray);
+        return res.status(200).json({
+          success: true,
+          totalSupplies: totalSupplies,
+        });
+      }
+    }
+  } catch (error) {
+    console.log("error (try-catch) : " + error);
+    return res.status(500).json({
+      success: false,
+      err: error,
+    });
+  }
+});
+
+router.route("/totalSupplyAt/:contractHash").get(async function (req, res, next) {
+  try {
+    debugger;
+    if (!req.params.contractHash) {
+      return res.status(400).json({
+        success: false,
+        message: "contractHash not found in request params",
+      });
+    }
+
+    if(!req.body.blockNumbers){
+      const AVG_BLOCK_TIME_IN_MS = 45000;
+      let block = (new Date().getTime()) / AVG_BLOCK_TIME_IN_MS;
+      let totalSupply = await votingEscrow.totalSupplyAt(req.params.contractHash,block);
+      return res.status(200).json({
+        success: true,
+        totalSupplies: [totalSupply],
+      });
+    }
+
+    if(req.body.blockNumbers){
+      if(!Array.isArray(req.body.blockNumbers)){
+        return res.status(400).json({
+          success: false,
+          message: "Send block numbers in array.",
+        });
+      }else{
+        let fetchTotalSupplyPromisesArray = [];
+        req.body.blockNumbers.forEach(block => {
+          fetchTotalSupplyPromisesArray.push(votingEscrow.totalSupplyAt(req.params.contractHash, block));
+        });
+
+        let totalSupplies = await Promise.all(fetchTotalSupplyPromisesArray);
+        return res.status(200).json({
+          success: true,
+          totalSupplies: totalSupplies,
+        });
+      }
+    }
+  } catch (error) {
+    console.log("error (try-catch) : " + error);
+    return res.status(500).json({
+      success: false,
+      err: error,
+    });
+  }
+});
+
+router.route("/balanceOf/:contractHash").get(async function (req, res, next) {
+  try {
+    
+    if (!req.params.contractHash) {
+      return res.status(400).json({
+        success: false,
+        message: "contractHash not found in request params",
+      });
+    }
+
+    if(!req.body.account){
+      return res.status(400).json({
+        success: false,
+        message: "account not found in request params",
+      });
+    }
+
+    if(!req.body.timestamps){
+      let timestamp = new Date().getTime();
+      let balances = await votingEscrow.balanceOf(req.params.contractHash,req.body.account,timestamp);
+      return res.status(200).json({
+        success: true,
+        balances: [balances],
+      });
+    }    
+
+    if(req.body.timestamps){
+      if(!Array.isArray(req.body.timestamps)){
+        return res.status(400).json({
+          success: false,
+          message: "Send timestamps in array.",
+        });
+      }else{
+        let fetchBalanceOfPromisesArray = [];
+        req.body.timestamps.forEach(timestamp => {
+          fetchBalanceOfPromisesArray.push(votingEscrow.balanceOf(req.params.contractHash,req.body.account, timestamp));
+        });
+
+        let balances = await Promise.all(fetchBalanceOfPromisesArray);
+        return res.status(200).json({
+          success: true,
+          balances: balances,
+        });}
+    }
+  } catch (error) {
+    console.log("error (try-catch) : " + error);
+    return res.status(500).json({
+      success: false,
+      err: error,
+    });
+  }
+});
+
+router.route("/balanceOfAt/:contractHash").get(async function (req, res, next) {
+  try {
+    
+    if (!req.params.contractHash) {
+      return res.status(400).json({
+        success: false,
+        message: "contractHash not found in request params",
+      });
+    }
+
+    if(!req.body.account){
+      return res.status(400).json({
+        success: false,
+        message: "account not found in request params",
+      });
+    }
+
+    if(!req.body.blockNumbers){
+      const AVG_BLOCK_TIME_IN_MS = 45000;
+      let block = Math.floor((new Date().getTime()) / AVG_BLOCK_TIME_IN_MS);
+      let balances = await votingEscrow.balanceOfAt(req.params.contractHash,req.body.account, block);
+      return res.status(200).json({
+        success: true,
+        balances: [balances],
+      });
+    } 
+
+    if(req.body.blockNumbers){
+      if(!Array.isArray(req.body.blockNumbers)){
+        return res.status(400).json({
+          success: false,
+          message: "Send block numbers in array.",
+        });
+      }else{
+        let fetchBalanceOfPromisesArray = [];
+        req.body.blockNumbers.forEach(block => {
+          fetchBalanceOfPromisesArray.push(votingEscrow.balanceOfAt(req.params.contractHash,req.body.account, block));
+        });
+
+        let balances = await Promise.all(fetchBalanceOfPromisesArray);
+        return res.status(200).json({
+          success: true,
+          balances: balances,
+        });}
+    }
+  } catch (error) {
+    console.log("error (try-catch) : " + error);
+    return res.status(500).json({
+      success: false,
+      err: error,
+    });
+  }
+});
+
 router.route("/CRVStats/:contractHash/:user").get(async function (req, res, next) {
     try {
 

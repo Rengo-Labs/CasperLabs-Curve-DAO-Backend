@@ -37,9 +37,9 @@ class VESTINGESCROWFACTORYClient {
     ownedTokens: string;
     owners: string;
     paused: string;
-    initial_locked: string;
-    total_claimed: string;
-    disabled_at: string;
+    initialLocked: string;
+    totalClaimed: string;
+    disabledAt: string;
     
   };
 
@@ -62,9 +62,9 @@ class VESTINGESCROWFACTORYClient {
       ownedTokens: "null",
       owners: "null",
       paused: "null",
-      initial_locked: "null",
-      total_claimed: "null",
-      disabled_at: "null"
+      initialLocked: "null",
+      totalClaimed: "null",
+      disabledAt: "null"
     }; 
   }
 
@@ -171,6 +171,66 @@ class VESTINGESCROWFACTORYClient {
     } else {
       throw Error("Problem with installation");
     }
+  }
+
+  public block_number(){
+    const AVG_BLOCK_TIME_IN_MS = 45000;
+    return Math.floor((new Date().getTime()) / AVG_BLOCK_TIME_IN_MS);
+  }
+
+  public get_blocktime(){
+    return (new Date().getTime());
+  }
+
+  public async lockedOf(recipient: string){
+    try{
+      let initial_locked = await this.initialLocked(recipient);
+      let blocktime = this.get_blocktime();
+      let total_vested_of = await this.totalVestedOf(recipient, blocktime);
+      return (initial_locked - total_vested_of);
+    }catch(error){
+      return "0"
+    }
+  }
+
+  public async balanceOf(recipient : string){
+    try{
+      let blocktime = this.get_blocktime();
+      let total_vested_of= await this.totalVestedOf(recipient, blocktime);
+      let self_total_claimed= await this.totalClaimed(recipient);
+      return (total_vested_of - self_total_claimed);
+    }catch(error){
+      return "0";
+    }
+  }
+
+  public async vestedOf(recipient : string){
+    try{
+      let blocktime =this.get_blocktime();
+      return await this.totalVestedOf(recipient, blocktime)
+    }catch(error){
+      return "0"
+    }
+  }
+
+  public async totalVestedOf(recipient: string, time: number){
+    let blocktime = this.get_blocktime();
+    let _time;
+    if(time){
+      _time = time;
+    }else{
+      _time = blocktime
+    }
+    
+    let start= await this.startTime();
+    let end = await this.endTime();
+    let locked = await this.initialLocked(recipient);
+    if( _time < start ){
+        return 0;
+    }
+    let ans = Math.floor((locked * (_time - start)) / (end - start));
+    ans = Math.min(ans, locked);
+    return ans;
   }
 
   public async vestedSupplySessionCode(
@@ -481,7 +541,7 @@ class VESTINGESCROWFACTORYClient {
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
         owner,
-        this.namedKeys.initial_locked
+        this.namedKeys.initialLocked
       );
       const maybeValue = result.value().unwrap();
       return maybeValue.value().toString();
@@ -498,7 +558,7 @@ class VESTINGESCROWFACTORYClient {
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
         owner,
-        this.namedKeys.total_claimed
+        this.namedKeys.totalClaimed
       );
       const maybeValue = result.value().unwrap();
       return maybeValue.value().toString();
@@ -515,7 +575,7 @@ class VESTINGESCROWFACTORYClient {
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
         owner,
-        this.namedKeys.disabled_at
+        this.namedKeys.disabledAt
       );
       const maybeValue = result.value().unwrap();
       return maybeValue.value().toString();

@@ -17,6 +17,8 @@ import {
   RuntimeArgs,
   CLOption,
 } from "casper-js-sdk";
+
+const keccak = require('keccak');
 import { Some, None } from "ts-results";
 import * as blake from "blakejs";
 import { concat } from "@ethersproject/bytes";
@@ -30,21 +32,21 @@ class GaugeControllerClient {
   private contractHash: string= "erc20";
   private contractPackageHash: string= "erc20";
   private namedKeys: {
-    gauge_types_ : string,
-    gauge_type_names : string,
-    vote_user_slopes : string,
-    vote_user_power : string,
-    last_user_vote : string,
-    points_weight : string,
-    changes_weight : string,
-    time_weight : string,
+    gaugeTypes_ : string,
+    gaugeTypeNames : string,
+    voteUserSlopes : string,
+    voteUserPower : string,
+    lastUserVote : string,
+    pointsWeight : string,
+    changesWeight : string,
+    timeWeight : string,
     gauges : string,
-    time_sum : string,
-    points_sum : string,
-    changes_sum : string,
-    points_total : string,
-    points_type_weight: string,
-    time_type_weight :string,
+    timeSum : string,
+    pointsSum : string,
+    changesSum : string,
+    pointsTotal : string,
+    pointsTypeWeight: string,
+    timeTypeWeight :string,
   };
 
   private isListening = false;
@@ -59,21 +61,21 @@ class GaugeControllerClient {
   ) 
   {
     this.namedKeys= {
-      gauge_types_:"null",
-      gauge_type_names : "null",
-      vote_user_slopes : "null",
-      vote_user_power : "null",
-      last_user_vote : "null",
-      points_weight : "null",
-      changes_weight : "null",
-      time_weight : "null",
+      gaugeTypes_:"null",
+      gaugeTypeNames : "null",
+      voteUserSlopes : "null",
+      voteUserPower : "null",
+      lastUserVote : "null",
+      pointsWeight : "null",
+      changesWeight : "null",
+      timeWeight : "null",
       gauges : "null",
-      time_sum : "null",
-      points_sum : "null",
-      changes_sum : "null",
-      points_total : "null",
-      points_type_weight : "null",
-      time_type_weight : "null"
+      timeSum : "null",
+      pointsSum : "null",
+      changesSum : "null",
+      pointsTotal : "null",
+      pointsTypeWeight : "null",
+      timeTypeWeight : "null"
     }; 
   }
 
@@ -539,7 +541,7 @@ class GaugeControllerClient {
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
         owner,
-        this.namedKeys.gauge_types_
+        this.namedKeys.gaugeTypes_
       );
       const maybeValue = result.value().unwrap();
       return maybeValue.value().toString();
@@ -556,7 +558,7 @@ class GaugeControllerClient {
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
         owner,
-        this.namedKeys.gauge_type_names
+        this.namedKeys.gaugeTypeNames
       );
       const maybeValue = result.value().unwrap();
       return maybeValue.value().toString();
@@ -581,7 +583,7 @@ class GaugeControllerClient {
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
         encodedBytes,
-        this.namedKeys.vote_user_slopes
+        this.namedKeys.voteUserSlopes
       );
 
       const maybeValue = result.value().unwrap();
@@ -592,13 +594,69 @@ class GaugeControllerClient {
 
   }
 
+  public get_blocktime(){
+    return (new Date().getTime());
+  }
+
+  public async gaugeRelativeWeight(addr: string, time: number){
+    try{
+      let time_;
+    
+    if(time)
+      time_ = time
+    else
+      time_= this.get_blocktime()
+    
+    return await this._gauge_relative_weight(addr, time_)
+    }catch(error){
+      return "0";
+    }
+  }
+
+  async _gauge_relative_weight(addr: string, time: number){
+    const WEEK = 604800000;
+    const MULTIPLIER = 1000000000;
+    let t = Math.floor((time / WEEK) * WEEK);
+    
+    let _total_weight = await this.points_total(t.toString());
+    if (_total_weight > 0){
+        let gauge_type = await this.gauge_types_(addr);
+        gauge_type = gauge_type -  1;
+        let _type_weight = await this.points_type_weight(gauge_type, t.toString());
+        let points_weight = await this.points_weight(addr, t.toString());
+        let _gauge_weight = points_weight.bias
+        return Math.floor((MULTIPLIER * _type_weight * _gauge_weight) / _total_weight)
+    } else {
+        return 0
+    }    
+}
+
+  public async getGaugeWeight(addr : string){
+    try{
+      let time_weight = await this.time_weight(addr);
+      let pointWeight = await this.points_weight(addr, time_weight);
+      return pointWeight.bias;
+    }catch(error){
+      return "0";
+    }
+  }
+
+  public async getTotalWeight(){
+    try{
+      let time_total = await this.time_total();
+      return await this.points_total(time_total.toString());
+    }catch(error){
+      return "0";
+    }
+  }
+
   public async vote_user_power(owner : string){
     try {
       
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
         owner,
-        this.namedKeys.vote_user_power
+        this.namedKeys.voteUserPower
       );
       const maybeValue = result.value().unwrap();
       return maybeValue.value().toString();
@@ -623,7 +681,7 @@ class GaugeControllerClient {
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
         encodedBytes,
-        this.namedKeys.last_user_vote
+        this.namedKeys.lastUserVote
       );
 
       const maybeValue = result.value().unwrap();
@@ -634,27 +692,58 @@ class GaugeControllerClient {
 
   }
 
-  public async points_weight(owner:string, spender:string) {
+  public async pointsWeightBias(owner:string, spender:string) {
     try {
-      const _spender = CLValueBuilder.u256(spender);
-
-      const _owner=new CLKey(new CLAccountHash(Uint8Array.from(Buffer.from(owner, "hex"))));
-      const finalBytes = concat([CLValueParsers.toBytes(_owner).unwrap(), CLValueParsers.toBytes(_spender).unwrap()]);
-      const blaked = blake.blake2b(finalBytes, undefined, 32);
-      const encodedBytes = Buffer.from(blaked).toString("hex");
+      
+      const formattedString = "points_weight" + "_bias_" + owner + "_" + spender;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
 
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
-        encodedBytes,
-        this.namedKeys.points_weight
+        hash,
+        this.namedKeys.pointsWeight
       );
 
-      const maybeValue = result.value().unwrap();
-      return maybeValue.value().toString();
+      return parseInt(result.data.val.data[1].data._hex);
     } catch (error) {
-      return "0";
+      return 0;
     }
+  }
 
+  public async pointsWeightSlope(owner:string, spender:string) {
+    try {
+      
+      const formattedString = "points_weight" + "_slope_" + owner + "_" + spender;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        hash,
+        this.namedKeys.pointsWeight
+      );
+
+      return parseInt(result.data.val.data[1].data._hex);
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  public async points_weight(owner:string, spender:string) {
+    try {
+    
+    let pointsWeight = {
+    bias : 0,
+    slope : 0
+    };
+
+    pointsWeight.bias = await this.pointsWeightBias(owner, spender);
+    pointsWeight.slope = await this.pointsWeightSlope(owner, spender);
+
+    return pointsWeight;
+
+    } catch (error) {
+      return {bias : 0, slope : 0};
+    }
   }
 
   public async changes_weight(owner:string, spender:string) {
@@ -669,7 +758,7 @@ class GaugeControllerClient {
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
         encodedBytes,
-        this.namedKeys.changes_weight
+        this.namedKeys.changesWeight
       );
 
       const maybeValue = result.value().unwrap();
@@ -686,7 +775,7 @@ class GaugeControllerClient {
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
         owner,
-        this.namedKeys.time_weight
+        this.namedKeys.timeWeight
       );
       const maybeValue = result.value().unwrap();
       return maybeValue.value().toString();
@@ -720,7 +809,7 @@ class GaugeControllerClient {
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
         owner,
-        this.namedKeys.time_sum
+        this.namedKeys.timeSum
       );
       const maybeValue = result.value().unwrap();
       return maybeValue.value().toString();
@@ -742,7 +831,7 @@ class GaugeControllerClient {
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
         encodedBytes,
-        this.namedKeys.points_sum
+        this.namedKeys.pointsSum
       );
 
       const maybeValue = result.value().unwrap();
@@ -764,7 +853,7 @@ class GaugeControllerClient {
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
         encodedBytes,
-        this.namedKeys.changes_sum
+        this.namedKeys.changesSum
       );
 
       const maybeValue = result.value().unwrap();
@@ -781,7 +870,7 @@ class GaugeControllerClient {
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
         owner,
-        this.namedKeys.points_total
+        this.namedKeys.pointsTotal
       );
       const maybeValue = result.value().unwrap();
       return maybeValue.value().toString();
@@ -803,7 +892,7 @@ class GaugeControllerClient {
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
         encodedBytes,
-        this.namedKeys.points_type_weight
+        this.namedKeys.pointsTypeWeight
       );
 
       const maybeValue = result.value().unwrap();
@@ -820,7 +909,7 @@ class GaugeControllerClient {
       const result = await utils.contractDictionaryGetter(
         this.nodeAddress,
         owner,
-        this.namedKeys.time_type_weight
+        this.namedKeys.timeTypeWeight
       );
       const maybeValue = result.value().unwrap();
       return maybeValue.value().toString();
