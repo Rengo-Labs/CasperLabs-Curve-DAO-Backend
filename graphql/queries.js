@@ -19,7 +19,7 @@ const gaugeVote = require("../models/gaugeVote");
 const votingEscrow = require("../models/votingEscrow");
 const daoPower = require("../models/daopower");
 const votingPowerModel = require("../models/votingPower");
-const gauge = require("../models/gauge");
+const Gauge = require("../models/gauge");
 const userBalance = require("../models/userBalance");
 const { gaugeType } = require("./types/gauge");
 const gaugeLiquidity = require("../models/gaugeLiquidity");
@@ -59,6 +59,29 @@ const response = {
     }
   },
 };
+
+const getGaugesByAddress =  {
+  type: GraphQLList(gaugeType),
+  description: "Retrieves gauges by gauge address",
+  args: {
+    gaugeAddress : {type : GraphQLString}
+  },
+  async resolve(parent, args, context) {
+    try {
+      
+      const filters = {}
+
+      if(args.gaugeAddress)
+      filters.id = args.gaugeAddress
+
+      return await Gauge
+      .find(filters);
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+};
+
 
 const castsByVoter =  {
   type: GraphQLList(castType),
@@ -356,6 +379,7 @@ module.exports = {
   daoPowersByTimestamp, 
   votingPower, 
   gauges, 
+  getGaugesByAddress,
   userBalancesByUnlockTime,
   userBalancesByWeight,
   responses,
