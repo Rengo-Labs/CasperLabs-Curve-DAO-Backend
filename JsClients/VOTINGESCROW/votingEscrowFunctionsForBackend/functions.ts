@@ -89,7 +89,7 @@ export const lockedEnd = async (contractHash:string,account:string ) => {
   console.log("locked End successfully");
   console.log("locked End: ", lockedEnd.end);
   
-  return lockedEnd.end;
+  return lockedEnd;
   
 };
 

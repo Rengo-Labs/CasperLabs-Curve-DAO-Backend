@@ -268,6 +268,38 @@ router.route("/getlastUserSlope/:contractHash").post(async function (req, res, n
   }
 });
 
+router.route("/lockedEnd/:contractHash").post(async function (req, res, next) {
+  try {
+    
+    if (!req.params.contractHash) {
+      return res.status(400).json({
+        success: false,
+        message: "contractHash not found in request params",
+      });
+    }
+
+    if(!req.body.account){
+      return res.status(400).json({
+        success: false,
+        message: "account not found in request body",
+      });
+    }
+    
+    let lockedEnd = await votingEscrow.lockedEnd(req.params.contractHash,req.body.account);
+    return res.status(200).json({
+      success: true,
+      lockedEnd: lockedEnd,
+    });
+    
+  } catch (error) {
+    console.log("error (try-catch) : " + error);
+    return res.status(500).json({
+      success: false,
+      err: error,
+    });
+  }
+});
+
 router.route("/CRVStats/:contractHash/:user").post(async function (req, res, next) {
     try {
 

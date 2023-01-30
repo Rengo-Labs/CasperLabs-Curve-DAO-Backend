@@ -162,20 +162,63 @@ class VOTINGESCROWClient {
   }
   public async lockedEnd(account: string) {
     try {
+      let lockedEnd = {
+        amount : 0,
+        end : 0,
+      };
+      lockedEnd.amount = await this.lockedEndAmount(account); 
+      lockedEnd.end = await this.lockedEndEnd(account);
 
-      const result = await utils.contractDictionaryGetter(
-        this.nodeAddress,
-        account,
-        this.namedKeys.locked
-      );
-      const maybeValue = result.value().unwrap();
-      return maybeValue.value().toString();
-
+      return lockedEnd;
     } catch (error) {
-      return "0";
+      return {
+        amount : 0,
+        end : 0,
+    };
     }
 
   }
+
+  async lockedEndAmount(account:string) {
+    try {
+      const formattedString = "locked" + "_amount_" + account;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      console.log("lockedEndAmount hash", hash);
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        hash,
+        this.namedKeys.locked
+      );
+
+      console.log("lockedEndAmount value",parseInt(result.data.val.data._hex))
+     
+      return parseInt(result.data.val.data._hex);
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  async lockedEndEnd(account:string) {
+    try {
+      const formattedString = "locked" + "_end_" + account;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      console.log("lockedEndEnd hash", hash);
+      const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        hash,
+        this.namedKeys.locked
+      );
+
+      console.log("lockedEndEnd value",parseInt(result.data.val.data._hex))
+     
+      return parseInt(result.data.val.data._hex);
+    } catch (error) {
+      return 0;
+    }
+  }
+
   public async lockedEndSessionCode(
     keys: Keys.AsymmetricKey,
     entrypointName:string,
@@ -729,7 +772,7 @@ class VOTINGESCROWClient {
      
       return parseInt(result.data.val.data[1].data._hex);
     } catch (error) {
-      return error;
+      return 0;
     }
   }
 
@@ -749,7 +792,7 @@ class VOTINGESCROWClient {
      
       return parseInt(result.data.val.data[1].data._hex);
     } catch (error) {
-      return error;
+      return 0;
     }
   }
 
@@ -769,7 +812,7 @@ class VOTINGESCROWClient {
      
       return parseInt(result.data.val.data._hex);
     } catch (error) {
-      return error;
+      return 0;
     }
   }
 
@@ -789,7 +832,7 @@ class VOTINGESCROWClient {
      
       return parseInt(result.data.val.data._hex);
     } catch (error) {
-      return error;
+      return 0;
     }
   }
 
