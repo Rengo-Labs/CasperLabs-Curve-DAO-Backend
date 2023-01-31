@@ -2012,7 +2012,7 @@ async function geteventsdata(
       );
       console.log("handleExecuteVote Mutation called.");
       return true;
-    } else if (eventName == "addType") {
+    } else if (eventName == "AddType") {
       console.log(eventName + " Event result: ");
 
       var id,type_id,name;
@@ -2063,7 +2063,7 @@ async function geteventsdata(
       );
       console.log("handleAddType Mutation called.");
       return true;
-    } else if (eventName == "newGauge") {
+    } else if (eventName == "NewGauge") {
       console.log(eventName + " Event result: ");
 
       var gauge_type,addr,transactionHash,weight;
@@ -2119,7 +2119,7 @@ async function geteventsdata(
       );
       console.log("handleNewGauge Mutation called.");
       return true;
-    } else if (eventName == "newGaugeWeight") {
+    } else if (eventName == "NewGaugeWeight") {
       console.log(eventName + " Event result: ");
 
       var id,time,weight,gauge_address;
@@ -2174,7 +2174,7 @@ async function geteventsdata(
       );
       console.log("handleNewGaugeWeight Mutation called.");
       return true;
-    } else if (eventName == "newTypeWeight") {
+    } else if (eventName == "NewTypeWeight") {
       console.log(eventName + " Event result: ");
 
       var id,time,weight,type_id,total_weight;
@@ -2235,7 +2235,7 @@ async function geteventsdata(
       );
       console.log("handleNewTypeWeight Mutation called.");
       return true;
-    } else if (eventName == "voteForGauge") {
+    } else if (eventName == "VoteForGauge") {
       console.log(eventName + " Event result: ");
 
       var id,time,weight,gauge_addr,user;

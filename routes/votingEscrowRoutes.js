@@ -334,28 +334,4 @@ router.route("/CRVStats/:contractHash/:user").post(async function (req, res, nex
     }
 });
 
-router.route("/lockedEnd/:contractHash").post(async function (req, res, next) {
-    try {
-      if (!req.params.contractHash) {
-        return res.status(400).json({
-            success: false,
-            message: "contractHash not found in request params",
-        });
-      }
-  
-      let lockedEnd = await votingEscrow.lockedEnd(req.params.contractHash);
-      return res.status(200).json({
-        success: true,
-        message: "Lock succesfully ended...",
-      });
-
-    } catch (error) {
-      console.log("error (try-catch) : " + error);
-      return res.status(500).json({
-        success: false,
-        err: error,
-      });
-    }
-});
-
 module.exports = router;
