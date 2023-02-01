@@ -2001,9 +2001,9 @@ async function geteventsdata(
         console.log(newData[2][0] + " = " + newData[2][1]);
         console.log(newData[3][0] + " = " + newData[3][1]);
         
-        id = splitdata(newData[0][1]);
-        type_id = newData[1][1];
-        name = newData[3][1];
+        id = newData[0][1];
+        type_id = newData[3][1];
+        name = newData[2][1];
       }
       else{
         console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -2051,10 +2051,10 @@ async function geteventsdata(
         console.log(newData[3][0] + " = " + newData[3][1]);
         console.log(newData[4][0] + " = " + newData[4][1]);
         
-        gauge_type = newData[0][1];
-        addr = splitdata(newData[1][1]);
-        transactionHash = splitdata(newData[2][1]);
-        weight = newData[3][1];
+         transactionHash = deployHash;
+        addr = splitdata(newData[0][1]);
+        gauge_type = newData[3][1];
+        weight = newData[4][1];
       }
       else{
         console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -2161,11 +2161,11 @@ async function geteventsdata(
         console.log(newData[4][0] + " = " + newData[4][1]);
         console.log(newData[5][0] + " = " + newData[5][1]);
         
-        id = splitdata(newData[0][1]);
-        time = newData[1][1];
-        weight = newData[2][1];
-        type_id = newData[3][1];
-        total_weight = newData[4][1];
+        id = newData[0][1];
+        time = newData[2][1];
+        total_weight = newData[3][1];
+        type_id = newData[4][1];
+        weight = newData[5][1];
       }
       else{
         console.log(newData[0][0].data + " = " + newData[0][1].data);
