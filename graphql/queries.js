@@ -24,6 +24,7 @@ const userBalance = require("../models/userBalance");
 const { gaugeType } = require("./types/gauge");
 const gaugeLiquidity = require("../models/gaugeLiquidity");
 const { gaugeLiquidityType } = require("./types/gaugeLiquidity");
+const allcontractsData = require("../models/allcontractsData");
 
 const responses = {
   type: GraphQLList(responseType),
@@ -68,14 +69,27 @@ const getGaugesByAddress =  {
   },
   async resolve(parent, args, context) {
     try {
-      
       const filters = {}
 
       if(args.gaugeAddress)
       filters.id = args.gaugeAddress
 
-      return await Gauge
+      let gauges = await Gauge
       .find(filters);
+
+      let promises = [];
+      gauges.forEach(gauge => {
+        const getGaugeContractHash = new Promise(async (resolve, reject) => {
+          let contractData = await allcontractsData.findOne({packageHash : gauge.id}, {contractHash : 1});
+          let gaugeData = {...gauge.toObject()}
+          gaugeData.contractHash = contractData.contractHash;
+          gaugeData.packageHash = gaugeData.id;
+          resolve(gaugeData);
+        });
+        promises.push(getGaugeContractHash);
+      })
+
+      return await Promise.all(promises);
     } catch (error) {
       throw new Error(error);
     }
