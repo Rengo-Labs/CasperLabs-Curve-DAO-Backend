@@ -66,11 +66,13 @@ const handleAddType = {
       const contractData = await allcontractsData.findOne({packageHash : process.env.GAUGE_CONTROLLER_PACKAGE_HASH});
 
       let nextWeek = nextPeriod(args.timestamp, WEEK);
+      nextWeek = Math.floor(nextWeek);
+      
       console.log("args-name", args);
 
       let gaugeType = await registerGaugeType(args.type_id, args.name);
 
-      let gaugeControllerPointsTypeWeight = await gaugeController.points_type_weight(contractData.contractHash, args.type_id, nextWeek);
+      let gaugeControllerPointsTypeWeight = await gaugeController.points_type_weight(contractData.contractHash, args.type_id, nextWeek.toString());
 
       let newData = new GaugeTypeWeight({
         id: nextWeek.toString(),
@@ -80,7 +82,7 @@ const handleAddType = {
         weight: gaugeControllerPointsTypeWeight
       });
 
-      let gaugeControllerPointsTotal = await gaugeController.points_total(contractData.contractHash, nextWeek);
+      let gaugeControllerPointsTotal = await gaugeController.points_total(contractData.contractHash, nextWeek.toString());
 
       let data = new GaugeTotalWeight({
         id: nextWeek.toString(),
@@ -95,21 +97,26 @@ const handleAddType = {
       state.gaugeTypeCount = ((new bigdecimal.BigDecimal(state.gaugeTypeCount)).add(new bigdecimal.BigDecimal('1'))).toString();
       
       const session = await mongoose.startSession();
-      await session.withTransaction(async () => {
-        await GaugeType.create([gaugeType], {session});
-        await GaugeTypeWeight.create([newData],{session});
-        await GaugeTotalWeight.create([data], {session});
-        await state.save({session});
-        await eventDataResult.save({ session });
-        await response.save({ session });
-      }, transactionOptions);
+      try{
+        await session.withTransaction(async () => {
+          await GaugeType.create([gaugeType], {session});
+          await GaugeTypeWeight.create([newData],{session});
+          await GaugeTotalWeight.create([data], {session});
+          await state.save({session});
+          await eventDataResult.save({ session });
+          await response.save({ session });
+        }, transactionOptions);
+        return response;
+      }catch(error){
+        throw new Error(error);
+      }finally{
 
-      return response;
-    }catch (error) {
-      throw new Error(error);
-    } finally {
       // Ending the session
       await session.endSession();
+      }
+     
+    }catch (error) {
+      throw new Error(error);
     }
   },
 };
@@ -128,7 +135,7 @@ const handleNewGauge = {
   },
   async resolve(parent, args, context) {
     try {
-
+      
       // updating mutation status
       let eventDataResult = await eventsData.findOne({
         _id: args.eventObjectId,
@@ -147,9 +154,10 @@ const handleNewGauge = {
       const contractData = await allcontractsData.findOne({packageHash : process.env.GAUGE_CONTROLLER_PACKAGE_HASH});
 
       let nextWeek = nextPeriod(args.timestamp, WEEK);
+      nextWeek = Math.floor(nextWeek);
       let gaugeType = await getGaugeType((args.gaugeType).toString());
 
-      let gaugeControllerGaugeTypeNames= await gaugeController.gauge_type_names(contractData.contractHash ,args.gauge_type);
+      let gaugeControllerGaugeTypeNames= await gaugeController.gauge_type_names(contractData.contractHash ,args.gaugeType);
 
       if (gaugeType === null) {
         gaugeType = await registerGaugeType(
@@ -196,7 +204,7 @@ const handleNewGauge = {
         //weight: '1000000000'
       });
 
-      let gaugeControllerPointsTotal= await gaugeController.points_total(contractData.contractHash, nextWeek);
+      let gaugeControllerPointsTotal= await gaugeController.points_total(contractData.contractHash, nextWeek.toString());
 
       let dataWeight = new GaugeTotalWeight({
         id: nextWeek.toString(),
@@ -213,24 +221,27 @@ const handleNewGauge = {
       //state.gaugeCount = '1000000000'
 
       const session = await mongoose.startSession();
-      await session.withTransaction(async () => {
-        await gaugeType.save({session});
-        await gauge.save({session});
-        await token.save({session});
-        await GaugeWeight.create([data], {session});
-        await GaugeTotalWeight.create([dataWeight], {session});
-        await state.save({session});
-        await eventDataResult.save({ session });
-        await response.save({ session });
-      }, transactionOptions);
-
-      return response;
+      try{
+        await session.withTransaction(async () => {
+          await gaugeType.save({session});
+          await gauge.save({session});
+          // await token.save({session});
+          await GaugeWeight.create([data], {session});
+          await GaugeTotalWeight.create([dataWeight], {session});
+          await state.save({session});
+          await eventDataResult.save({ session });
+          await response.save({ session });
+        }, transactionOptions);
+        return response;
+      }catch(error){
+        throw new Error(error);
+      }finally {
+        // Ending the session
+        await session.endSession();
+      }
     }catch (error) {
       throw new Error(error);
-    } finally {
-      // Ending the session
-      await session.endSession();
-    }
+    } 
   },
 };
 
@@ -290,21 +301,25 @@ const handleNewGaugeWeight = {
       }
 
       const session = await mongoose.startSession();
-      await session.withTransaction(async () => {
-        if(gauge != null){
-          await GaugeWeight.create([newData],{session});
-          await GaugeTotalWeight.create([data],{session});
-        }
-        await eventDataResult.save({ session });
-        await response.save({ session });
-      }, transactionOptions);
-
-      return response;
-    }catch (error) {
-      throw new Error(error);
-    } finally {
+      try{
+        await session.withTransaction(async () => {
+          if(gauge != null){
+            await GaugeWeight.create([newData],{session});
+            await GaugeTotalWeight.create([data],{session});
+          }
+          await eventDataResult.save({ session });
+          await response.save({ session });
+        }, transactionOptions);
+  
+        return response;
+      }catch(error){
+        throw new Error(error);
+      } finally {
       // Ending the session
       await session.endSession();
+    }
+    }catch (error) {
+      throw new Error(error);
     }
   },
 };
@@ -322,6 +337,7 @@ const handleNewTypeWeight = {
   },
   async resolve(parent, args, context) {
     try {
+      
         // updating mutation status
         let eventDataResult = await eventsData.findOne({
           _id: args.eventObjectId,
@@ -359,23 +375,32 @@ const handleNewTypeWeight = {
           //weight: "1000000000"
           });
         }
-
+        
         const session = await mongoose.startSession();
-        await session.withTransaction(async () => {
-          if(gaugeType !== null){
-            await GaugeTypeWeight.create([gaugeTypeWeight],{session});
-            await GaugeTotalWeight.create([gaugeTotalWeight], {session});
-          }
-          await eventDataResult.save({ session });
-          await response.save({ session });
-        }, transactionOptions);
+        try{
+          await session.withTransaction(async () => {
+            
+            if(gaugeType !== null){
+              await GaugeTypeWeight.create([gaugeTypeWeight],{session});
+              await GaugeTotalWeight.create([gaugeTotalWeight], {session});
+            }
+            await eventDataResult.save({ session });
+            await response.save({ session });
+          }, transactionOptions);
+        }catch(error){
+          
+          throw new Error(error);
+        }finally{
+          // Ending the session
+          await session.endSession();
+        }
+       
   
         return response;
-      }catch (error) {
+      }
+      catch (error) {
+        
         throw new Error(error);
-      } finally {
-        // Ending the session
-        await session.endSession();
       }
   },
 };
@@ -480,25 +505,30 @@ const handleVoteForGauge = {
       }
 
       const session = await mongoose.startSession();
-      await session.withTransaction(async () => {
-        if(gauge !== null){
-          await GaugeWeight.create([gaugeWeight],{ session });
-          await GaugeTotalWeight.create([gaugeTotalWeight],{ session });
-          await user.save({session});
-          await GaugeWeightVote.create([gaugeWeightVote], {session});
-          await GaugeVote.create(gaugeVote);
-        }
-        await eventDataResult.save({ session });
-        await response.save({ session });
-      }, transactionOptions);
-
-      return response;
-    }catch (error) {
-      throw new Error(error);
-    } finally {
+      try{
+        await session.withTransaction(async () => {
+          if(gauge !== null){
+            await GaugeWeight.create([gaugeWeight],{ session });
+            await GaugeTotalWeight.create([gaugeTotalWeight],{ session });
+            await user.save({session});
+            await GaugeWeightVote.create([gaugeWeightVote], {session});
+            await GaugeVote.create(gaugeVote);
+          }
+          await eventDataResult.save({ session });
+          await response.save({ session });
+        }, transactionOptions);
+  
+        return response;
+      }catch(error){
+        throw new Error(error);
+      }finally {
       // Ending the session
       await session.endSession();
     }
+     
+    }catch (error) {
+      throw new Error(error);
+    } 
   },
 };
 
@@ -506,8 +536,7 @@ function nextPeriod(timestamp, period) {
   console.log(timestamp);
   console.log(period);
   let nextPeriod = (new bigdecimal.BigDecimal(timestamp)).add(new bigdecimal.BigDecimal(period));
-  return (nextPeriod.divide((new bigdecimal.BigDecimal(period)))).multiply(new bigdecimal.BigDecimal(period));
-  
+  return nextPeriod.divide(new bigdecimal.BigDecimal(period), 10, halfUp).multiply(new bigdecimal.BigDecimal(period));
 }
 
 module.exports = {

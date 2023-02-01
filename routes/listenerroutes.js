@@ -3,6 +3,7 @@ var express = require("express");
 var router = express.Router();
 var { request } = require("graphql-request");
 var allcontractsDataModel = require("../models/allcontractsData");
+const { fetchBlockHeightHelper } = require("../utils/casper");
 
 function splitdata(data) {
   var temp = data.split("(");
@@ -50,36 +51,23 @@ async function geteventsdata(
 ) {
   try {
     if (!_deployHash) {
-      return res.status(400).json({
-        success: false,
-        message: "There is no deployHash specified in the req body.",
-      });
+      console.log("There is no deployHash specified in the req body.");
     }
     if (!_timestamp) {
-      return res.status(400).json({
-        success: false,
-        message: "There is no timestamp specified in the req body.",
-      });
+      console.log("There is no timestamp specified in the req body.");
     }
     if (!_block_hash) {
-      return res.status(400).json({
-        success: false,
-        message: "There is no blockHash specified in the req body.",
-      });
+      console.log("There is no blockHash specified in the req body.");
     }
     if (!_eventname) {
-      return res.status(400).json({
-        success: false,
-        message: "There is no eventname specified in the req body.",
-      });
+      console.log("There is no eventname specified in the req body.")
     }
     if (!_eventdata) {
-      return res.status(400).json({
-        success: false,
-        message: "There is no eventdata specified in the req body.",
-      });
+      console.log("There is no eventdata specified in the req body.")
     }
 
+    let blockNumber = await fetchBlockHeightHelper(_block_hash);
+    blockNumber = blockNumber.toString();
     let newData = _eventdata;
     let deployHash = _deployHash;
     let timestamp = _timestamp;
@@ -94,8 +82,7 @@ async function geteventsdata(
       console.log(eventName + " Event result: ");
 
       var tokenAmounts,fees,invariant,tokenSupply,poolId,
-      providerId,transactionHash,logIndex,registryAddress,
-      blockNumber;
+      providerId,transactionHash,logIndex,registryAddress;
       if(newData[0][0].data == undefined)
       {
         console.log(newData[0][0] + " = " + newData[0][1]);
@@ -120,7 +107,6 @@ async function geteventsdata(
         transactionHash = splitdata(newData[8][1]);
         logIndex = newData[9][1];
         registryAddress = newData[10][1];
-        blockNumber = newData[11][1];
       }
       else
       {
@@ -146,7 +132,6 @@ async function geteventsdata(
         transactionHash = splitdata(newData[8][1].data);
         logIndex = newData[9][1].data;
         registryAddress = newData[10][1].data;
-        blockNumber = newData[11][1].data;
       }
       
       console.log("tokenAmounts: ", tokenAmounts);
@@ -218,7 +203,7 @@ async function geteventsdata(
       console.log(eventName + " Event result: ");
 
       var tokenAmounts,fees,tokenSupply,poolId,providerId,
-      transactionHash,logIndex,registryAddress,blockNumber;
+      transactionHash,logIndex,registryAddress;
       if(newData[0][0].data == undefined)
       {
         console.log(newData[0][0] + " = " + newData[0][1]);
@@ -241,7 +226,6 @@ async function geteventsdata(
         transactionHash = splitdata(newData[7][1]);
         logIndex = newData[8][1];
         registryAddress = newData[9][1];
-        blockNumber = newData[10][1];
       }
       else{
         console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -264,7 +248,6 @@ async function geteventsdata(
         transactionHash = splitdata(newData[7][1].data);
         logIndex = newData[8][1].data;
         registryAddress = newData[9][1].data;
-        blockNumber = newData[10][1].data;
       }  
       
       console.log("tokenAmounts: ", tokenAmounts);
@@ -332,8 +315,7 @@ async function geteventsdata(
       console.log(eventName + " Event result: ");
 
       var tokenAmounts,fees,invariant,tokenSupply,poolId,
-      providerId,transactionHash,logIndex,registryAddress,
-      blockNumber;
+      providerId,transactionHash,logIndex,registryAddress;
       if(newData[0][0].data == undefined)
       {
         console.log(newData[0][0] + " = " + newData[0][1]);
@@ -358,7 +340,6 @@ async function geteventsdata(
         transactionHash = splitdata(newData[8][1]);
         logIndex = newData[9][1];
         registryAddress = newData[10][1];
-        blockNumber = newData[11][1];
       }
       else
       {
@@ -384,7 +365,6 @@ async function geteventsdata(
         transactionHash = splitdata(newData[8][1].data);
         logIndex = newData[9][1].data;
         registryAddress = newData[10][1].data;
-        blockNumber = newData[11][1].data;
       }
 
       console.log("tokenAmounts: ", tokenAmounts);
@@ -456,7 +436,7 @@ async function geteventsdata(
       console.log(eventName + " Event result: ");
 
       var tokenAmounts,coinAmount,poolId,providerId,
-      transactionHash,logIndex,registryAddress,blockNumber;
+      transactionHash,logIndex,registryAddress;
       if(newData[0][0].data == undefined)
       {
         console.log(newData[0][0] + " = " + newData[0][1]);
@@ -477,7 +457,6 @@ async function geteventsdata(
         transactionHash = splitdata(newData[6][1]);
         logIndex = newData[7][1];
         registryAddress = newData[8][1];
-        blockNumber = newData[9][1];
       }
       else
       {
@@ -499,7 +478,6 @@ async function geteventsdata(
         transactionHash = splitdata(newData[6][1].data);
         logIndex = newData[7][1].data;
         registryAddress = newData[8][1].data;
-        blockNumber = newData[9][1].data;
       }
 
       console.log("tokenAmounts: ", tokenAmounts);
@@ -2022,8 +2000,7 @@ async function geteventsdata(
         console.log(newData[1][0] + " = " + newData[1][1]);
         console.log(newData[2][0] + " = " + newData[2][1]);
         console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-  
+        
         id = splitdata(newData[0][1]);
         type_id = newData[1][1];
         name = newData[3][1];
@@ -2033,11 +2010,10 @@ async function geteventsdata(
         console.log(newData[1][0].data + " = " + newData[1][1].data);
         console.log(newData[2][0].data + " = " + newData[2][1].data);
         console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-  
-        id = splitdata(newData[0][1].data);
-        type_id = newData[1][1].data;
-        name = newData[3][1].data;
+       
+        id = newData[0][1].data;
+        type_id = newData[3][1].data;
+        name = newData[2][1].data;
       }
       
 
@@ -2056,7 +2032,7 @@ async function geteventsdata(
         {
           id: id,
           type_id: type_id,
-          timestamp: timestamp,
+          timestamp: timestamp.toString(),
           name: name,
           eventObjectId: eventResult._id,
         }
@@ -2074,8 +2050,7 @@ async function geteventsdata(
         console.log(newData[2][0] + " = " + newData[2][1]);
         console.log(newData[3][0] + " = " + newData[3][1]);
         console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-
+        
         gauge_type = newData[0][1];
         addr = splitdata(newData[1][1]);
         transactionHash = splitdata(newData[2][1]);
@@ -2087,12 +2062,11 @@ async function geteventsdata(
         console.log(newData[2][0].data + " = " + newData[2][1].data);
         console.log(newData[3][0].data + " = " + newData[3][1].data);
         console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-  
-        gauge_type = newData[0][1].data;
-        addr = splitdata(newData[1][1].data);
-        transactionHash = splitdata(newData[2][1].data);
-        weight = newData[3][1].data;
+        
+        transactionHash = deployHash;
+        addr = splitdata(newData[0][1].data);
+        gauge_type = newData[3][1].data;
+        weight = newData[4][1].data;
       }
 
       console.log("gauge_type: ", gauge_type);
@@ -2113,7 +2087,7 @@ async function geteventsdata(
           blockNumber: blockNumber,
           transactionHash: transactionHash,
           weight: weight,
-          timestamp: timestamp,
+          timestamp: timestamp.toString(),
           eventObjectId: eventResult._id,
         }
       );
@@ -2186,8 +2160,7 @@ async function geteventsdata(
         console.log(newData[3][0] + " = " + newData[3][1]);
         console.log(newData[4][0] + " = " + newData[4][1]);
         console.log(newData[5][0] + " = " + newData[5][1]);
-        console.log(newData[6][0] + " = " + newData[6][1]);
-      
+        
         id = splitdata(newData[0][1]);
         time = newData[1][1];
         weight = newData[2][1];
@@ -2201,13 +2174,12 @@ async function geteventsdata(
         console.log(newData[3][0].data + " = " + newData[3][1].data);
         console.log(newData[4][0].data + " = " + newData[4][1].data);
         console.log(newData[5][0].data + " = " + newData[5][1].data);
-        console.log(newData[6][0].data + " = " + newData[6][1].data);
-  
-        id = splitdata(newData[0][1].data);
-        time = newData[1][1].data;
-        weight = newData[2][1].data;
-        type_id = newData[3][1].data;
-        total_weight = newData[4][1].data;
+        
+        id = newData[0][1].data;
+        time = newData[2][1].data;
+        total_weight = newData[3][1].data;
+        type_id = newData[4][1].data;
+        weight = newData[5][1].data;
       }
       
       console.log("id: ", id);
@@ -2416,10 +2388,6 @@ async function geteventsdata(
     }
   } catch (error) {
     console.log("error (try-catch) : " + error);
-    return res.status(500).json({
-      success: false,
-      err: error,
-    });
   }
 }
 
