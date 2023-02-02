@@ -25,6 +25,7 @@ const { gaugeType } = require("./types/gauge");
 const gaugeLiquidity = require("../models/gaugeLiquidity");
 const { gaugeLiquidityType } = require("./types/gaugeLiquidity");
 const allcontractsData = require("../models/allcontractsData");
+const { name } = require("../JsClients/LIQUIDITYGAUGEV3/liquidityGauageV3FunctionsForBackend/functions");
 
 const responses = {
   type: GraphQLList(responseType),
@@ -82,6 +83,7 @@ const getGaugesByAddress =  {
         const getGaugeContractHash = new Promise(async (resolve, reject) => {
           let contractData = await allcontractsData.findOne({packageHash : gauge.id}, {contractHash : 1});
           let gaugeData = {...gauge.toObject()}
+          gaugeData.name = await name(contractData.contractHash);
           gaugeData.contractHash = contractData.contractHash;
           gaugeData.packageHash = gaugeData.id;
           resolve(gaugeData);

@@ -12,6 +12,7 @@ const gaugeType = new GraphQLObjectType({
     fields: () => ({
       _id: {type: GraphQLID },
       id: {type: GraphQLString },
+      name:{type:GraphQLString},
       address:{type:GraphQLString},
       contractHash:{type:GraphQLString},
       packageHash:{type:GraphQLString},
