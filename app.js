@@ -14,6 +14,7 @@ var indexRouter = require('./routes/index');
 var adminRouter = require("./routes/adminroutes");
 var afterDeploymentRouter = require("./routes/afterDeploymentRoutes");
 var listenerRouter = require("./routes/listenerroutes");
+var coinsmarketcapapiRouter = require("./routes/coinsmarketcapapi");
 var erc20CrvRouter = require("./routes/erc20CrvRoutes");
 var votingEscrowRouter = require("./routes/votingEscrowRoutes");
 var vestingEscrowRouter = require("./routes/vestingEscrowRoutes");
@@ -70,6 +71,7 @@ app.use((req, res, next) => {
 app.use('/', indexRouter);
 app.use("/", listenerRouter.router);
 app.use("/", erc20CrvRouter);
+app.use("/", coinsmarketcapapiRouter);
 app.use("/votingEscrow", votingEscrowRouter);
 app.use("/vestingEscrow", vestingEscrowRouter);
 app.use("/gaugeController",gaugeControllerRouter);
