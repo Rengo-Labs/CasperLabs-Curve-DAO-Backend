@@ -1514,7 +1514,7 @@ async function geteventsdata(
       );
       console.log("handleUpdateLiquidityLimit Mutation called.");
       return true;
-    } else if (eventName == "deposit") {
+    } else if (eventName == "Deposit") {
       console.log(eventName + " Event result: ");
 
       var provider,id,value,transactionHash,logIndex;
@@ -2268,9 +2268,9 @@ async function geteventsdata(
       );
       console.log("handleVoteForGauge Mutation called.");
       return true;
-    } else if (eventName == "Deposit") {
+    } else if (eventName == "deposit") {
       console.log(eventName + " Event result: ");
-
+      
       var provider,value,locktime,_type,ts;
       if(newData[0][0].data == undefined)
       {
@@ -2282,11 +2282,11 @@ async function geteventsdata(
         console.log(newData[5][0] + " = " + newData[5][1]);
         console.log(newData[6][0] + " = " + newData[6][1]);
 
-        provider = splitdata(newData[0][1]);
-        value = newData[1][1];
-        locktime = newData[2][1];
-        _type = newData[3][1];
-        ts = newData[4][1];
+        provider = splitdata(newData[4][1]);
+        value = newData[6][1];
+        locktime = newData[3][1];
+        ts = newData[5][1];
+        _type = newData[0][1];
       }
       else{
         console.log(newData[0][0].data + " = " + newData[0][1].data);
@@ -2297,11 +2297,11 @@ async function geteventsdata(
         console.log(newData[5][0].data + " = " + newData[5][1].data);
         console.log(newData[6][0].data + " = " + newData[6][1].data);
   
-        provider = splitdata(newData[0][1].data);
-        value = newData[1][1].data;
-        locktime = newData[2][1].data;
-        _type = newData[3][1].data;
-        ts = newData[4][1].data;
+        provider = splitdata(newData[4][1].data);
+        value = newData[6][1].data;
+        locktime = newData[3][1].data;
+        ts = newData[5][1].data;
+        _type = newData[0][1].data;
       }
       
       console.log("provider: ", provider);

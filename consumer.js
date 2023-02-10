@@ -172,8 +172,12 @@ async function consumeEvent (redis)
 
                   await redis.client.RPUSH(process.env.GRAPHQLREDISQUEUE,serializedValue);
                   console.log("Event pushed to queue...");
+                  let interval = setInterval(async () => {
+                    console.log("Heartbeat Signaled...");
+                    heartbeat();
+                  }, 15000)
                   await callMutations(redis);
-                  
+                  clearInterval(interval);
                   //committing offset
                   resolveOffset(message.offset);
                   await heartbeat();
