@@ -126,19 +126,23 @@ const handleDeposit = {
       });
 
       const session = await mongoose.startSession();
-      await session.withTransaction(async () => {
-        await deposit.save({session});
-        await eventDataResult.save({ session });
-        await response.save({ session });
-        await provider.save({ session });
-      }, transactionOptions);
-
-      return response;
-    }catch (error) {
-      throw new Error(error);
-    } finally {
+      try{
+        await session.withTransaction(async () => {
+          await deposit.save({session});
+          await eventDataResult.save({ session });
+          await response.save({ session });
+          await provider.save({ session });
+        }, transactionOptions);
+  
+        return response;
+      }catch(error){
+        throw new Error(error);
+      }finally{
       // Ending the session
       await session.endSession();
+      }
+    }catch (error) {
+      throw new Error(error);
     }
   },
 };
@@ -181,19 +185,24 @@ const handleWithdraw = {
       });
 
       const session = await mongoose.startSession();
-      await session.withTransaction(async () => {
+      try{
+        await session.withTransaction(async () => {
         await withdraw.save({session});
         await eventDataResult.save({ session });
         await response.save({ session });
         await provider.save({ session });
       }, transactionOptions);
 
-      return response;
-    }catch (error) {
-      throw new Error(error);
-    } finally {
+        return response;
+      }
+      catch(error){
+        throw new Error(error);
+      }finally{
       // Ending the session
       await session.endSession();
+      }
+    }catch (error) {
+      throw new Error(error);
     }
   },
 };
