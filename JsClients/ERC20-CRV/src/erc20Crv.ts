@@ -354,8 +354,8 @@ class ERC20CRVClient {
         this.namedKeys.allowances
       );
 
-      const maybeValue = result.value().unwrap();
-      return maybeValue.value().toString();
+      const maybeValue = parseInt(result.data._hex);
+      return maybeValue;
     } catch (error) {
       return "0";
     }
