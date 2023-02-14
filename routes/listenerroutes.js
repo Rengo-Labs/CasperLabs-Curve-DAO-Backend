@@ -888,7 +888,7 @@ async function geteventsdata(
       );
       console.log("handleNewProxyApp Mutation called.");
       return true;
-    } else if (eventName == "updateLiquidityLimit") {
+    } else if (eventName == "UpdateLiquidityLimit") {
       console.log(eventName + " Event result: ");
 
       let {user,contract_package_hash,original_balance,original_supply,

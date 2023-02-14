@@ -67,6 +67,7 @@ const handleUpdateLiquidityLimit = {
       });
 
       const session = await mongoose.startSession();
+    try{
       await session.withTransaction(async () => {
         await gauge.save({session});
         await eventDataResult.save({ session });
@@ -75,11 +76,14 @@ const handleUpdateLiquidityLimit = {
       }, transactionOptions);
 
       return response;
-    }catch (error) {
+    }catch(error){
       throw new Error(error);
-    } finally {
+    }finally {
       // Ending the session
       await session.endSession();
+    }
+    }catch (error) {
+      throw new Error(error);
     }
   },
 };
