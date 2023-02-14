@@ -219,21 +219,25 @@ const handleVotingWithdraw = {
       });
 
       const session = await mongoose.startSession();
-      await session.withTransaction(async () => {
-        await daopower.save({session});
-        await votingpower.save({session});
-        await userbalance.save({session});
-        await votingescrow.save({session});
-        await eventDataResult.save({ session });
-        await response.save({ session });
-      }, transactionOptions);
-
-      return response;
+      try{
+        await session.withTransaction(async () => {
+          await daopower.save({session});
+          await votingpower.save({session});
+          await userbalance.save({session});
+          await votingescrow.save({session});
+          await eventDataResult.save({ session });
+          await response.save({ session });
+        }, transactionOptions);
+  
+        return response;
+      }catch(err){
+        throw new Error(error);
+      } finally {
+        // Ending the session
+        await session.endSession();
+      }
     } catch (error) {
       throw new Error(error);
-    } finally {
-      // Ending the session
-      await session.endSession();
     }
   },
 };

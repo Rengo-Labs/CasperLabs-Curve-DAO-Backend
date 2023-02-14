@@ -41,6 +41,27 @@ router
     }
   });
 
+function extractDataFromEvent(eventData){
+  let data = {};
+  if(eventData[0][0].data == undefined){
+      for(let i = 0; i < eventData.length; i++){
+        eval(`var ${eventData[i][0]} = "${eventData[i][1]}"`);
+        data[eventData[i][0]] = eval(eventData[i][0]);
+        if(data[eventData[i][0]].includes("(") && data[eventData[i][0]].includes(")"))
+        data[eventData[i][0]] = splitdata(eval(eventData[i][0]));
+      }
+  }else{
+      for(let i = 0; i < eventData.length; i++){
+          eval(`var ${eventData[i][0].data} = "${eventData[i][1].data}"`);
+          data[eventData[i][0].data] = eval(eventData[i][0].data);
+          if(data[eventData[i][0].data].includes("(") && data[eventData[i][0].data].includes(")"))
+          data[eventData[i][0].data] = splitdata(eval(eventData[i][0].data));
+      }
+  }
+  return data;
+};
+
+
 async function geteventsdata(
   eventResult,
   _deployHash,
@@ -80,68 +101,15 @@ async function geteventsdata(
 
     if (eventName == "addLiquidity") {
       console.log(eventName + " Event result: ");
-
-      var tokenAmounts,fees,invariant,tokenSupply,poolId,
-      providerId,transactionHash,logIndex,registryAddress;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-        console.log(newData[6][0] + " = " + newData[6][1]);
-        console.log(newData[7][0] + " = " + newData[7][1]);
-        console.log(newData[8][0] + " = " + newData[8][1]);
-        console.log(newData[9][0] + " = " + newData[9][1]);
-        console.log(newData[10][0] + " = " + newData[10][1]);
-        console.log(newData[11][0] + " = " + newData[11][1]);
-  
-        tokenAmounts = newData[2][1];
-        fees = newData[3][1];
-        invariant = newData[4][1];
-        tokenSupply = newData[5][1];
-        poolId = splitdata(newData[6][1]);
-        providerId = splitdata(newData[7][1]);
-        transactionHash = splitdata(newData[8][1]);
-        logIndex = newData[9][1];
-        registryAddress = newData[10][1];
-      }
-      else
-      {
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-        console.log(newData[6][0].data + " = " + newData[6][1].data);
-        console.log(newData[7][0].data + " = " + newData[7][1].data);
-        console.log(newData[8][0].data + " = " + newData[8][1].data);
-        console.log(newData[9][0].data + " = " + newData[9][1].data);
-        console.log(newData[10][0].data + " = " + newData[10][1].data);
-        console.log(newData[11][0].data + " = " + newData[11][1].data);
-  
-        tokenAmounts = newData[2][1].data;
-        fees = newData[3][1].data;
-        invariant = newData[4][1].data;
-        tokenSupply = newData[5][1].data;
-        poolId = splitdata(newData[6][1].data);
-        providerId = splitdata(newData[7][1].data);
-        transactionHash = splitdata(newData[8][1].data);
-        logIndex = newData[9][1].data;
-        registryAddress = newData[10][1].data;
-      }
       
+      let {tokenAmounts,fees,invariant,tokenSupply,poolId,providerId,registryAddress} = extractDataFromEvent(newData);
       console.log("tokenAmounts: ", tokenAmounts);
       console.log("fees: ", fees);
       console.log("invariant: ", invariant);
       console.log("tokenSupply: ", tokenSupply);
       console.log("poolId: ", poolId);
       console.log("providerId: ", providerId);
-      console.log("transactionHash: ", transactionHash);
-      console.log("logIndex: ", logIndex);
+      console.log("transactionHash: ", deployHash);
       console.log("registryAddress: ", registryAddress);
       console.log("blockNumber: ", blockNumber);
 
@@ -190,8 +158,8 @@ async function geteventsdata(
           timestamp: timestamp,
           poolId: poolId,
           providerId: providerId,
-          transactionHash: transactionHash,
-          logIndex: logIndex,
+          transactionHash: deployHash,
+          logIndex: "0",
           registryAddress: registryAddress,
           blockNumber: blockNumber,
           eventObjectId: eventResult._id,
@@ -202,61 +170,14 @@ async function geteventsdata(
     } else if (eventName == "removeLiquidity") {
       console.log(eventName + " Event result: ");
 
-      var tokenAmounts,fees,tokenSupply,poolId,providerId,
-      transactionHash,logIndex,registryAddress;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-        console.log(newData[6][0] + " = " + newData[6][1]);
-        console.log(newData[7][0] + " = " + newData[7][1]);
-        console.log(newData[8][0] + " = " + newData[8][1]);
-        console.log(newData[9][0] + " = " + newData[9][1]);
-        console.log(newData[10][0] + " = " + newData[10][1]);
+      let {tokenAmounts,fees,tokenSupply,poolId,providerId,registryAddress} = extractDataFromEvent(newData);
 
-        tokenAmounts = newData[2][1];
-        fees = newData[3][1];
-        tokenSupply = newData[4][1];
-        poolId = splitdata(newData[5][1]);
-        providerId = splitdata(newData[6][1]);
-        transactionHash = splitdata(newData[7][1]);
-        logIndex = newData[8][1];
-        registryAddress = newData[9][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-        console.log(newData[6][0].data + " = " + newData[6][1].data);
-        console.log(newData[7][0].data + " = " + newData[7][1].data);
-        console.log(newData[8][0].data + " = " + newData[8][1].data);
-        console.log(newData[9][0].data + " = " + newData[9][1].data);
-        console.log(newData[10][0].data + " = " + newData[10][1].data);
-  
-        tokenAmounts = newData[2][1].data;
-        fees = newData[3][1].data;
-        tokenSupply = newData[4][1].data;
-        poolId = splitdata(newData[5][1].data);
-        providerId = splitdata(newData[6][1].data);
-        transactionHash = splitdata(newData[7][1].data);
-        logIndex = newData[8][1].data;
-        registryAddress = newData[9][1].data;
-      }  
-      
       console.log("tokenAmounts: ", tokenAmounts);
       console.log("fees: ", fees);
       console.log("tokenSupply: ", tokenSupply);
       console.log("poolId: ", poolId);
       console.log("providerId: ", providerId);
-      console.log("transactionHash: ", transactionHash);
-      console.log("logIndex: ", logIndex);
+      console.log("transactionHash: ", deployHash);
       console.log("registryAddress: ", registryAddress);
       console.log("blockNumber: ", blockNumber);
 
@@ -302,8 +223,8 @@ async function geteventsdata(
           timestamp: timestamp,
           poolId: poolId,
           providerId: providerId,
-          transactionHash: transactionHash,
-          logIndex: logIndex,
+          transactionHash: deployHash,
+          logIndex: "0",
           registryAddress: registryAddress,
           blockNumber: blockNumber,
           eventObjectId: eventResult._id,
@@ -314,58 +235,8 @@ async function geteventsdata(
     } else if (eventName == "removeLiquidityImbalance") {
       console.log(eventName + " Event result: ");
 
-      var tokenAmounts,fees,invariant,tokenSupply,poolId,
-      providerId,transactionHash,logIndex,registryAddress;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-        console.log(newData[6][0] + " = " + newData[6][1]);
-        console.log(newData[7][0] + " = " + newData[7][1]);
-        console.log(newData[8][0] + " = " + newData[8][1]);
-        console.log(newData[9][0] + " = " + newData[9][1]);
-        console.log(newData[10][0] + " = " + newData[10][1]);
-        console.log(newData[11][0] + " = " + newData[11][1]);
-  
-        tokenAmounts = newData[2][1];
-        fees = newData[3][1];
-        invariant = newData[4][1];
-        tokenSupply = newData[5][1];
-        poolId = splitdata(newData[6][1]);
-        providerId = splitdata(newData[7][1]);
-        transactionHash = splitdata(newData[8][1]);
-        logIndex = newData[9][1];
-        registryAddress = newData[10][1];
-      }
-      else
-      {
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-        console.log(newData[6][0].data + " = " + newData[6][1].data);
-        console.log(newData[7][0].data + " = " + newData[7][1].data);
-        console.log(newData[8][0].data + " = " + newData[8][1].data);
-        console.log(newData[9][0].data + " = " + newData[9][1].data);
-        console.log(newData[10][0].data + " = " + newData[10][1].data);
-        console.log(newData[11][0].data + " = " + newData[11][1].data);
-  
-        tokenAmounts = newData[2][1].data;
-        fees = newData[3][1].data;
-        invariant = newData[4][1].data;
-        tokenSupply = newData[5][1].data;
-        poolId = splitdata(newData[6][1].data);
-        providerId = splitdata(newData[7][1].data);
-        transactionHash = splitdata(newData[8][1].data);
-        logIndex = newData[9][1].data;
-        registryAddress = newData[10][1].data;
-      }
+      let {tokenAmounts,fees,invariant,tokenSupply,poolId,
+        providerId,registryAddress} = extractDataFromEvent(newData);
 
       console.log("tokenAmounts: ", tokenAmounts);
       console.log("fees: ", fees);
@@ -373,8 +244,7 @@ async function geteventsdata(
       console.log("tokenSupply: ", tokenSupply);
       console.log("poolId: ", poolId);
       console.log("providerId: ", providerId);
-      console.log("transactionHash: ", transactionHash);
-      console.log("logIndex: ", logIndex);
+      console.log("transactionHash: ", deployHash);
       console.log("registryAddress: ", registryAddress);
       console.log("blockNumber: ", blockNumber);
 
@@ -423,8 +293,8 @@ async function geteventsdata(
           timestamp: timestamp,
           poolId: poolId,
           providerId: providerId,
-          transactionHash: transactionHash,
-          logIndex: logIndex,
+          transactionHash: deployHash,
+          logIndex: "0",
           registryAddress: registryAddress,
           blockNumber: blockNumber,
           eventObjectId: eventResult._id,
@@ -435,57 +305,13 @@ async function geteventsdata(
     } else if (eventName == "removeLiquidityOne") {
       console.log(eventName + " Event result: ");
 
-      var tokenAmounts,coinAmount,poolId,providerId,
-      transactionHash,logIndex,registryAddress;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-        console.log(newData[6][0] + " = " + newData[6][1]);
-        console.log(newData[7][0] + " = " + newData[7][1]);
-        console.log(newData[8][0] + " = " + newData[8][1]);
-        console.log(newData[9][0] + " = " + newData[9][1]);
-  
-        tokenAmounts = newData[2][1];
-        coinAmount = newData[3][1];
-        poolId = splitdata(newData[4][1]);
-        providerId = splitdata(newData[5][1]);
-        transactionHash = splitdata(newData[6][1]);
-        logIndex = newData[7][1];
-        registryAddress = newData[8][1];
-      }
-      else
-      {
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-        console.log(newData[6][0].data + " = " + newData[6][1].data);
-        console.log(newData[7][0].data + " = " + newData[7][1].data);
-        console.log(newData[8][0].data + " = " + newData[8][1].data);
-        console.log(newData[9][0].data + " = " + newData[9][1].data);
-  
-        tokenAmounts = newData[2][1].data;
-        coinAmount = newData[3][1].data;
-        poolId = splitdata(newData[4][1].data);
-        providerId = splitdata(newData[5][1].data);
-        transactionHash = splitdata(newData[6][1].data);
-        logIndex = newData[7][1].data;
-        registryAddress = newData[8][1].data;
-      }
+      let {tokenAmounts,coinAmount,poolId,providerId,registryAddress} = extractDataFromEvent(newData);
 
       console.log("tokenAmounts: ", tokenAmounts);
       console.log("coinAmmount: ", coinAmount);
       console.log("poolId: ", poolId);
       console.log("providerId: ", providerId);
-      console.log("transactionHash: ", transactionHash);
-      console.log("logIndex: ", logIndex);
+      console.log("transactionHash: ", deployHash);
       console.log("registryAddress: ", registryAddress);
       console.log("blockNumber: ", blockNumber);
 
@@ -528,8 +354,8 @@ async function geteventsdata(
           timestamp: timestamp,
           poolId: poolId,
           providerId: providerId,
-          transactionHash: transactionHash,
-          logIndex: logIndex,
+          transactionHash: deployHash,
+          logIndex: "0",
           registryAddress: registryAddress,
           blockNumber: blockNumber,
           eventObjectId: eventResult._id,
@@ -540,55 +366,11 @@ async function geteventsdata(
     } else if (eventName == "tokenExchange") {
       console.log(eventName + " Event result: ");
 
-      var poolId,transactionHash,logIndex,buyer,
-      sold_id,tokens_sold,bought_id,tokens_bought;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-        console.log(newData[6][0] + " = " + newData[6][1]);
-        console.log(newData[7][0] + " = " + newData[7][1]);
-        console.log(newData[8][0] + " = " + newData[8][1]);
-        console.log(newData[9][0] + " = " + newData[9][1]);
-
-        poolId = splitdata(newData[2][1]);
-        transactionHash = splitdata(newData[3][1]);
-        logIndex = newData[4][1];
-        buyer = splitdata(newData[5][1]);
-        sold_id = splitdata(newData[6][1]);
-        tokens_sold = newData[7][1];
-        bought_id = splitdata(newData[8][1]);
-        tokens_bought = newData[9][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-        console.log(newData[6][0].data + " = " + newData[6][1].data);
-        console.log(newData[7][0].data + " = " + newData[7][1].data);
-        console.log(newData[8][0].data + " = " + newData[8][1].data);
-        console.log(newData[9][0].data + " = " + newData[9][1].data);
-
-        poolId = splitdata(newData[2][1].data);
-        transactionHash = splitdata(newData[3][1].data);
-        logIndex = newData[4][1].data;
-        buyer = splitdata(newData[5][1].data);
-        sold_id = splitdata(newData[6][1].data);
-        tokens_sold = newData[7][1].data;
-        bought_id = splitdata(newData[8][1].data);
-        tokens_bought = newData[9][1].data;
-      }
+      let {poolId,buyer,
+        sold_id,tokens_sold,bought_id,tokens_bought} = extractDataFromEvent(newData);
 
       console.log("poolId: ", poolId);
-      console.log("transactionHash: ", transactionHash);
-      console.log("logIndex: ", logIndex);
+      console.log("transactionHash: ", deployHash);
       console.log("buyer: ", buyer);
       console.log("sold_id: ", sold_id);
       console.log("token_sold: ", tokens_sold);
@@ -629,10 +411,10 @@ async function geteventsdata(
       }`,
         {
           poolId: poolId,
-          transactionHash: transactionHash,
+          transactionHash: deployHash,
           block: block_hash,
           timestamp: timestamp,
-          logIndex: logIndex,
+          logIndex: "0",
           buyer: buyer,
           sold_id: sold_id,
           tokens_sold: tokens_sold,
@@ -646,55 +428,11 @@ async function geteventsdata(
     } else if (eventName == "exchangeUnderlying") {
       console.log(eventName + " Event result: ");
 
-      var poolId,transactionHash,logIndex,buyer,sold_id,
-      tokens_sold,bought_id,tokens_bought;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-        console.log(newData[6][0] + " = " + newData[6][1]);
-        console.log(newData[7][0] + " = " + newData[7][1]);
-        console.log(newData[8][0] + " = " + newData[8][1]);
-        console.log(newData[9][0] + " = " + newData[9][1]);
-
-        poolId = splitdata(newData[2][1]);
-        transactionHash = splitdata(newData[4][1]);
-        logIndex = newData[5][1];
-        buyer = splitdata(newData[3][1]);
-        sold_id = splitdata(newData[0][1]);
-        tokens_sold = newData[1][1];
-        bought_id = splitdata(newData[6][1]);
-        tokens_bought = newData[7][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-        console.log(newData[6][0].data + " = " + newData[6][1].data);
-        console.log(newData[7][0].data + " = " + newData[7][1].data);
-        console.log(newData[8][0].data + " = " + newData[8][1].data);
-        console.log(newData[9][0].data + " = " + newData[9][1].data);
-
-        poolId = splitdata(newData[2][1].data);
-        transactionHash = splitdata(newData[4][1].data);
-        logIndex = newData[5][1].data;
-        buyer = splitdata(newData[3][1].data);
-        sold_id = splitdata(newData[0][1].data);
-        tokens_sold = newData[1][1].data;
-        bought_id = splitdata(newData[6][1].data);
-        tokens_bought = newData[7][1].data;
-      }
+      let {poolId,buyer,sold_id,
+        tokens_sold,bought_id,tokens_bought} = extractDataFromEvent(newData);
 
       console.log("poolId: ", poolId);
-      console.log("transactionHash: ", transactionHash);
-      console.log("logIndex: ", logIndex);
+      console.log("transactionHash: ", deployHash);
       console.log("buyer: ", buyer);
       console.log("sold_id: ", sold_id);
       console.log("tokens_sold: ", tokens_sold);
@@ -735,10 +473,10 @@ async function geteventsdata(
       }`,
         {
           poolId: poolId,
-          transactionHash: transactionHash,
+          transactionHash: deployHash,
           block: block_hash,
           timestamp: timestamp,
-          logIndex: logIndex,
+          logIndex: "0",
           buyer: buyer,
           sold_id: sold_id,
           tokens_sold: tokens_sold,
@@ -752,38 +490,10 @@ async function geteventsdata(
     } else if (eventName == "newAdmin") {
       console.log(eventName + " Event result: ");
 
-      var poolId,transactionHash,logIndex,admin;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-  
-        poolId = splitdata(newData[0][1]);
-        transactionHash = splitdata(newData[1][1]);
-        logIndex = newData[2][1];
-        admin = splitdata(newData[3][1]);
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-  
-        poolId = splitdata(newData[0][1].data);
-        transactionHash = splitdata(newData[1][1].data);
-        logIndex = newData[2][1].data;
-        admin = splitdata(newData[3][1].data);
-      }
+      let {poolId,admin} = extractDataFromEvent(newData);
 
       console.log("poolId: ", poolId);
-      console.log("transactionHash: ", transactionHash);
-      console.log("logIndex: ", logIndex);
+      console.log("transactionHash: ", deployHash);
       console.log("admin: ", admin);
 
       await request(
@@ -812,10 +522,10 @@ async function geteventsdata(
       }`,
         {
           poolId: poolId,
-          transactionHash: transactionHash,
+          transactionHash: deployHash,
           block: block_hash,
           timestamp: timestamp,
-          logIndex: logIndex,
+          logIndex: "0",
           admin: admin,
           eventObjectId: eventResult._id,
         }
@@ -824,43 +534,10 @@ async function geteventsdata(
       return true;
     } else if (eventName == "newFee") {
       console.log(eventName + " Event result: ");
-
-      var poolId,transactionHash,logIndex,fee,admin_fee;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-        console.log(newData[6][0] + " = " + newData[6][1]);
-  
-        poolId = splitdata(newData[0][1]);
-        transactionHash = splitdata(newData[1][1]);
-        logIndex = newData[2][1];
-        fee = newData[3][1];
-        admin_fee = newData[4][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-        console.log(newData[6][0].data + " = " + newData[6][1].data);
-  
-        poolId = splitdata(newData[0][1].data);
-        transactionHash = splitdata(newData[1][1].data);
-        logIndex = newData[2][1].data;
-        fee = newData[3][1].data;
-        admin_fee = newData[4][1].data;
-      }
      
+      let {poolId,fee,admin_fee} = extractDataFromEvent(newData);
       console.log("poolId: ", poolId);
-      console.log("transactionHash: ", transactionHash);
-      console.log("logIndex: ", logIndex);
+      console.log("transactionHash: ", deployHash);
       console.log("fee: ", fee);
       console.log("admin_fee: ", admin_fee);
 
@@ -892,10 +569,10 @@ async function geteventsdata(
       }`,
         {
           poolId: poolId,
-          transactionHash: transactionHash,
+          transactionHash: deployHash,
           block: block_hash,
           timestamp: timestamp,
-          logIndex: logIndex,
+          logIndex: "0",
           fee: fee,
           admin_fee: admin_fee,
           eventObjectId: eventResult._id,
@@ -906,47 +583,11 @@ async function geteventsdata(
     } else if (eventName == "newParameters") {
       console.log(eventName + " Event result: ");
 
-      var poolId,A,transactionHash,logIndex,fee,admin_fee;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-        console.log(newData[6][0] + " = " + newData[6][1]);
-        console.log(newData[7][0] + " = " + newData[7][1]);
-
-        poolId = splitdata(newData[0][1]);
-        A = newData[4][1];
-        transactionHash = splitdata(newData[1][1]);
-        logIndex = newData[2][1];
-        fee = newData[3][1];
-        admin_fee = newData[4][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-        console.log(newData[6][0].data + " = " + newData[6][1].data);
-        console.log(newData[7][0].data + " = " + newData[7][1].data);
-  
-        poolId = splitdata(newData[0][1].data);
-        A = newData[4][1].data;
-        transactionHash = splitdata(newData[1][1].data);
-        logIndex = newData[2][1].data;
-        fee = newData[3][1].data;
-        admin_fee = newData[4][1].data;
-      }
+      let {poolId,A,fee,admin_fee} = extractDataFromEvent(newData);
 
       console.log("poolId: ", poolId);
       console.log("A: ", A);
-      console.log("transactionHash: ", transactionHash);
-      console.log("logIndex: ", logIndex);
+      console.log("transactionHash: ", deployHash);
       console.log("fee: ", fee);
       console.log("admin_fee: ", admin_fee);
 
@@ -981,10 +622,10 @@ async function geteventsdata(
         {
           poolId: poolId,
           A: A,
-          transactionHash: transactionHash,
+          transactionHash: deployHash,
           block: block_hash,
           timestamp: timestamp,
-          logIndex: logIndex,
+          logIndex: "0",
           fee: fee,
           admin_fee: admin_fee,
           eventObjectId: eventResult._id,
@@ -995,39 +636,11 @@ async function geteventsdata(
     } else if (eventName == "RampA") {
       console.log(eventName + " Event result: ");
 
-      var poolId,new_A,transactionHash,logIndex;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-
-        poolId = splitdata(newData[0][1]);
-        new_A = newData[1][1];
-        transactionHash = splitdata(newData[2][1]);
-        logIndex = newData[3][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-  
-        poolId = splitdata(newData[0][1].data);
-        new_A = newData[1][1].data;
-        transactionHash = splitdata(newData[2][1].data);
-        logIndex = newData[3][1].data;
-      }
+      let {poolId,new_A} = extractDataFromEvent(newData);
     
       console.log("poolId: ", poolId);
       console.log("newA: ", new_A);
-      console.log("transactionHash: ", transactionHash);
-      console.log("logIndex: ", logIndex);
+      console.log("transactionHash: ", deployHash);
 
       await request(
         process.env.GRAPHQL,
@@ -1056,10 +669,10 @@ async function geteventsdata(
         {
           poolId: poolId,
           new_A: new_A,
-          transactionHash: transactionHash,
+          transactionHash: deployHash,
           block: block_hash,
           timestamp: timestamp,
-          logIndex: logIndex,
+          logIndex: "0",
           eventObjectId: eventResult._id,
         }
       );
@@ -1068,39 +681,11 @@ async function geteventsdata(
     } else if (eventName == "stopRampA") {
       console.log(eventName + " Event result: ");
 
-      var poolId,A,transactionHash,logIndex;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-
-        poolId = splitdata(newData[0][1]);
-        A = newData[1][1];
-        transactionHash = splitdata(newData[2][1]);
-        logIndex = newData[3][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-  
-        poolId = splitdata(newData[0][1].data);
-        A = newData[1][1].data;
-        transactionHash = splitdata(newData[2][1].data);
-        logIndex = newData[3][1].data;
-      }
+      let { poolId,A } = extractDataFromEvent(newData);
 
       console.log("poolId: ", poolId);
       console.log("A: ", A);
-      console.log("transactionHash: ", transactionHash);
-      console.log("logIndex: ", logIndex);
+      console.log("transactionHash: ", deployHash);
 
       await request(
         process.env.GRAPHQL,
@@ -1129,10 +714,10 @@ async function geteventsdata(
         {
           poolId: poolId,
           A: A,
-          transactionHash: transactionHash,
+          transactionHash: deployHash,
           block: block_hash,
           timestamp: timestamp,
-          logIndex: logIndex,
+          logIndex: "0",
           eventObjectId: eventResult._id,
         }
       );
@@ -1141,34 +726,11 @@ async function geteventsdata(
     } else if (eventName == "addressModified") {
       console.log(eventName + " Event result: ");
 
-      var addressProviderContractHash,id,transactionHash;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-
-        addressProviderContractHash = splitdata(newData[0][1]);
-        id = splitdata(newData[1][1]);
-        transactionHash = splitdata(newData[2][1]);
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-
-        addressProviderContractHash = splitdata(newData[0][1].data);
-        id = splitdata(newData[1][1].data);
-        transactionHash = splitdata(newData[2][1].data);
-      }
+      let {addressProviderContractHash,contract_package_hash} = extractDataFromEvent(newData);
       
       console.log("addressProviderContractHash: ", addressProviderContractHash);
-      console.log("id: ", id);
-      console.log("transactionHash: ", transactionHash);
+      console.log("id: ", contract_package_hash);
+      console.log("transactionHash: ", deployHash);
 
       await request(
         process.env.GRAPHQL,
@@ -1194,10 +756,10 @@ async function geteventsdata(
       }`,
         {
           addressProviderContractHash: addressProviderContractHash,
-          id: id,
+          id: contract_package_hash,
           block: block_hash,
           timestamp: timestamp,
-          transactionHash: transactionHash,
+          transactionHash: deployHash,
           eventObjectId: eventResult._id,
         }
       );
@@ -1206,34 +768,11 @@ async function geteventsdata(
     } else if (eventName == "newAddressIdentifier") {
       console.log(eventName + " Event result: ");
 
-      var addressProviderContractHash,id,transactionHash;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-
-        addressProviderContractHash = splitdata(newData[0][1]);
-        id = splitdata(newData[1][1]);
-        transactionHash = splitdata(newData[2][1]);
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-
-        addressProviderContractHash = splitdata(newData[0][1].data);
-        id = splitdata(newData[1][1].data);
-        transactionHash = splitdata(newData[2][1].data);
-      }
+      let {addressProviderContractHash,contract_package_hash}= extractDataFromEvent(newData);
 
       console.log("addressProviderContractHash: ", addressProviderContractHash);
-      console.log("id: ", id);
-      console.log("transactionHash: ", transactionHash);
+      console.log("id: ", contract_package_hash);
+      console.log("transactionHash: ", deployHash);
 
       await request(
         process.env.GRAPHQL,
@@ -1259,10 +798,10 @@ async function geteventsdata(
       }`,
         {
           addressProviderContractHash: addressProviderContractHash,
-          id: id,
+          id: contract_package_hash,
           block: block_hash,
           timestamp: timestamp,
-          transactionHash: transactionHash,
+          transactionHash: deployHash,
           eventObjectId: eventResult._id,
         }
       );
@@ -1270,30 +809,10 @@ async function geteventsdata(
       return true;
     } else if (eventName == "poolAdded") {
       console.log(eventName + " Event result: ");
-
-      var poolId,transactionHash;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-  
-        poolId = splitdata(newData[1][1]);
-        transactionHash = splitdata(newData[2][1]);
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-  
-        poolId = splitdata(newData[1][1].data);
-        transactionHash = splitdata(newData[2][1].data);
-      }
      
+      let {poolId} = extractDataFromEvent(newData);
       console.log("poolId: ", poolId);
-      console.log("transactionHash: ", transactionHash);
+      console.log("transactionHash: ", deployHash);
 
       await request(
         process.env.GRAPHQL,
@@ -1305,7 +824,7 @@ async function geteventsdata(
       }`,
         {
           poolId: poolId,
-          transactionHash: transactionHash,
+          transactionHash: deployHash,
           block: block_hash,
           timestamp: timestamp,
           eventObjectId: eventResult._id,
@@ -1316,30 +835,10 @@ async function geteventsdata(
     } else if (eventName == "poolRemoved") {
       console.log(eventName + " Event result: ");
 
-      var poolId,transactionHash;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-  
-        poolId = splitdata(newData[1][1]);
-        transactionHash = splitdata(newData[2][1]);
-      }
-      else
-      {
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-  
-        poolId = splitdata(newData[1][1].data);
-        transactionHash = splitdata(newData[2][1].data);
-      }
+      let{poolId} = extractDataFromEvent(newData);
 
       console.log("poolId: ", poolId);
-      console.log("transactionHash: ", transactionHash);
+      console.log("transactionHash: ", deployHash);
 
       await request(
         process.env.GRAPHQL,
@@ -1351,7 +850,7 @@ async function geteventsdata(
       }`,
         {
           poolId: poolId,
-          transactionHash: transactionHash,
+          transactionHash: deployHash,
           block: block_hash,
           timestamp: timestamp,
           eventObjectId: eventResult._id,
@@ -1362,39 +861,12 @@ async function geteventsdata(
     } else if (eventName == "newProxyApp") {
       console.log(eventName + " Event result: ");
 
-      var appId,proxy,context,transactionHash;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-  
-        appId = splitdata(newData[0][1]);
-        proxy = splitdata(newData[1][1]);
-        context = newData[2][1];
-        transactionHash = splitdata(newData[3][1]);
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-  
-        appId = splitdata(newData[0][1].data);
-        proxy = splitdata(newData[1][1].data);
-        context = newData[2][1].data;
-        transactionHash = splitdata(newData[3][1].data);
-      }
+      let {appId,proxy,context} = extractDataFromEvent(newData);
 
       console.log("appId: ", appId);
       console.log("proxy: ", proxy);
       console.log("context: ", context);
-      console.log("transactionHash: ", transactionHash);
+      console.log("transactionHash: ", deployHash);
 
       await request(
         process.env.GRAPHQL,
@@ -1408,7 +880,7 @@ async function geteventsdata(
           appId: appId,
           proxy: proxy,
           context: context,
-          transactionHash: transactionHash,
+          transactionHash: deployHash,
           block: block_hash,
           timestamp: timestamp,
           eventObjectId: eventResult._id,
@@ -1419,55 +891,16 @@ async function geteventsdata(
     } else if (eventName == "updateLiquidityLimit") {
       console.log(eventName + " Event result: ");
 
-      var user,id,original_balance,original_supply,
-      working_balance,working_supply,transactionHash;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-        console.log(newData[6][0] + " = " + newData[6][1]);
-        console.log(newData[7][0] + " = " + newData[7][1]);
-        console.log(newData[8][0] + " = " + newData[8][1]);
-  
-        user = splitdata(newData[0][1]);
-        id = splitdata(newData[1][1]);
-        original_balance = newData[2][1];
-        original_supply = newData[3][1];
-        working_balance = newData[4][1];
-        working_supply = newData[5][1];
-        transactionHash = splitdata(newData[6][1]);
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-        console.log(newData[6][0].data + " = " + newData[6][1].data);
-        console.log(newData[7][0].data + " = " + newData[7][1].data);
-        console.log(newData[8][0].data + " = " + newData[8][1].data);
-  
-        user = splitdata(newData[0][1].data);
-        id = splitdata(newData[1][1].data);
-        original_balance = newData[2][1].data;
-        original_supply = newData[3][1].data;
-        working_balance = newData[4][1].data;
-        working_supply = newData[5][1].data;
-        transactionHash = splitdata(newData[6][1].data);
-      }
+      let {user,contract_package_hash,original_balance,original_supply,
+        working_balance,working_supply} = extractDataFromEvent(newData);
 
       console.log("user: ", user);
-      console.log("id: ", id);
+      console.log("id: ", contract_package_hash);
       console.log("original_balance: ", original_balance);
       console.log("original_supply: ", original_supply);
       console.log("working_balance: ", working_balance);
       console.log("working_supply: ", working_supply);
-      console.log("transactionHash: ", transactionHash);
+      console.log("transactionHash: ", deployHash);
 
       await request(
         process.env.GRAPHQL,
@@ -1501,12 +934,12 @@ async function geteventsdata(
       }`,
         {
           user: user,
-          id: id,
+          id: contract_package_hash,
           original_balance: original_balance,
           original_supply: original_supply,
           working_balance: working_balance,
           working_supply: working_supply,
-          transactionHash: transactionHash,
+          transactionHash: deployHash,
           block: block_hash,
           timestamp: timestamp,
           eventObjectId: eventResult._id,
@@ -1517,44 +950,12 @@ async function geteventsdata(
     } else if (eventName == "Deposit") {
       console.log(eventName + " Event result: ");
 
-      var provider,id,value,transactionHash,logIndex;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-        console.log(newData[6][0] + " = " + newData[6][1]);
-  
-        provider = splitdata(newData[0][1]);
-        id = splitdata(newData[1][1]);
-        value = newData[2][1].data;
-        transactionHash = splitdata(newData[3][1]);
-        logIndex = newData[4][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-        console.log(newData[6][0].data + " = " + newData[6][1].data);
-  
-        provider = splitdata(newData[0][1].data);
-        id = splitdata(newData[1][1].data);
-        value = newData[2][1].data;
-        transactionHash = splitdata(newData[3][1].data);
-        logIndex = newData[4][1].data;
-      }
+      let {contract_package_hash,provider,value} = extractDataFromEvent(newData)
 
       console.log("provider: ", provider);
-      console.log("id: ", id);
+      console.log("id: ", contract_package_hash);
       console.log("value: ", value);
-      console.log("transactionHash: ", transactionHash);
-      console.log("logIndex: ", logIndex);
+      console.log("transactionHash: ", deployHash);
 
       await request(
         process.env.GRAPHQL,
@@ -1566,56 +967,24 @@ async function geteventsdata(
       }`,
         {
           provider: provider,
-          id: id,
+          id: contract_package_hash,
           value: value,
-          transactionHash: transactionHash,
-          logIndex: logIndex,
+          transactionHash: deployHash,
+          logIndex: "0",
           eventObjectId: eventResult._id,
         }
       );
       console.log("handleDeposit Mutation called.");
       return true;
-    } else if (eventName == "withdraw") {
+    } else if (eventName == "Withdraw") {
       console.log(eventName + " Event result: ");
 
-      var provider,id,value,transactionHash,logIndex;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-        console.log(newData[6][0] + " = " + newData[6][1]);
-  
-        provider = splitdata(newData[0][1]);
-        id = splitdata(newData[1][1]);
-        value = newData[2][1].data;
-        transactionHash = splitdata(newData[3][1]);
-        logIndex = newData[4][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-        console.log(newData[6][0].data + " = " + newData[6][1].data);
-  
-        provider = splitdata(newData[0][1].data);
-        id = splitdata(newData[1][1].data);
-        value = newData[2][1].data;
-        transactionHash = splitdata(newData[3][1].data);
-        logIndex = newData[4][1].data;
-      }
+      let {provider,contract_package_hash,value} = extractDataFromEvent(newData);
 
       console.log("provider: ", provider);
-      console.log("id: ", id);
+      console.log("id: ", contract_package_hash);
       console.log("value: ", value);
-      console.log("transactionHash: ", transactionHash);
-      console.log("logIndex: ", logIndex);
+      console.log("transactionHash: ", deployHash);
 
       await request(
         process.env.GRAPHQL,
@@ -1627,10 +996,10 @@ async function geteventsdata(
       }`,
         {
           provider: provider,
-          id: id,
+          id: contract_package_hash,
           value: value,
-          transactionHash: transactionHash,
-          logIndex: logIndex,
+          transactionHash: deployHash,
+          logIndex: "0",
           eventObjectId: eventResult._id,
         }
       );
@@ -1639,26 +1008,7 @@ async function geteventsdata(
     } else if (eventName == "minimumBalanceSet") {
       console.log(eventName + " Event result: ");
 
-      var address,minBalance;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-  
-        address = splitdata(newData[0][1]);
-        minBalance = newData[1][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-  
-        address = splitdata(newData[0][1].data);
-        minBalance = newData[1][1].data;
-      }
+      let {address, minBalance} = extractDataFromEvent(newData);
 
       console.log("address: ", address);
       console.log("minBalance: ", minBalance);
@@ -1682,26 +1032,7 @@ async function geteventsdata(
     } else if (eventName == "minimumTimeSet") {
       console.log(eventName + " Event result: ");
 
-      var address,minTime;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-  
-        address = splitdata(newData[0][1]);
-        minTime = newData[1][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-  
-        address = splitdata(newData[0][1].data);
-        minTime = newData[1][1].data;
-      }
+      let {address, minTime} = extractDataFromEvent(newData);
       
       console.log("address: ", address);
       console.log("minTime: ", minTime);
@@ -1724,28 +1055,8 @@ async function geteventsdata(
       return true;
     } else if (eventName == "changeMinQuorum") {
       console.log(eventName + " Event result: ");
-
-      var address,minAcceptQuorumPct;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-  
-        address = splitdata(newData[0][1]);
-        minAcceptQuorumPct = newData[1][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-  
-        address = splitdata(newData[0][1].data);
-        minAcceptQuorumPct = newData[1][1].data;
-      }
       
+      let {address,minAcceptQuorumPct} = extractDataFromEvent(newData);
       console.log("address: ", address);
       console.log("minAcceptQuorumPct: ", minAcceptQuorumPct);
 
@@ -1767,28 +1078,8 @@ async function geteventsdata(
       return true;
     } else if (eventName == "changeSupportRequired") {
       console.log(eventName + " Event result: ");
-
-      var address,supportRequiredPct;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-  
-        address = splitdata(newData[0][1]);
-        supportRequiredPct = newData[1][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-  
-        address = splitdata(newData[0][1].data);
-        supportRequiredPct = newData[1][1].data;
-      }
       
+      let {address,supportRequiredPct} = extractDataFromEvent(newData);
       console.log("address: ", address);
       console.log("supportRequiredPct: ", supportRequiredPct);
 
@@ -1811,35 +1102,7 @@ async function geteventsdata(
     } else if (eventName == "startVote") {
       console.log(eventName + " Event result: ");
 
-      var creator,voteId,metadata,transactionFrom;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-  
-        creator = splitdata(newData[0][1]);
-        voteId = newData[1][1];
-        metadata = newData[2][1];
-        transactionFrom = splitdata(newData[3][1]);
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-  
-        creator = splitdata(newData[0][1].data);
-        voteId = newData[1][1].data;
-        metadata = newData[2][1].data;
-        transactionFrom = splitdata(newData[3][1].data);
-      }
-      
+      let {creator,voteId,metadata,transactionFrom} = extractDataFromEvent(newData);
       console.log("creator: ", creator);
       console.log("voteId: ", voteId);
       console.log("metadata: ", metadata);
@@ -1878,35 +1141,7 @@ async function geteventsdata(
     } else if (eventName == "castVote") {
       console.log(eventName + " Event result: ");
 
-      var voteId ,voter,stake,supports;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-  
-        voteId = newData[0][1];
-        voter = splitdata(newData[1][1]);
-        stake = splitdata(newData[2][1]);
-        supports = newData[3][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-  
-        voteId = newData[0][1].data;
-        voter = splitdata(newData[1][1].data);
-        stake = splitdata(newData[2][1].data);
-        supports = newData[3][1].data;
-      }
-      
+      let {voteId ,voter,stake,supports} = extractDataFromEvent(newData);
       console.log("voteId: ", voteId);
       console.log("voter: ", voter);
       console.log("stake: ", stake);
@@ -1948,23 +1183,24 @@ async function geteventsdata(
     } else if (eventName == "executeVote") {
       console.log(eventName + " Event result: ");
 
-      var voteId;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
+      // var voteId;
+      // if(newData[0][0].data == undefined)
+      // {
+      //   console.log(newData[0][0] + " = " + newData[0][1]);
+      //   console.log(newData[1][0] + " = " + newData[1][1]);
+      //   console.log(newData[2][0] + " = " + newData[2][1]);
         
-        voteId = newData[0][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
+      //   voteId = newData[0][1];
+      // }
+      // else{
+      //   console.log(newData[0][0].data + " = " + newData[0][1].data);
+      //   console.log(newData[1][0].data + " = " + newData[1][1].data);
+      //   console.log(newData[2][0].data + " = " + newData[2][1].data);
   
-        voteId = newData[0][1].data;
-      }
+      //   voteId = newData[0][1].data;
+      // }
       
+      let {voteId} = extractDataFromEvent(newData);
       console.log("voteId: ", voteId);
 
       await request(
@@ -1993,31 +1229,9 @@ async function geteventsdata(
     } else if (eventName == "AddType") {
       console.log(eventName + " Event result: ");
 
-      var id,type_id,name;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        
-        id = newData[0][1];
-        type_id = newData[3][1];
-        name = newData[2][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-       
-        id = newData[0][1].data;
-        type_id = newData[3][1].data;
-        name = newData[2][1].data;
-      }
-      
+      let {contract_package_hash, type_id, name } = extractDataFromEvent(newData);
 
-      console.log("id: ", id);
+      console.log("id: ", contract_package_hash);
       console.log("type_id: ", type_id);
       console.log("name: ", name);
 
@@ -2030,7 +1244,7 @@ async function geteventsdata(
                 
       }`,
         {
-          id: id,
+          id: contract_package_hash,
           type_id: type_id,
           timestamp: timestamp.toString(),
           name: name,
@@ -2041,37 +1255,12 @@ async function geteventsdata(
       return true;
     } else if (eventName == "NewGauge") {
       console.log(eventName + " Event result: ");
-
-      var gauge_type,addr,transactionHash,weight;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        
-         transactionHash = deployHash;
-        addr = splitdata(newData[0][1]);
-        gauge_type = newData[3][1];
-        weight = newData[4][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        
-        transactionHash = deployHash;
-        addr = splitdata(newData[0][1].data);
-        gauge_type = newData[3][1].data;
-        weight = newData[4][1].data;
-      }
+      
+      let {gauge_type,addr,weight} = extractDataFromEvent(newData)
 
       console.log("gauge_type: ", gauge_type);
       console.log("addr: ", addr);
-      console.log("transactionHash: ", transactionHash);
+      console.log("transactionHash: ", deployHash);
       console.log("weight: ", weight);
 
       await request(
@@ -2085,7 +1274,7 @@ async function geteventsdata(
           gaugeType: gauge_type,
           addr: addr,
           blockNumber: blockNumber,
-          transactionHash: transactionHash,
+          transactionHash: deployHash,
           weight: weight,
           timestamp: timestamp.toString(),
           eventObjectId: eventResult._id,
@@ -2096,36 +1285,37 @@ async function geteventsdata(
     } else if (eventName == "NewGaugeWeight") {
       console.log(eventName + " Event result: ");
 
-      var id,time,weight,gauge_address;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
+      // var id,time,weight,gauge_address;
+      // if(newData[0][0].data == undefined)
+      // {
+      //   console.log(newData[0][0] + " = " + newData[0][1]);
+      //   console.log(newData[1][0] + " = " + newData[1][1]);
+      //   console.log(newData[2][0] + " = " + newData[2][1]);
+      //   console.log(newData[3][0] + " = " + newData[3][1]);
+      //   console.log(newData[4][0] + " = " + newData[4][1]);
+      //   console.log(newData[5][0] + " = " + newData[5][1]);
 
-        id = splitdata(newData[0][1]);
-        time = newData[1][1];
-        weight = newData[2][1];
-        gauge_address = splitdata(newData[3][1]);
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
+      //   id = splitdata(newData[0][1]);
+      //   time = newData[1][1];
+      //   weight = newData[2][1];
+      //   gauge_address = splitdata(newData[3][1]);
+      // }
+      // else{
+      //   console.log(newData[0][0].data + " = " + newData[0][1].data);
+      //   console.log(newData[1][0].data + " = " + newData[1][1].data);
+      //   console.log(newData[2][0].data + " = " + newData[2][1].data);
+      //   console.log(newData[3][0].data + " = " + newData[3][1].data);
+      //   console.log(newData[4][0].data + " = " + newData[4][1].data);
+      //   console.log(newData[5][0].data + " = " + newData[5][1].data);
   
-        id = splitdata(newData[0][1].data);
-        time = newData[1][1].data;
-        weight = newData[2][1].data;
-        gauge_address = splitdata(newData[3][1].data);
-      }
+      //   id = splitdata(newData[0][1].data);
+      //   time = newData[1][1].data;
+      //   weight = newData[2][1].data;
+      //   gauge_address = splitdata(newData[3][1].data);
+      // }
       
-      console.log("id: ", id);
+      let {contract_package_hash,time,weight,gauge_address} =  extractDataFromEvent(newData);
+      console.log("id: ", contract_package_hash);
       console.log("time: ", time);
       console.log("weight: ", weight);
       console.log("gauge_address: ", gauge_address);
@@ -2139,7 +1329,7 @@ async function geteventsdata(
                 
       }`,
         {
-          id: id,
+          id: contract_package_hash,
           time: time,
           weight: weight,
           gauge_address: gauge_address,
@@ -2151,38 +1341,9 @@ async function geteventsdata(
     } else if (eventName == "NewTypeWeight") {
       console.log(eventName + " Event result: ");
 
-      var id,time,weight,type_id,total_weight;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-        
-        id = newData[0][1];
-        time = newData[2][1];
-        total_weight = newData[3][1];
-        type_id = newData[4][1];
-        weight = newData[5][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-        
-        id = newData[0][1].data;
-        time = newData[2][1].data;
-        total_weight = newData[3][1].data;
-        type_id = newData[4][1].data;
-        weight = newData[5][1].data;
-      }
+      let {contract_package_hash,time,weight,type_id,total_weight} = extractDataFromEvent(newData);
       
-      console.log("id: ", id);
+      console.log("id: ", contract_package_hash);
       console.log("time: ", time);
       console.log("weight: ", weight);
       console.log("type_id: ", type_id);
@@ -2195,9 +1356,9 @@ async function geteventsdata(
           result
       }
                 
-      }`,
+        }`,
         {
-          id: id,
+          id: contract_package_hash,
           time: time,
           weight: weight,
           type_id: type_id,
@@ -2210,40 +1371,42 @@ async function geteventsdata(
     } else if (eventName == "VoteForGauge") {
       console.log(eventName + " Event result: ");
 
-      var id,time,weight,gauge_addr,user;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-        console.log(newData[6][0] + " = " + newData[6][1]);
+      // var id,time,weight,gauge_addr,user;
+      // if(newData[0][0].data == undefined)
+      // {
+      //   console.log(newData[0][0] + " = " + newData[0][1]);
+      //   console.log(newData[1][0] + " = " + newData[1][1]);
+      //   console.log(newData[2][0] + " = " + newData[2][1]);
+      //   console.log(newData[3][0] + " = " + newData[3][1]);
+      //   console.log(newData[4][0] + " = " + newData[4][1]);
+      //   console.log(newData[5][0] + " = " + newData[5][1]);
+      //   console.log(newData[6][0] + " = " + newData[6][1]);
 
-        id = splitdata(newData[0][1]);
-        time = newData[1][1];
-        weight = newData[2][1];
-        gauge_addr = splitdata(newData[3][1]);
-        user = newData[4][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-        console.log(newData[6][0].data + " = " + newData[6][1].data);
+      //   id = splitdata(newData[0][1]);
+      //   time = newData[1][1];
+      //   weight = newData[2][1];
+      //   gauge_addr = splitdata(newData[3][1]);
+      //   user = newData[4][1];
+      // }
+      // else{
+      //   console.log(newData[0][0].data + " = " + newData[0][1].data);
+      //   console.log(newData[1][0].data + " = " + newData[1][1].data);
+      //   console.log(newData[2][0].data + " = " + newData[2][1].data);
+      //   console.log(newData[3][0].data + " = " + newData[3][1].data);
+      //   console.log(newData[4][0].data + " = " + newData[4][1].data);
+      //   console.log(newData[5][0].data + " = " + newData[5][1].data);
+      //   console.log(newData[6][0].data + " = " + newData[6][1].data);
   
-        id = splitdata(newData[0][1].data);
-        time = newData[1][1].data;
-        weight = newData[2][1].data;
-        gauge_addr = splitdata(newData[3][1].data);
-        user = newData[4][1].data;
-      }
+      //   id = splitdata(newData[0][1].data);
+      //   time = newData[1][1].data;
+      //   weight = newData[2][1].data;
+      //   gauge_addr = splitdata(newData[3][1].data);
+      //   user = newData[4][1].data;
+      // }
 
-      console.log("id: ", id);
+      let {contract_package_hash,time,weight,gauge_addr,user} = extractDataFromEvent(newData);
+
+      console.log("id: ", contract_package_hash);
       console.log("time: ", time);
       console.log("weight: ", weight);
       console.log("gauge_addr: ", gauge_addr);
@@ -2258,7 +1421,7 @@ async function geteventsdata(
                 
       }`,
         {
-          id: id,
+          id: contract_package_hash,
           time: time,
           weight: weight,
           gauge_addr: gauge_addr,
@@ -2270,39 +1433,7 @@ async function geteventsdata(
       return true;
     } else if (eventName == "deposit") {
       console.log(eventName + " Event result: ");
-      
-      var provider,value,locktime,_type,ts;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
-        console.log(newData[5][0] + " = " + newData[5][1]);
-        console.log(newData[6][0] + " = " + newData[6][1]);
-
-        provider = splitdata(newData[4][1]);
-        value = newData[6][1];
-        locktime = newData[3][1];
-        ts = newData[5][1];
-        _type = newData[0][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-        console.log(newData[5][0].data + " = " + newData[5][1].data);
-        console.log(newData[6][0].data + " = " + newData[6][1].data);
-  
-        provider = splitdata(newData[4][1].data);
-        value = newData[6][1].data;
-        locktime = newData[3][1].data;
-        ts = newData[5][1].data;
-        _type = newData[0][1].data;
-      }
+      let {provider,value,locktime,_type,ts} = extractDataFromEvent(newData);
       
       console.log("provider: ", provider);
       console.log("value: ", value);
@@ -2330,33 +1461,10 @@ async function geteventsdata(
       );
       console.log("handleVotingDeposit Mutation called.");
       return true;
-    } else if (eventName == "Withdraw") {
+    } else if (eventName == "withdraw") {
       console.log(eventName + " Event result: ");
-      
-      var provider,value,ts;
-      if(newData[0][0].data == undefined)
-      {
-        console.log(newData[0][0] + " = " + newData[0][1]);
-        console.log(newData[1][0] + " = " + newData[1][1]);
-        console.log(newData[2][0] + " = " + newData[2][1]);
-        console.log(newData[3][0] + " = " + newData[3][1]);
-        console.log(newData[4][0] + " = " + newData[4][1]);
 
-        provider = splitdata(newData[0][1]);
-        value = newData[1][1];
-        ts = newData[2][1];
-      }
-      else{
-        console.log(newData[0][0].data + " = " + newData[0][1].data);
-        console.log(newData[1][0].data + " = " + newData[1][1].data);
-        console.log(newData[2][0].data + " = " + newData[2][1].data);
-        console.log(newData[3][0].data + " = " + newData[3][1].data);
-        console.log(newData[4][0].data + " = " + newData[4][1].data);
-  
-        provider = splitdata(newData[0][1].data);
-        value = newData[1][1].data;
-        ts = newData[2][1].data;
-      }
+      let {provider, value, ts} = extractDataFromEvent(newData)
 
       console.log("provider: ", provider);
       console.log("value: ", value);
@@ -2367,8 +1475,7 @@ async function geteventsdata(
         `mutation handleVotingWithdraw( $provider: String!,$value: String!,$timestamp: String!, $block: String!, $eventObjectId: String!){
            handleVotingWithdraw( provider: $provider,value: $value,timestamp: $timestamp, block: $block, eventObjectId: $eventObjectId) {
           result
-      }
-                
+      }          
       }`,
         {
           provider: provider,
