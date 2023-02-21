@@ -1,6 +1,5 @@
 const Token = require("../../models/token");
 const LpToken = require("../../models/lpToken");
-// let erc20= require('../JsClients/Registry/test/installed.ts')
 //let erc20= require('../JsClients/Registry/test/installed.ts');
 const { getSystemState } = require("../services/system-state");
 var bigdecimal = require("bigdecimal");

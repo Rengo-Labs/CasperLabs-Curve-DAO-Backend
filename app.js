@@ -21,8 +21,6 @@ var vestingEscrowRouter = require("./routes/vestingEscrowRoutes");
 var gaugeControllerRouter = require("./routes/gaugeControllerRoutes");
 var readWasmRouter = require("./routes/readWasm");
 
-var eventsDataModel = require("./models/eventsData");
-
 //kafka setup
 const consumer = require("./consumer");
 
@@ -30,7 +28,7 @@ const consumer = require("./consumer");
 require("./dbConnection");
 
 //connecting database's backup file  
-//require("./backupDatabase");
+require("./backupDatabase");
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -44,11 +42,6 @@ app.use(express.static(path.join(__dirname, "public")));
 
 //Connect to Redis
 var redis = require("./connectRedis");
-
-//function to deserialize Event Data
-function deserialize(serializedJavascript) {
-  return eval("(" + serializedJavascript + ")");
-}
 
 //Defining all routes
 app.use("/", adminRouter);
@@ -86,8 +79,6 @@ app.use(
 );
 
 consumer.consumeEvent(redis);
-
-
 
 
 // catch 404 and forward to error handler
