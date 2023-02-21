@@ -2,13 +2,9 @@
 const { GraphQLSchema, GraphQLObjectType } = require("graphql");
 
 // Import queries
-const { responses, response, 
-  castsByVoter,
-  castsByVoteId,
-  votes,
-  votesByCreator,
-  votesByVoteIdAndCreator,
-  votesByVoteId,
+const { 
+  responses,
+  response, 
   gaugeVotesByTime,
   gaugeVotesByUser, 
   votingEscrows, 
@@ -61,17 +57,6 @@ const {
   handleWithdraw,
 } = require("../graphql/mappings/dao/gauge");
 
-// Import voting mutations
-const {
-  handleMinimumBalanceSet,
-  handleMinimumTimeSet,
-  handleChangeMinQuorum,
-  handleChangeSupportRequired,
-  handleStartVote,
-  handleCastVote,
-  handleExecuteVote,
-} = require("../graphql/mappings/dao/voting");
-
 //Import Gauge-Controller mutations
 const {
   handleAddType,
@@ -93,12 +78,6 @@ const QueryType = new GraphQLObjectType({
   fields: {
     responses,
     response,
-    castsByVoter,
-    castsByVoteId,
-    votes,
-    votesByCreator,
-    votesByVoteIdAndCreator,
-    votesByVoteId,
     gaugeVotesByTime,
     gaugeVotesByUser, 
     votingEscrows, 
@@ -137,13 +116,6 @@ const MutationType = new GraphQLObjectType({
     handleWithdraw,
     handlePoolAdded,
     handlePoolRemoved,
-    handleMinimumBalanceSet,
-    handleMinimumTimeSet,
-    handleChangeMinQuorum,
-    handleChangeSupportRequired,
-    handleStartVote,
-    handleCastVote,
-    handleExecuteVote,
     handleAddType,
     handleNewGauge,
     handleNewGaugeWeight,
