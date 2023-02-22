@@ -1,6 +1,7 @@
 import { config } from "dotenv";
 config();
 import { GaugeControllerClient} from "../src";
+const { fetchBlockStateRootHashHelper } = require("../../../utils/casper");
 
 const {
   NODE_ADDRESS,
@@ -26,6 +27,21 @@ export const points_type_weight = async (contractHash : string ,owner : string, 
  return pointsTypeWeight;
 }
 
+export const points_type_weight_block = async (contractHash : string ,owner : string, spender : string, blockNumber : Number) => {
+ 
+ let blockData = await fetchBlockStateRootHashHelper(blockNumber);
+ console.log("stateRootHash: ",blockData.block.header.state_root_hash);
+
+  // We don't need hash- prefix so i'm removing it
+ await gaugeController.setContractHash(contractHash);
+
+ //pointsTypeWeight
+ const pointsTypeWeight = await gaugeController.points_type_weight_block(owner ,  spender, blockData.block.header.state_root_hash);
+ console.log(`... Points type weight: ${pointsTypeWeight}`);
+
+ return pointsTypeWeight;
+}
+
 export const points_weight = async (contractHash : string ,owner : string, spender : string) => {
  
   // We don't need hash- prefix so i'm removing it
@@ -33,6 +49,21 @@ export const points_weight = async (contractHash : string ,owner : string, spend
 
  //pointsWeight
  const pointsWeight = await gaugeController.points_weight(owner ,  spender);
+ console.log(`... Points weight: ${pointsWeight}`);
+
+ return pointsWeight;
+}
+
+export const points_weight_block = async (contractHash : string ,owner : string, spender : string, blockNumber : Number) => {
+  
+ let blockData = await fetchBlockStateRootHashHelper(blockNumber);
+ console.log("stateRootHash: ",blockData.block.header.state_root_hash);
+
+ // We don't need hash- prefix so i'm removing it
+ await gaugeController.setContractHash(contractHash);
+
+ //pointsWeight
+ const pointsWeight = await gaugeController.points_weight_block(owner ,  spender, blockData.block.header.state_root_hash);
  console.log(`... Points weight: ${pointsWeight}`);
 
  return pointsWeight;
@@ -49,12 +80,42 @@ export const points_total = async (contractHash : string, owner : string) => {
   return pointsTotal;
 }
 
+export const points_total_block = async (contractHash : string, owner : string, blockNumber : Number) => {
+  
+  let blockData = await fetchBlockStateRootHashHelper(blockNumber);
+  console.log("stateRootHash: ",blockData.block.header.state_root_hash);
+  
+  // We don't need hash- prefix so i'm removing it
+  await gaugeController.setContractHash(contractHash);
+
+  //pointsTotal
+  const pointsTotal = await gaugeController.points_total_block(owner, blockData.block.header.state_root_hash);
+  console.log(`... Points total: ${pointsTotal}`);
+ 
+  return pointsTotal;
+}
+
 export const gauge_type_names = async (contractHash : string,owner : string) => {
   // We don't need hash- prefix so i'm removing it
   await gaugeController.setContractHash(contractHash);
 
   //gaugeTypeNames
   const gaugeTypeNames = await gaugeController.gauge_type_names(owner);
+  console.log(`... Points total: ${gaugeTypeNames}`);
+ 
+  return gaugeTypeNames;
+}
+
+export const gauge_type_names_block = async (contractHash : string,owner : string, blockNumber : Number) => {
+   
+  let blockData = await fetchBlockStateRootHashHelper(blockNumber);
+  console.log("stateRootHash: ",blockData.block.header.state_root_hash);
+  
+  // We don't need hash- prefix so i'm removing it
+  await gaugeController.setContractHash(contractHash);
+
+  //gaugeTypeNames
+  const gaugeTypeNames = await gaugeController.gauge_type_names_block(owner, blockData.block.header.state_root_hash);
   console.log(`... Points total: ${gaugeTypeNames}`);
  
   return gaugeTypeNames;

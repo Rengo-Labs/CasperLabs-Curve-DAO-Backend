@@ -318,6 +318,37 @@ class VOTINGESCROWClient {
 
   }
 
+  public async balanceOfBlock(account: string, t: number,stateRootHash:any) {
+    try {
+      
+      if(t == null)
+      {
+        t = (new Date().getTime());
+      }
+      console.log("account: ",account);
+      console.log("t: ",t);
+      let epoch = await this.userPointEpochBlock(account,stateRootHash);
+      console.log("epoch: ",epoch);
+      if(epoch == 0)
+      {
+        return "0";
+      }
+      else{
+        let lastPoint  = await this.userPointHistoryBlock(account,epoch,stateRootHash);
+        console.log("lastPoint: ",lastPoint);
+        lastPoint.bias = (lastPoint.bias -(lastPoint.slope * (t-lastPoint.ts)));
+        if (lastPoint.bias < 0) {
+            lastPoint.bias = 0;
+        }
+        return lastPoint.bias;
+      }
+   
+    } catch (error) {
+      return "0";
+    }
+
+  }
+
   async findBlockEpoch(block:number,max_epoch:number){
      let min = 0;
      let max = max_epoch;
@@ -419,6 +450,28 @@ class VOTINGESCROWClient {
 
   }
 
+  public async totalSupplyBlock(t: number,stateRootHash:any) {
+    try {
+
+      if(t == null)
+      {
+        t = (new Date().getTime());
+      }
+      console.log("t: ",t);
+      let epoch = await this.epochBlock(stateRootHash);
+      console.log("epoch: ",parseInt(epoch._hex));
+     
+      let lastPoint = await this.pointHistoryBlock(epoch,stateRootHash);
+      return await this.supplyAtBlock(lastPoint, t,stateRootHash);
+
+    } catch (error) {
+      
+      return "0";
+    }
+
+  }
+
+
   public block_number(){
     const AVG_BLOCK_TIME_IN_MS = 45000;
     return Math.floor((new Date().getTime()) / AVG_BLOCK_TIME_IN_MS);
@@ -484,6 +537,36 @@ class VOTINGESCROWClient {
         last_point.bias = 0;
       }
       return last_point.bias;
+  }
+
+  public async supplyAtBlock(point:{ts : number, bias : number, slope: number} , t: number,stateRootHash:any) {   
+    const WEEK = 604800000;
+    let last_point = point;
+
+    let t_i = Math.floor((last_point.ts / WEEK ) * WEEK);
+
+    for (let i=0; i < 255; i++){
+      t_i = t_i + WEEK;
+      let d_slope = 0;
+
+      if (t_i > t){
+        t_i = t;
+      } else {
+          d_slope = await this.slopeChangesBlock(t_i.toString(),stateRootHash);
+      }
+
+      last_point.bias = last_point.bias - (last_point.slope * this.convert(t_i, last_point.ts))
+
+      if(t_i == t){
+        break;
+      }
+      last_point.slope = last_point.slope + d_slope;
+      last_point.ts = t_i;
+    }
+    if (last_point.bias < 0){
+      last_point.bias = 0;
+    }
+    return last_point.bias;
   }
 
   public async balanceOfAtSessionCode(
@@ -657,6 +740,17 @@ class VOTINGESCROWClient {
     return result.value();
   }
 
+  public async epochBlock(stateRootHash:any) {
+    const result = await contractSimpleGetterBlock(
+      stateRootHash,
+      this.nodeAddress,
+      this.contractHash,
+      ["epoch"]
+    );
+
+    return result.value();
+  }
+
   async pointHistoryBias(epoch: number) {
     try {
 
@@ -742,6 +836,107 @@ class VOTINGESCROWClient {
       pointHistory.slope = await this.pointHistorySlope(epoch);
       pointHistory.ts = await this.pointHistoryTs(epoch);
       pointHistory.blk = await this.pointHistoryBlk(epoch);
+      
+      return pointHistory;
+    } catch (error) {
+      return {
+        bias : 0,
+        slope : 0,
+        ts : 0,
+        blk : 0
+      };
+    }
+  }
+
+  async pointHistoryBiasBlock(epoch: number,stateRootHash:any) {
+    try {
+
+      const formattedString = "point_history" + "_bias_" + epoch;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      const result = await utils.contractDictionaryGetterBlock(
+        stateRootHash,
+        this.nodeAddress,
+        hash,
+        this.namedKeys.pointHistory
+      );
+      return parseInt(result.data.val.data[1].data._hex);
+
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  async pointHistorySlopeBlock(epoch: number,stateRootHash:any) {
+    try {
+
+      const formattedString = "point_history" + "_slope_" + epoch;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      const result = await utils.contractDictionaryGetterBlock(
+        stateRootHash,
+        this.nodeAddress,
+        hash,
+        this.namedKeys.pointHistory
+      );
+      return parseInt(result.data.val.data[1].data._hex);
+
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  async pointHistoryTsBlock(epoch: number,stateRootHash:any) {
+    try {
+
+      const formattedString = "point_history" + "_ts_" + epoch;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      const result = await utils.contractDictionaryGetterBlock(
+        stateRootHash,
+        this.nodeAddress,
+        hash,
+        this.namedKeys.pointHistory
+      );
+      return parseInt(result.data.val.data._hex);
+
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  async pointHistoryBlkBlock(epoch: number,stateRootHash:any) {
+    try {
+
+      const formattedString = "point_history" + "_blk_" + epoch;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      const result = await utils.contractDictionaryGetterBlock(
+        stateRootHash,
+        this.nodeAddress,
+        hash,
+        this.namedKeys.pointHistory
+      );
+      return parseInt(result.data.val.data._hex);
+
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  public async pointHistoryBlock(epoch: number,stateRootHash:any) {
+    try {
+      let pointHistory = {
+        bias : 0,
+        slope : 0,
+        ts : 0,
+        blk : 0
+      }
+
+      pointHistory.bias = await this.pointHistoryBiasBlock(epoch,stateRootHash);
+      pointHistory.slope = await this.pointHistorySlopeBlock(epoch,stateRootHash);
+      pointHistory.ts = await this.pointHistoryTsBlock(epoch,stateRootHash);
+      pointHistory.blk = await this.pointHistoryBlkBlock(epoch,stateRootHash);
       
       return pointHistory;
     } catch (error) {
@@ -861,6 +1056,116 @@ class VOTINGESCROWClient {
     }
   }
 
+  async userPointHistoryBiasBlock(user:string, userEpoch:string, stateRootHash:any) {
+    try {
+      
+      const formattedString = "user_point_history" + "_bias_account-hash-" + user + "_" + userEpoch;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      console.log("bias hash", hash);
+      const result = await utils.contractDictionaryGetterBlock(
+        stateRootHash,
+        this.nodeAddress,
+        hash,
+        this.namedKeys.userPointHistory
+      );
+
+      console.log("bias value",parseInt(result.data.val.data[1].data._hex))
+     
+      return parseInt(result.data.val.data[1].data._hex);
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  async userPointHistorySlopeBlock(user:string, userEpoch:string, stateRootHash:any) {
+    try {
+      const formattedString = "user_point_history" + "_slope_account-hash-" + user + "_" + userEpoch;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      console.log("slope hash", hash);
+      const result = await utils.contractDictionaryGetterBlock(
+        stateRootHash,
+        this.nodeAddress,
+        hash,
+        this.namedKeys.userPointHistory
+      );
+
+      console.log("slope value",parseInt(result.data.val.data[1].data._hex))
+     
+      return parseInt(result.data.val.data[1].data._hex);
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  async userPointHistoryTsBlock(user:string, userEpoch:string, stateRootHash:any) {
+    try {
+      const formattedString = "user_point_history" + "_ts_account-hash-" + user + "_" + userEpoch;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      console.log("ts hash", hash);
+      const result = await utils.contractDictionaryGetterBlock(
+        stateRootHash,
+        this.nodeAddress,
+        hash,
+        this.namedKeys.userPointHistory
+      );
+
+      console.log("ts value",parseInt(result.data.val.data._hex))
+     
+      return parseInt(result.data.val.data._hex);
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  async userPointHistoryBlkBlock(user:string, userEpoch:string, stateRootHash:any) {
+    try {
+      const formattedString = "user_point_history" + "_blk_account-hash-" + user + "_" + userEpoch;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      console.log("blk hash", hash);
+      const result = await utils.contractDictionaryGetterBlock(
+        stateRootHash,
+        this.nodeAddress,
+        hash,
+        this.namedKeys.userPointHistory
+      );
+
+      console.log("blk value",parseInt(result.data.val.data._hex))
+     
+      return parseInt(result.data.val.data._hex);
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  public async userPointHistoryBlock(user:string, userEpoch:string,stateRootHash:any) {
+    try {
+      let userPointHistory = {
+        bias : 0,
+        slope : 0,
+        ts : 0,
+        blk : 0
+    };
+      userPointHistory.bias = await this.userPointHistoryBiasBlock(user, userEpoch,stateRootHash); 
+      userPointHistory.slope = await this.userPointHistorySlopeBlock(user, userEpoch,stateRootHash); 
+      userPointHistory.ts = await this.userPointHistoryTsBlock(user, userEpoch,stateRootHash); 
+      userPointHistory.blk = await this.userPointHistoryBlkBlock(user, userEpoch,stateRootHash); 
+
+      return userPointHistory;
+    } catch (error) {
+      return {
+        bias : 0,
+        slope : 0,
+        ts : 0,
+        blk : 0
+    };
+    }
+  }
+
+
   public async userPointEpoch(user: string) {
     try {
       
@@ -877,10 +1182,44 @@ class VOTINGESCROWClient {
     }
   }
 
+  public async userPointEpochBlock(user: string, stateRootHash:any) {
+    try {
+      
+      const result = await utils.contractDictionaryGetterBlock(
+        stateRootHash,
+        this.nodeAddress,
+        user,
+        this.namedKeys.userPointEpoch
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+      
+    } catch (error) {
+      return "0";
+    }
+  }
+
   public async slopeChanges(time: string) {
     try {
 
       const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        time,
+        this.namedKeys.slopeChanges
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+  }
+
+  public async slopeChangesBlock(time: string,stateRootHash:any) {
+    try {
+
+      const result = await utils.contractDictionaryGetterBlock(
+        stateRootHash,
         this.nodeAddress,
         time,
         this.namedKeys.slopeChanges
@@ -1298,6 +1637,26 @@ const contractSimpleGetter = async (
   key: string[]
 ) => {
   const stateRootHash = await utils.getStateRootHash(nodeAddress);
+  const clValue = await utils.getContractData(
+    nodeAddress,
+    stateRootHash,
+    contractHash,
+    key
+  );
+
+  if (clValue && clValue.CLValue instanceof CLValue) {
+    return clValue.CLValue!;
+  } else {
+    throw Error("Invalid stored value");
+  }
+};
+
+const contractSimpleGetterBlock = async (
+  stateRootHash:string,
+  nodeAddress: string,
+  contractHash: string,
+  key: string[]
+) => {
   const clValue = await utils.getContractData(
     nodeAddress,
     stateRootHash,

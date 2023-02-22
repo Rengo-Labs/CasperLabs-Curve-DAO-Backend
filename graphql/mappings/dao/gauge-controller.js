@@ -44,6 +44,7 @@ const handleAddType = {
     type_id: { type: GraphQLString },
     timestamp: { type: GraphQLString },
     name: {type: GraphQLString},
+    blockNumber: {type: GraphQLString},
     eventObjectId : { type: GraphQLString },
   },
   async resolve(parent, args, context) {
@@ -72,7 +73,7 @@ const handleAddType = {
 
       let gaugeType = await registerGaugeType(args.type_id, args.name);
 
-      let gaugeControllerPointsTypeWeight = await gaugeController.points_type_weight(contractData.contractHash, args.type_id, nextWeek.toString());
+      let gaugeControllerPointsTypeWeight = await gaugeController.points_type_weight_block(contractData.contractHash, args.type_id, nextWeek.toString(),parseFloat(args.blockNumber));
 
       let newData = new GaugeTypeWeight({
         id: nextWeek.toString(),
@@ -82,7 +83,7 @@ const handleAddType = {
         weight: gaugeControllerPointsTypeWeight
       });
 
-      let gaugeControllerPointsTotal = await gaugeController.points_total(contractData.contractHash, nextWeek.toString());
+      let gaugeControllerPointsTotal = await gaugeController.points_total_block(contractData.contractHash, nextWeek.toString(),parseFloat(args.blockNumber));
 
       let data = new GaugeTotalWeight({
         id: nextWeek.toString(),
@@ -157,7 +158,7 @@ const handleNewGauge = {
       nextWeek = Math.floor(nextWeek);
       let gaugeType = await getGaugeType((args.gaugeType).toString());
 
-      let gaugeControllerGaugeTypeNames= await gaugeController.gauge_type_names(contractData.contractHash ,args.gaugeType);
+      let gaugeControllerGaugeTypeNames= await gaugeController.gauge_type_names_block(contractData.contractHash ,args.gaugeType,parseFloat(args.blockNumber));
 
       if (gaugeType === null) {
         gaugeType = await registerGaugeType(
@@ -204,7 +205,7 @@ const handleNewGauge = {
         //weight: '1000000000'
       });
 
-      let gaugeControllerPointsTotal= await gaugeController.points_total(contractData.contractHash, nextWeek.toString());
+      let gaugeControllerPointsTotal= await gaugeController.points_total_block(contractData.contractHash, nextWeek.toString(),parseFloat(args.blockNumber));
 
       let dataWeight = new GaugeTotalWeight({
         id: nextWeek.toString(),
@@ -253,6 +254,7 @@ const handleNewGaugeWeight = {
     time: { type: GraphQLString },
     weight: { type: GraphQLString },
     gauge_address: { type: GraphQLString },
+    blockNumber: { type: GraphQLString },
     eventObjectId : { type: GraphQLString },
   },
   async resolve(parent, args, context) {
@@ -287,7 +289,7 @@ const handleNewGaugeWeight = {
         // weight: '1000000000'
         });
 
-        let gaugeControllerPointsTotal= await gaugeController.points_total(contractData.contractHash, nextWeek);
+        let gaugeControllerPointsTotal= await gaugeController.points_total_block(contractData.contractHash, nextWeek,parseFloat(args.blockNumber));
 
         data = new GaugeTotalWeight({
           id: nextWeek.toString(),
@@ -414,6 +416,7 @@ const handleVoteForGauge = {
     weight: { type: GraphQLString },
     gauge_addr: { type: GraphQLString },
     user: { type: GraphQLString },
+    blockNumber: {type: GraphQLString},
     eventObjectId : { type: GraphQLString },
   },
   async resolve(parent, args, context) {
@@ -444,7 +447,7 @@ const handleVoteForGauge = {
       if (gauge !== null) {
         let nextWeek = nextPeriod(args.time, WEEK);
 
-        let gaugeControllerPointsWeight= (await gaugeController.points_weight(contractData.contractHash, args.gauge_addr, nextWeek)).value0;
+        let gaugeControllerPointsWeight= (await gaugeController.points_weight_block(contractData.contractHash, args.gauge_addr, nextWeek,parseFloat(args.blockNumber))).value0;
 
         gaugeWeight = new GaugeWeight({
           id: gauge.id + "-" + nextWeek.toString(),
@@ -455,7 +458,7 @@ const handleVoteForGauge = {
         });
         console.log("gaugeWeight: ",gaugeWeight);
 
-        let gaugeControllerPointsTotal= await gaugeController.points_total(contractData.contractHash,nextWeek);
+        let gaugeControllerPointsTotal= await gaugeController.points_total_block(contractData.contractHash,nextWeek,parseFloat(args.blockNumber));
 
         gaugeTotalWeight = new GaugeTotalWeight({
           id: nextWeek.toString(),
@@ -483,8 +486,8 @@ const handleVoteForGauge = {
         
         contractData = await allcontractsData.findOne({packageHash : process.env.VOTING_ESCROW_PACKAGE_HASH});
         
-        let veCRV = await votingEscrow.balanceOf(contractData.contractHash, user.id);
-        let totalveCRV = await votingEscrow.totalSupply(contractData.contractHash);
+        let veCRV = await votingEscrow.balanceOfBlock(contractData.contractHash, user.id,null,parseFloat(args.blockNumber));
+        let totalveCRV = await votingEscrow.totalSupplyBlock(contractData.contractHash,null,parseFloat(args.blockNumber));
 
         // suppossed values
         //let veCRV = '1000';

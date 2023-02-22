@@ -1016,8 +1016,8 @@ async function geteventsdata(
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleAddType( $id: String!,$type_id: String!,$timestamp: String!,$name: String!, $eventObjectId : String!){
-              handleAddType( id: $id,type_id: $type_id,timestamp: $timestamp,name:$name, eventObjectId : $eventObjectId) {
+        `mutation handleAddType( $id: String!,$type_id: String!,$timestamp: String!,$name: String!,$blockNumber: String!, $eventObjectId : String!){
+              handleAddType( id: $id,type_id: $type_id,timestamp: $timestamp,name:$name,blockNumber:$blockNumber, eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -1027,6 +1027,7 @@ async function geteventsdata(
           type_id: type_id,
           timestamp: timestamp.toString(),
           name: name,
+          blockNumber:blockNumber,
           eventObjectId: eventResult._id,
         }
       );
@@ -1101,8 +1102,8 @@ async function geteventsdata(
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleNewGaugeWeight( $id: String!,$time: String!,$weight: String!,$gauge_address: String!,$eventObjectId : String!){
-           handleNewGaugeWeight( id: $id,time: $time,weight: $weight,gauge_address: $gauge_address,eventObjectId : $eventObjectId) {
+        `mutation handleNewGaugeWeight( $id: String!,$time: String!,$weight: String!,$gauge_address: String!,$blockNumber: String!,$eventObjectId : String!){
+           handleNewGaugeWeight( id: $id,time: $time,weight: $weight,gauge_address: $gauge_address,blockNumber: $blockNumber,eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -1112,6 +1113,7 @@ async function geteventsdata(
           time: time,
           weight: weight,
           gauge_address: gauge_address,
+          blockNumber:blockNumber,
           eventObjectId: eventResult._id,
         }
       );
@@ -1193,8 +1195,8 @@ async function geteventsdata(
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleVoteForGauge( $id: String!,$time: String!,$weight: String!,$gauge_addr: String!,$user: String!, $eventObjectId : String!){
-           handleVoteForGauge( id: $id,time: $time,weight: $weight,gauge_addr: $gauge_addr,user: $user, eventObjectId : $eventObjectId) {
+        `mutation handleVoteForGauge( $id: String!,$time: String!,$weight: String!,$gauge_addr: String!,$user: String!,$blockNumber: String!, $eventObjectId : String!){
+           handleVoteForGauge( id: $id,time: $time,weight: $weight,gauge_addr: $gauge_addr,user: $user, blockNumber:$blockNumber,eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -1205,6 +1207,7 @@ async function geteventsdata(
           weight: weight,
           gauge_addr: gauge_addr,
           user: user,
+          blockNumber:blockNumber,
           eventObjectId: eventResult._id,
         }
       );

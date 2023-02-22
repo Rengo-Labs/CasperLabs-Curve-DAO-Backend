@@ -86,6 +86,82 @@ try {
 }
 }
 
+// to get the last block's StateRootHash
+async function getBlockStateRootHash(retry, blockNumber) {
+  try {
+    
+      const interval = setTimeout(function () {
+        retry.rpcNotResponded = true;
+        console.log("RPC not responded for block: ", blockNumber);
+      }, 30000);
+
+      let flag = 0;
+      let blockNumberInfoResult;
+      console.log("blockNumber: ",blockNumber);
+      casperService
+        .getBlockInfoByHeight(blockNumber)
+        .then(function (blockData) {
+          blockNumberInfoResult = blockData;
+          flag = 1;
+        })
+        .catch(function (error) {
+          console.log("RPC failed: in fecthing the blockData");
+          console.log("error is : ", error);
+          retry.rpcFailed = true;
+        });
+
+      while (
+        flag == 0 &&
+        retry.rpcNotResponded == false &&
+        retry.rpcFailed == false
+      ) {
+        console.log("Checking for RPC response Type...");
+        await sleep(1000);
+      }
+
+      if (flag == 1) {
+        clearInterval(interval);
+        return blockNumberInfoResult;
+      } else if (retry.rpcNotResponded == true || retry.rpcFailed == true) {
+        return false;
+      }
+    
+  } catch (error) {
+    console.log("error is : ", error);
+  }
+}
+
+// This function is to retry block data upon RPC Failures
+async function fetchBlockStateRootHashHelper(blockNumber) {
+try {
+  let retry = {
+  rpcFailed: false,
+  rpcNotResponded: false,
+  };
+  let blockResult = await getBlockStateRootHash(retry,blockNumber);
+
+  if (blockResult == false) {
+  if (retry.rpcNotResponded == true || retry.rpcFailed == true) {
+      while (blockResult == false) {
+      retry.rpcFailed = false;
+      retry.rpcNotResponded = false;
+      console.log("Retrying the RPC Call for last blockData...");
+      blockResult = await getBlockStateRootHash(retry,blockNumber);
+      }
+      console.log(
+      "Retrying Attempts to fetch last blockData is Successfull..."
+      );
+      return blockResult;
+  }
+  } else {
+  return blockResult;
+  }
+} catch (error) {
+  console.log("Error : ", error);
+}
+}
+
 module.exports = {
-    fetchBlockHeightHelper
+    fetchBlockHeightHelper,
+    fetchBlockStateRootHashHelper
 }

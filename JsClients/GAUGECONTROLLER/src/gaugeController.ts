@@ -568,6 +568,23 @@ class GaugeControllerClient {
     }
   }
 
+  public async gauge_type_names_block(owner : string, stateRootHash : any){
+    try {
+
+      const result = await utils.contractDictionaryGetterBlock(
+        stateRootHash,
+        this.nodeAddress,
+        owner,
+        this.namedKeys.gaugeTypeNames
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+  }
+
   public async vote_user_slopes(owner:string, spender:string) {
     try {
       let votedSlope = {
@@ -779,6 +796,44 @@ class GaugeControllerClient {
     }
   }
 
+  async pointsWeightBiasBlock(owner:string, spender:string, stateRootHash:any) {
+    try {
+      
+      const formattedString = "points_weight" + "_bias_" + owner + "_" + spender;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      const result = await utils.contractDictionaryGetterBlock(
+        stateRootHash,
+        this.nodeAddress,
+        hash,
+        this.namedKeys.pointsWeight
+      );
+
+      return parseInt(result.data.val.data._hex);
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  async pointsWeightSlopeBlock(owner:string, spender:string, stateRootHash:any) {
+    try {
+      
+      const formattedString = "points_weight" + "_slope_" + owner + "_" + spender;
+      const hash = keccak('keccak256').update(formattedString).digest('hex');
+
+      const result = await utils.contractDictionaryGetterBlock(
+        stateRootHash,
+        this.nodeAddress,
+        hash,
+        this.namedKeys.pointsWeight
+      );
+
+      return parseInt(result.data.val.data._hex);
+    } catch (error) {
+      return 0;
+    }
+  }
+
   public async points_weight(owner:string, spender:string) {
     try {
     
@@ -789,6 +844,24 @@ class GaugeControllerClient {
 
     pointsWeight.bias = await this.pointsWeightBias(owner, spender);
     pointsWeight.slope = await this.pointsWeightSlope(owner, spender);
+
+    return pointsWeight;
+
+    } catch (error) {
+      return {bias : 0, slope : 0};
+    }
+  }
+
+  public async points_weight_block(owner:string, spender:string, stateRootHash:any) {
+    try {
+    
+    let pointsWeight = {
+    bias : 0,
+    slope : 0
+    };
+
+    pointsWeight.bias = await this.pointsWeightBiasBlock(owner, spender,stateRootHash);
+    pointsWeight.slope = await this.pointsWeightSlopeBlock(owner, spender,stateRootHash);
 
     return pointsWeight;
 
@@ -932,6 +1005,24 @@ class GaugeControllerClient {
     
   }
 
+  public async points_total_block(owner: string, stateRootHash:any) {
+    try {
+
+      const result = await utils.contractDictionaryGetterBlock(
+        stateRootHash,
+        this.nodeAddress,
+        owner,
+        this.namedKeys.pointsTotal
+      );
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+
+    } catch (error) {
+      return "0";
+    }
+    
+  }
+
   public async points_type_weight(owner:string, spender:string) {
     try {
       const _spender = CLValueBuilder.u256(spender);
@@ -941,6 +1032,29 @@ class GaugeControllerClient {
       const encodedBytes = Buffer.from(blaked).toString("hex");
 
       const result = await utils.contractDictionaryGetter(
+        this.nodeAddress,
+        encodedBytes,
+        this.namedKeys.pointsTypeWeight
+      );
+
+      const maybeValue = result.value().unwrap();
+      return maybeValue.value().toString();
+    } catch (error) {
+      return "0";
+    }
+
+  }
+
+  public async points_type_weight_block(owner:string, spender:string,stateRootHash:any) {
+    try {
+      const _spender = CLValueBuilder.u256(spender);
+      const _owner= CLValueBuilder.tuple2([CLValueBuilder.bool(true), CLValueBuilder.u128(owner)]);
+      const finalBytes = concat([CLValueParsers.toBytes(_owner).unwrap(), CLValueParsers.toBytes(_spender).unwrap()]);
+      const blaked = blake.blake2b(finalBytes, undefined, 32);
+      const encodedBytes = Buffer.from(blaked).toString("hex");
+
+      const result = await utils.contractDictionaryGetterBlock(
+        stateRootHash,
         this.nodeAddress,
         encodedBytes,
         this.namedKeys.pointsTypeWeight

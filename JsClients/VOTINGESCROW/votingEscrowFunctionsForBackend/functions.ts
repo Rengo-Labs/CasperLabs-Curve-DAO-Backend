@@ -1,6 +1,7 @@
 import { config } from "dotenv";
 config();
 import { VOTINGESCROWClient} from "../src";
+const { fetchBlockStateRootHashHelper } = require("../../../utils/casper");
 
 const {
   NODE_ADDRESS,
@@ -27,6 +28,22 @@ export const balanceOf = async (contractHash:string,account:string,t:number) => 
 
 };
 
+export const balanceOfBlock = async (contractHash:string,account:string,t:number,blockNumber:Number) => {
+
+  let blockData = await fetchBlockStateRootHashHelper(blockNumber);
+  console.log("stateRootHash: ",blockData.block.header.state_root_hash);
+
+  // We don't need hash- prefix so i'm removing it
+  await votingEscrow.setContractHash(contractHash);
+
+  //balanceof
+  const balance = await votingEscrow.balanceOfBlock(account,t,blockData.block.header.state_root_hash);
+  console.log(contractHash +` =... balanceof : ${balance}`);
+
+  return balance;
+
+};
+
 export const balanceOfAt = async (contractHash:string,addr:string,block:number) => {
 
   // We don't need hash- prefix so i'm removing it
@@ -37,6 +54,22 @@ export const balanceOfAt = async (contractHash:string,addr:string,block:number) 
   console.log(contractHash +` =... balanceof : ${balance}`);
 
   return balance;
+
+};
+
+export const totalSupplyBlock = async (contractHash:string, t : number,blockNumber:Number) => {
+
+  let blockData = await fetchBlockStateRootHashHelper(blockNumber);
+  console.log("stateRootHash: ",blockData.block.header.state_root_hash);
+
+  // We don't need hash- prefix so i'm removing it
+  await votingEscrow.setContractHash(contractHash);
+
+  //totalSupply
+  const totalSupply = await votingEscrow.totalSupplyBlock(t,blockData.block.header.state_root_hash);
+  console.log(contractHash +` =... totalSupply : ${totalSupply}`);
+
+  return totalSupply;
 
 };
 

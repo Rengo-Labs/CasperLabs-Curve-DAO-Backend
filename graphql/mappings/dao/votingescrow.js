@@ -52,8 +52,8 @@ const handleVotingDeposit = {
     
       const contractData = await allcontractsData.findOne({packageHash : process.env.VOTING_ESCROW_PACKAGE_HASH});
 
-      let power = await votingEscrow.balanceOf(contractData.contractHash,args.provider);
-      let totalPower = await votingEscrow.totalSupply(contractData.contractHash);
+      let power = await votingEscrow.balanceOfBlock(contractData.contractHash,args.provider,null,parseFloat(args.blockNumber));
+      let totalPower = await votingEscrow.totalSupplyBlock(contractData.contractHash,null,parseFloat(args.blockNumber));
 
       //supposed values
       //let power = '1000';
@@ -164,8 +164,8 @@ const handleVotingWithdraw = {
     
       const contractData = await allcontractsData.findOne({packageHash : process.env.VOTING_ESCROW_PACKAGE_HASH});
 
-      let power = await votingEscrow.balanceOf(contractData.contractHash,args.provider);
-      let totalPower = await votingEscrow.totalSupply(contractData.contractHash);
+      let power = await votingEscrow.balanceOfBlock(contractData.contractHash,args.provider,null,parseFloat(args.blockNumber));
+      let totalPower = await votingEscrow.totalSupplyBlock(contractData.contractHash,null,parseFloat(args.blockNumber));
 
       //Supposed values 
       //let power = '1000';
