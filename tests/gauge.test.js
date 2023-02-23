@@ -67,76 +67,48 @@ async function UpdateLiquidityLimit(
     return response;
   }
   
-async function Deposit(provider, id, value, transactionHash, logIndex, eventObjectId) {
+async function Deposit(provider, id, value, transactionHash, logIndex, blockNumber, eventObjectId) {
     console.log("Calling handleDeposit mutation...");
     let response = await request(
       process.env.GRAPHQL,
-      `mutation handleDeposit( 
-                 $provider: String!,
-                 $id: String!,
-                 $value: String!,
-                 $transactionHash: String!,
-                 $logIndex: String!,
-                 $eventObjectId: String!
-  
-                 ){
-                  handleDeposit( 
-                   provider: $provider,
-                   id: $id,
-                   value: $value,
-                   transactionHash: $transactionHash,
-                   logIndex: $logIndex,
-                   eventObjectId: $eventObjectId
-                   ) {
-                 result
-             }
-                       
-             }`,
+      `mutation handleDeposit( $provider: String!,$id: String!,$value: String!,$transactionHash: String!,$logIndex: String!,$block: String!, $eventObjectId : String!){
+         handleDeposit( provider: $provider,id: $id,value: $value,transactionHash: $transactionHash,logIndex: $logIndex,block : $block, eventObjectId : $eventObjectId) {
+        result
+    }
+              
+    }`,
       {
         provider: provider,
         id: id,
         value: value,
         transactionHash: transactionHash,
         logIndex: logIndex,
-        eventObjectId: eventObjectId
+        block : blockNumber,
+        eventObjectId: eventObjectId,
       }
     );
     console.log(response);
     return response;
   }
   
-async function Withdraw(provider, id, value, transactionHash, logIndex, eventObjectId) {
+async function Withdraw(provider, id, value, transactionHash, logIndex, blockNumber,eventObjectId) {
     console.log("Calling handleWithdraw mutation...");
     let response = await request(
       process.env.GRAPHQL,
-      `mutation handleWithdraw( 
-                 $provider: String!,
-                 $id: String!,
-                 $value: String!,
-                 $transactionHash: String!,
-                 $logIndex: String!,
-                 $eventObjectId : String!
-  
-                 ){
-                  handleWithdraw( 
-                   provider: $provider,
-                   id: $id,
-                   value: $value,
-                   transactionHash: $transactionHash,
-                   logIndex: $logIndex,
-                   eventObjectId: $eventObjectId
-                   ) {
-                 result
-             }
-                       
-             }`,
+      `mutation handleWithdraw( $provider: String!,$id: String!,$value: String!,$transactionHash: String!,$logIndex: String!,$block :String!, $eventObjectId : String!){
+        handleWithdraw( provider: $provider,id: $id,value: $value,transactionHash: $transactionHash,logIndex: $logIndex,block : $block, eventObjectId : $eventObjectId) {
+        result
+    }
+              
+    }`,
       {
         provider: provider,
         id: id,
         value: value,
         transactionHash: transactionHash,
         logIndex: logIndex,
-        eventObjectId: eventObjectId
+        block : blockNumber,
+        eventObjectId: eventObjectId,
       }
     );
     console.log(response);
@@ -186,22 +158,24 @@ module.exports = describe('GraphQL Mutations for Gauge', () => {
     })
 
     it('handleDeposit should return true', async () => {
-        const {handleDeposit : {result}} = await Deposit('provider', '01', '1000', '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '22', "635fb3b4a89eacba3cd149a5");
+        const {handleDeposit : {result}} = await Deposit('provider', '01', '1000', '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '22', "123123","635fb3b4a89eacba3cd149a5");
         assert.equal(result, true);
         let deposit = await GaugeDeposit.findOne({ id: '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-22' });
         assert.equal(deposit.id, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-22');
         assert.equal(deposit.gauge, '01');
         assert.equal(deposit.provider, 'provider');
         assert.equal(deposit.value, '1000');
+        assert.equal(deposit.block, '123123');
     })
 
     it('handleWithdraw should return true', async () => {
-        const {handleWithdraw : {result}} = await Withdraw('provider', '01', '1000', '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '21', "635fb3b4a89eacba3cd149a5");
+        const {handleWithdraw : {result}} = await Withdraw('provider', '01', '1000', '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c', '21',"123123", "635fb3b4a89eacba3cd149a5");
         assert.equal(result, true);
         let withdraw = await GaugeWithdraw.findOne({ id: '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-21' });
         assert.equal(withdraw.id, '388c4a68e5d814177880ac8533b813740dc86861ae6991769e4e5b237406468c-21');
         assert.equal(withdraw.gauge, '01');
         assert.equal(withdraw.provider, 'provider');
         assert.equal(withdraw.value, '1000');
+        assert.equal(withdraw.block, '123123');
     })
 });

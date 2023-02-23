@@ -18,7 +18,9 @@ const gaugeWeightVoteSchema = new Schema({
     weight:{
         type:String
     },
-  
+    block : {
+      type : String
+    }
 });
 
 var gaugeWeightVote = mongoose.model("gaugeWeightVote", gaugeWeightVoteSchema);

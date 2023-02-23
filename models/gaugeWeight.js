@@ -15,7 +15,9 @@ const gaugeWeightSchema = new Schema({
     weight:{
         type:String
     },
-  
+    block:{
+      type:String
+    },
 });
 
 var gaugeWeight = mongoose.model("gaugeWeight", gaugeWeightSchema);

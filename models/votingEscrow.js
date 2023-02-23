@@ -17,6 +17,7 @@ const votingEscrowSchema = new Schema({
     type : {type:String},
     timestamp : {type:String},
     totalPower : {type:String},
+    block : {type:String},
 });
 
 var votingEscrow = mongoose.model("votingEscrow", votingEscrowSchema);

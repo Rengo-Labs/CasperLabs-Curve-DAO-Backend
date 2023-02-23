@@ -8,7 +8,7 @@ const VotingPower = require("../models/votingPower");
 const UserBalance = require("../models/userBalance");
 const VotingEscrow = require("../models/votingEscrow");
   
-async function VotingDeposit(provider, value, locktime, type, timestamp, block_hash, eventObjectId) {
+async function VotingDeposit(provider, value, locktime, type, timestamp, blockNumber, eventObjectId) {
     console.log("Calling handleDeposit mutation...");
     let response = await request(
         process.env.GRAPHQL,
@@ -24,7 +24,7 @@ async function VotingDeposit(provider, value, locktime, type, timestamp, block_h
  locktime: locktime,
  type: type,
  timestamp: timestamp,
- block: block_hash,
+ block: blockNumber,
  eventObjectId: eventObjectId,
 }
 );
@@ -32,7 +32,7 @@ async function VotingDeposit(provider, value, locktime, type, timestamp, block_h
     return response;
   }
   
-async function VotingWithdraw(provider, value, timestamp, block_hash, eventObjectId) {
+async function VotingWithdraw(provider, value, timestamp, blockNumber, eventObjectId) {
     console.log("Calling handleWithdraw mutation...");
     let response =  await request(
         process.env.GRAPHQL,
@@ -46,7 +46,7 @@ async function VotingWithdraw(provider, value, timestamp, block_hash, eventObjec
  provider: provider,
  value: value,
  timestamp: timestamp,
- block: block_hash,
+ block: blockNumber,
  eventObjectId: eventObjectId,
 }
 );
@@ -150,12 +150,12 @@ module.exports = describe('GraphQL Mutations for Gauge', () => {
 
     it('handleVotingDeposit should return true', async () => {
         
-        const {handleVotingDeposit : {result}} = await VotingDeposit('provider', 'value', '1000', 'type', '604800', "block", "635fb3b4a89eacba3cd149a5");
+        const {handleVotingDeposit : {result}} = await VotingDeposit('provider', 'value', '1000', 'type', '604800', "123123", "635fb3b4a89eacba3cd149a5");
         
         assert.equal(result, true);
-        let daopower = await DaoPower.findOne({id : `block-604800`})
+        let daopower = await DaoPower.findOne({id : `123123-604800`})
         assert.exists(daopower.totalPower, 'total power is null or undefined');
-        assert.equal(daopower.block, 'block');
+        assert.equal(daopower.block, '123123');
         assert.equal(daopower.timestamp, '604800');
         
         let votingpower = await VotingPower.findOne({id : "provider"});
@@ -177,12 +177,12 @@ module.exports = describe('GraphQL Mutations for Gauge', () => {
 
     it('handleVotingWithdraw should return true', async () => {
         
-        const {handleVotingWithdraw : {result}} = await VotingWithdraw('provider', 'value', '604800', "block", "635fb3b4a89eacba3cd149a5");
+        const {handleVotingWithdraw : {result}} = await VotingWithdraw('provider', 'value', '604800', "123123", "635fb3b4a89eacba3cd149a5");
         
         assert.equal(result, true);
-        let daopower = await DaoPower.findOne({id : `block-604800`})
+        let daopower = await DaoPower.findOne({id : `123123-604800`})
         assert.exists(daopower.totalPower, 'total power is null or undefined');
-        assert.equal(daopower.block, 'block');
+        assert.equal(daopower.block, '123123');
         assert.equal(daopower.timestamp, '604800');
         
         let votingpower = await VotingPower.findOne({id : "provider"});

@@ -44,7 +44,7 @@ const handleAddType = {
     type_id: { type: GraphQLString },
     timestamp: { type: GraphQLString },
     name: {type: GraphQLString},
-    blockNumber: {type: GraphQLString},
+    block: {type: GraphQLString},
     eventObjectId : { type: GraphQLString },
   },
   async resolve(parent, args, context) {
@@ -72,22 +72,24 @@ const handleAddType = {
       console.log("args-name", args);
 
       let gaugeType = await registerGaugeType(args.type_id, args.name);
-
-      let gaugeControllerPointsTypeWeight = await gaugeController.points_type_weight_block(contractData.contractHash, args.type_id, nextWeek.toString(),parseFloat(args.blockNumber));
+      gaugeType.block = args.block;
+      let gaugeControllerPointsTypeWeight = await gaugeController.points_type_weight_block(contractData.contractHash, args.type_id, nextWeek.toString(),parseFloat(args.block));
 
       let newData = new GaugeTypeWeight({
         id: nextWeek.toString(),
         type: gaugeType.id,
         time: nextWeek.toString(),
+        block : args.block,
         //weight: '1000000000',
         weight: gaugeControllerPointsTypeWeight
       });
 
-      let gaugeControllerPointsTotal = await gaugeController.points_total_block(contractData.contractHash, nextWeek.toString(),parseFloat(args.blockNumber));
+      let gaugeControllerPointsTotal = await gaugeController.points_total_block(contractData.contractHash, nextWeek.toString(),parseFloat(args.block));
 
       let data = new GaugeTotalWeight({
         id: nextWeek.toString(),
         time: nextWeek.toString(),
+        block : args.block,
         weight : bigDecimal.round(
           parseFloat(gaugeControllerPointsTotal),
           // '1000000000',
@@ -128,7 +130,7 @@ const handleNewGauge = {
   args: {
     gaugeType: { type: GraphQLString },
     addr: { type: GraphQLString },
-    blockNumber: { type: GraphQLString },
+    block: { type: GraphQLString },
     transactionHash: { type: GraphQLString },
     weight: { type: GraphQLString },
     timestamp: { type: GraphQLString },   
@@ -158,7 +160,7 @@ const handleNewGauge = {
       nextWeek = Math.floor(nextWeek);
       let gaugeType = await getGaugeType((args.gaugeType).toString());
 
-      let gaugeControllerGaugeTypeNames= await gaugeController.gauge_type_names_block(contractData.contractHash ,args.gaugeType,parseFloat(args.blockNumber));
+      let gaugeControllerGaugeTypeNames= await gaugeController.gauge_type_names_block(contractData.contractHash ,args.gaugeType,parseFloat(args.block));
 
       if (gaugeType === null) {
         gaugeType = await registerGaugeType(
@@ -166,6 +168,7 @@ const handleNewGauge = {
           gaugeControllerGaugeTypeNames,
           //'1000000000',
         );
+        gaugeType.block = args.block;
       }
 
       gaugeType.gaugeCount = ((new bigdecimal.BigDecimal(gaugeType.gaugeCount)).add(new bigdecimal.BigDecimal('1'))).toString();
@@ -176,7 +179,7 @@ const handleNewGauge = {
         address: args.addr,
         type: gaugeType.id,
         created: args.timestamp,
-        createdAtBlock: args.blockNumber,
+        createdAtBlock: args.block,
         createdAtTransaction: args.transactionHash,
       });
 
@@ -201,15 +204,17 @@ const handleNewGauge = {
         id: gauge.id + "-" + nextWeek.toString(),
         gauge: gauge.id,
         time: nextWeek,
+        block : args.block,
         weight: (new bigdecimal.BigDecimal(args.weight)).toString(),
         //weight: '1000000000'
       });
 
-      let gaugeControllerPointsTotal= await gaugeController.points_total_block(contractData.contractHash, nextWeek.toString(),parseFloat(args.blockNumber));
+      let gaugeControllerPointsTotal= await gaugeController.points_total_block(contractData.contractHash, nextWeek.toString(),parseFloat(args.block));
 
       let dataWeight = new GaugeTotalWeight({
         id: nextWeek.toString(),
         time: nextWeek.toString(),
+        block : args.block,
         weight : bigDecimal.round(
           parseFloat(gaugeControllerPointsTotal),
           //'1000000000',
@@ -254,7 +259,7 @@ const handleNewGaugeWeight = {
     time: { type: GraphQLString },
     weight: { type: GraphQLString },
     gauge_address: { type: GraphQLString },
-    blockNumber: { type: GraphQLString },
+    block: { type: GraphQLString },
     eventObjectId : { type: GraphQLString },
   },
   async resolve(parent, args, context) {
@@ -285,15 +290,17 @@ const handleNewGaugeWeight = {
           id: gauge.id + "-" + nextWeek.toString(),
           gauge: gauge.id,
           time: nextWeek,
+          block : args.block,
           weight: args.weight,
         // weight: '1000000000'
         });
 
-        let gaugeControllerPointsTotal= await gaugeController.points_total_block(contractData.contractHash, nextWeek,parseFloat(args.blockNumber));
+        let gaugeControllerPointsTotal= await gaugeController.points_total_block(contractData.contractHash, nextWeek,parseFloat(args.block));
 
         data = new GaugeTotalWeight({
           id: nextWeek.toString(),
           time: nextWeek,
+          block : args.block,
           weight : bigDecimal.round(
             parseFloat(gaugeControllerPointsTotal),
             //'1000000000',
@@ -335,6 +342,7 @@ const handleNewTypeWeight = {
     weight: { type: GraphQLString },
     type_id: { type: GraphQLString },
     total_weight: { type: GraphQLString },
+    block : { type: GraphQLString },
     eventObjectId : { type: GraphQLString },
   },
   async resolve(parent, args, context) {
@@ -364,6 +372,7 @@ const handleNewTypeWeight = {
             id: gaugeType.id + "-" + args.time.toString(),
             type: gaugeType.id,
             time: args.time,
+            block : args.block,
             weight: new bigdecimal.BigDecimal(args.weight),
             //weight:"1000000000"
           });
@@ -371,6 +380,7 @@ const handleNewTypeWeight = {
           gaugeTotalWeight = new GaugeTotalWeight({
             id: gaugeType.id + "-" + args.time.toString(),
             time: args.time,
+            block : args.block,
             weight : bigDecimal.round(
               args.total_weight,
               parseFloat(GAUGE_TOTAL_WEIGHT_PRECISION)), //issue fixed
@@ -416,7 +426,7 @@ const handleVoteForGauge = {
     weight: { type: GraphQLString },
     gauge_addr: { type: GraphQLString },
     user: { type: GraphQLString },
-    blockNumber: {type: GraphQLString},
+    block: {type: GraphQLString},
     eventObjectId : { type: GraphQLString },
   },
   async resolve(parent, args, context) {
@@ -447,22 +457,25 @@ const handleVoteForGauge = {
       if (gauge !== null) {
         let nextWeek = nextPeriod(args.time, WEEK);
 
-        let gaugeControllerPointsWeight= (await gaugeController.points_weight_block(contractData.contractHash, args.gauge_addr, nextWeek,parseFloat(args.blockNumber))).value0;
+        let pointsWeightBlock = await gaugeController.points_weight_block(contractData.contractHash, args.gauge_addr, nextWeek,parseFloat(args.block));
+        let gaugeControllerPointsWeight= pointsWeightBlock.bias;
 
         gaugeWeight = new GaugeWeight({
           id: gauge.id + "-" + nextWeek.toString(),
           gauge: gauge.id,
           time: nextWeek,
+          block : args.block,
           weight: new bigdecimal.BigDecimal(gaugeControllerPointsWeight),
           //weight: "1000000000"
         });
         console.log("gaugeWeight: ",gaugeWeight);
 
-        let gaugeControllerPointsTotal= await gaugeController.points_total_block(contractData.contractHash,nextWeek,parseFloat(args.blockNumber));
+        let gaugeControllerPointsTotal= await gaugeController.points_total_block(contractData.contractHash,nextWeek,parseFloat(args.block));
 
         gaugeTotalWeight = new GaugeTotalWeight({
           id: nextWeek.toString(),
           time: nextWeek,
+          block : args.block,
           weight : bigDecimal.round(
             parseFloat(gaugeControllerPointsTotal),
             //'1000000000',
@@ -478,6 +491,7 @@ const handleVoteForGauge = {
           gauge: gauge.id,
           user: user.id,
           time: args.time,
+          block : args.block,
           weight: new bigdecimal.BigDecimal(args.weight),
           //weight:"1000000000"
         });
@@ -486,18 +500,15 @@ const handleVoteForGauge = {
         
         contractData = await allcontractsData.findOne({packageHash : process.env.VOTING_ESCROW_PACKAGE_HASH});
         
-        let veCRV = await votingEscrow.balanceOfBlock(contractData.contractHash, user.id,null,parseFloat(args.blockNumber));
-        let totalveCRV = await votingEscrow.totalSupplyBlock(contractData.contractHash,null,parseFloat(args.blockNumber));
-
-        // suppossed values
-        //let veCRV = '1000';
-        //let totalveCRV = '10000';
+        let veCRV = await votingEscrow.balanceOfBlock(contractData.contractHash, user.id,null,parseFloat(args.block));
+        let totalveCRV = await votingEscrow.totalSupplyBlock(contractData.contractHash,null,parseFloat(args.block));
 
         gaugeVote = new GaugeVote({
           id: gauge.id + "-" + user.id + "-" + args.time.toString(),
           gauge: gauge.id,
           user: user.id,
           time: args.time,
+          block : args.block,
           weight: new bigdecimal.BigDecimal(args.weight),
           total_weight : gaugeTotalWeight.weight,
           veCRV : veCRV,
