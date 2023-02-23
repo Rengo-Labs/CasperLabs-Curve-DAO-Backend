@@ -8,7 +8,11 @@ npm install to install the require packages
 
 npm start to start the server
 
-AWS Link: http://curvegraphqlbackendfinalized-env.eba-fn2jdxgn.us-east-1.elasticbeanstalk.com/
+#### Architecture Documentation: 
+https://docs.google.com/document/d/1eiP_UrAI2vrevCzMLlosOp23WibxohCiv6BirpU99V0/edit?usp=sharing
+
+#### AWS Link: 
+http://curvegraphqlbackendfinalized-env.eba-fn2jdxgn.us-east-1.elasticbeanstalk.com/
 
 ## Running Testcases 
 
