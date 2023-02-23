@@ -41,6 +41,41 @@ router
     }
   });
 
+router
+  .route("/getContractHashesAgainstPackageHashes")
+  .post(async function (req, res, next) {
+    try {
+      if (!req.body.packageHashes) {
+        return res.status(400).json({
+          success: false,
+          message: "There are no packageHashes specified in the req body.",
+        });
+      }
+      console.log(req.body.packageHashes);
+      let contractHashes=[];
+      for (var i=0; i<req.body.packageHashes.length;i++)
+      {
+        let packageHash = req.body.packageHashes[i].toLowerCase();
+        let contractHash = await allcontractsDataModel.findOne({
+          packageHash: packageHash,
+        });
+        contractHashes.push(contractHash.contractHash);
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "ContractHashes has been Successfully found.",
+        contractHashes: contractHashes,
+      });
+    } catch (error) {
+      console.log("error (try-catch) : " + error);
+      return res.status(500).json({
+        success: false,
+        err: error,
+      });
+    }
+});
+
 function extractDataFromEvent(eventData){
   let data = {};
   if(eventData[0][0].data == undefined){
