@@ -1,3 +1,6 @@
+//This file is coded because it was in the subgraph code, currently not being used,
+//but not deleting it because can be used in the future.
+
 require("dotenv").config();
 const { GraphQLString } = require("graphql");
 const Response = require("../../models/response");

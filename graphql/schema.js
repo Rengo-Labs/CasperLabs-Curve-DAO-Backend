@@ -2,9 +2,7 @@
 const { GraphQLSchema, GraphQLObjectType } = require("graphql");
 
 // Import queries
-const { 
-  responses,
-  response, 
+const {  
   gaugeVotesByTime,
   gaugeVotesByUser, 
   votingEscrows, 
@@ -16,9 +14,6 @@ const {
   userBalancesByUnlockTime,
   userBalancesByWeight,
 } = require("./queries");
-
-// Import mutations
-const { handleNewResponse } = require("./mutations");
 
 // Import Pool mutations
 const {
@@ -76,8 +71,6 @@ const QueryType = new GraphQLObjectType({
   name: "QueryType",
   description: "Queries",
   fields: {
-    responses,
-    response,
     gaugeVotesByTime,
     gaugeVotesByUser, 
     votingEscrows, 
@@ -100,7 +93,6 @@ const MutationType = new GraphQLObjectType({
     handleRemoveLiquidity,
     handleRemoveLiquidityImbalance, 
     handleRemoveLiquidityOne,
-    handleNewResponse,
     handleTokenExchange,
     handleTokenExchangeUnderlying,
     handleNewAdmin,

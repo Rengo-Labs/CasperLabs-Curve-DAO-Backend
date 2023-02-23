@@ -1,7 +1,6 @@
 const { GraphQLList, GraphQLInt, GraphQLString } = require("graphql");
 
 // import types
-const { responseType } = require("./types/response");
 const { gaugeVoteType } = require("./types/gaugeVote");
 const { votingEscrowType } = require("./types/votingEscrow");
 const { daoPowerType } = require("./types/daopower");
@@ -9,7 +8,6 @@ const { votingPowerType } = require("./types/votingPower");
 const { userBalanceType } = require("./types/userBalance");
 
 // import Models
-const Response = require("../models/response");
 const gaugeVote = require("../models/gaugeVote");
 const votingEscrow = require("../models/votingEscrow");
 const daoPower = require("../models/daopower");
@@ -21,41 +19,6 @@ const gaugeLiquidity = require("../models/gaugeLiquidity");
 const { gaugeLiquidityType } = require("./types/gaugeLiquidity");
 const allcontractsData = require("../models/allcontractsData");
 const { name } = require("../JsClients/LIQUIDITYGAUGEV3/liquidityGauageV3FunctionsForBackend/functions");
-
-const responses = {
-  type: GraphQLList(responseType),
-  description: "Retrieves list of responses",
-  args: {
-    start: { type: GraphQLInt },
-    end: { type: GraphQLInt },
-  },
-  async resolve(parent, args, context) {
-    try {
-      let responses = await Response.find();
-      console.log("responses: ",responses);
-      return responses.splice(args.start, args.end);
-    } catch (error) {
-      throw new Error(error);
-    }
-  },
-};
-
-const response = {
-  type: responseType,
-  description: "Retrieves response against Id",
-  args: {
-    id: { type: GraphQLString },
-  },
-  async resolve(parent, args, context) {
-    try {
-      let response = await Response.findOne({ id: args.id });
-
-      return response;
-    } catch (error) {
-      throw new Error(error);
-    }
-  },
-};
 
 const getGaugesByAddress =  {
   type: GraphQLList(gaugeType),
