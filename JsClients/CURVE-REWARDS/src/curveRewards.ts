@@ -283,19 +283,20 @@ class CURVEREWARDSClient {
 
   public async balanceOf(owner: string) {
     try {
-      
-      const result = await utils.contractDictionaryGetter(
-        this.nodeAddress,
-        owner,
-        this.namedKeys.balances
-      );
-      const maybeValue = result.value().unwrap();
-      return maybeValue.value().toString();
-
-    } catch (error) {
-      return "0";
-    }
-    
+		  const _account = CLPublicKey.fromHex(owner);
+		  const key = createRecipientAddress(_account);
+		  const keyBytes = CLValueParsers.toBytes(key).unwrap();
+		  const itemKey = Buffer.from(keyBytes).toString("base64");
+		  const result = await utils.contractDictionaryGetter(
+			this.nodeAddress,
+			itemKey,
+			this.namedKeys!.balances
+		  );
+		  return result.value();
+	
+		} catch (error) {
+		  return "0";
+		}
   }
 
   public async uni() {

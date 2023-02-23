@@ -10,8 +10,7 @@
 /Scripts/MULTICALL/keys
 /Scripts/VOTING/keys
 /Scripts/VOTINGESCROW/keys
-/Scripts/VOTINGESCROWFACTORY/keys
-
+/Scripts/VESTINGESCROWFACTORY/keys
 # Logs
 logs
 *.log
