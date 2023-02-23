@@ -35,6 +35,7 @@ const handleVotingDeposit = {
   },
   async resolve(parent, args, context) {
     try {  
+      debugger;
       // updating mutation status
       let eventDataResult = await eventsData.findOne({
         _id: args.eventObjectId,
@@ -52,12 +53,8 @@ const handleVotingDeposit = {
     
       const contractData = await allcontractsData.findOne({packageHash : process.env.VOTING_ESCROW_PACKAGE_HASH});
 
-      let power = await votingEscrow.balanceOfBlock(contractData.contractHash,args.provider,null,parseFloat(args.blockNumber));
-      let totalPower = await votingEscrow.totalSupplyBlock(contractData.contractHash,null,parseFloat(args.blockNumber));
-
-      //supposed values
-      //let power = '1000';
-      //let totalPower = '10000';
+      let power = await votingEscrow.balanceOfBlock(contractData.contractHash,args.provider,null,parseFloat(args.block));
+      let totalPower = await votingEscrow.totalSupplyBlock(contractData.contractHash,null,parseFloat(args.block));
 
       let daopower = await DaoPower.findOne({id : `${args.block}-${args.timestamp}`});
       if(!daopower){
@@ -80,11 +77,14 @@ const handleVotingDeposit = {
       if(!votingpower)
         votingpower = new VotingPower({
           id : args.provider,
-          power : power
+          power : power,
+          block : args.block,
         })
       
-      else
+      else{
         votingpower.power = power;
+        votingpower.block =args.block;
+      }
       
       let userbalance = await UserBalance.findOne({id : args.provider});
 
@@ -93,12 +93,14 @@ const handleVotingDeposit = {
         id : args.provider,
         user : args.provider,
         unlock_time : args.locktime,
-        CRVLocked : args.value
+        CRVLocked : args.value,
+        block : args.block,
       });
 
       else{
         userbalance.unlock_time = args.locktime;
         userbalance.CRVLocked = args.value;
+        userbalance.block =args.block;
       }
        
       let votingescrow = new VotingEscrow({
@@ -108,7 +110,8 @@ const handleVotingDeposit = {
         locktime : args.locktime,
         type : args.type,
         timestamp : args.timestamp,
-        totalPower : totalPower
+        totalPower : totalPower,
+        block : args.block,
       });
 
       const session = await mongoose.startSession();
@@ -164,13 +167,9 @@ const handleVotingWithdraw = {
     
       const contractData = await allcontractsData.findOne({packageHash : process.env.VOTING_ESCROW_PACKAGE_HASH});
 
-      let power = await votingEscrow.balanceOfBlock(contractData.contractHash,args.provider,null,parseFloat(args.blockNumber));
-      let totalPower = await votingEscrow.totalSupplyBlock(contractData.contractHash,null,parseFloat(args.blockNumber));
+      let power = await votingEscrow.balanceOfBlock(contractData.contractHash,args.provider,null,parseFloat(args.block));
+      let totalPower = await votingEscrow.totalSupplyBlock(contractData.contractHash,null,parseFloat(args.block));
 
-      //Supposed values 
-      //let power = '1000';
-      //let totalPower = '10000';
-      
       let daopower = await DaoPower.findOne({id : `${args.block}-${args.timestamp}`});
       if(!daopower){
         daopower = new DaoPower({
@@ -192,11 +191,14 @@ const handleVotingWithdraw = {
       if(!votingpower)
         votingpower = new VotingPower({
           id : args.provider,
-          power : power
+          power : power,
+          block : args.block,
         })
       
-      else
+      else{
         votingpower.power = power;
+        votingpower.block = args.block;
+      }
       
       let userbalance = await UserBalance.findOne({id : args.provider});
 
@@ -204,18 +206,22 @@ const handleVotingWithdraw = {
        userbalance = new UserBalance({
         id : args.provider,
         user : args.provider,
-        CRVLocked : args.value
+        CRVLocked : args.value,
+        block : args.block,
       });
 
-      else
+      else{
         userbalance.CRVLocked = args.value;
+        userbalance.block = args.block;
+      }
       
       let votingescrow = new VotingEscrow({
         id : args.provider,
         provider : args.provider,
         value : args.value,
         timestamp : args.timestamp,
-        totalPower : totalPower
+        totalPower : totalPower,
+        block : args.block,
       });
 
       const session = await mongoose.startSession();

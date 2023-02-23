@@ -12,6 +12,9 @@ const gaugeTotalWeightSchema = new Schema({
     weight:{
         type:String
     },
+    block : {
+      type:String
+    }
   
 });
 

@@ -10,12 +10,14 @@ const gaugeTypeWeightSchema = new Schema({
       type:String
     },
     time:{
-        type:String
+      type:String
     },
     weight:{
-        type:String
+      type:String
     },
-  
+    block : {
+      type:String
+    }
 });
 
 var gaugeTypeWeight = mongoose.model("gaugeTypeWeight", gaugeTypeWeightSchema);

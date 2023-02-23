@@ -15,6 +15,9 @@ const userBalanceSchema = new Schema({
     unlock_time : {
       type:String
     },
+    block : {
+      type:String
+    },
 });
 
 var userBalance = mongoose.model("userBalance", userBalanceSchema);

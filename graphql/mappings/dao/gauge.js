@@ -97,6 +97,7 @@ const handleDeposit = {
     value: { type: GraphQLString },
     transactionHash: { type: GraphQLString },
     logIndex: { type: GraphQLString },
+    block : {type : GraphQLString},
     eventObjectId : { type: GraphQLString },
   },
   async resolve(parent, args, context) {
@@ -123,6 +124,7 @@ const handleDeposit = {
         gauge: args.id,
         provider: provider.id,
         value: args.value,
+        block : args.block,
       });
 
       const session = await mongoose.startSession();
@@ -156,6 +158,7 @@ const handleWithdraw = {
     value: { type: GraphQLString },
     transactionHash: { type: GraphQLString },
     logIndex: { type: GraphQLString },
+    block : {type : GraphQLString},
     eventObjectId : { type: GraphQLString },
   },
   async resolve(parent, args, context) {
@@ -182,6 +185,7 @@ const handleWithdraw = {
         gauge: args.id,
         provider: provider.id,
         value: args.value,
+        block : args.block,
       });
 
       const session = await mongoose.startSession();

@@ -15,7 +15,9 @@ const gaugeDepositSchema = new Schema({
     value:{
         type:String
     },
-  
+    block:{
+      type:String
+  },
 });
 
 var gaugeDeposit = mongoose.model("gaugeDeposit", gaugeDepositSchema);

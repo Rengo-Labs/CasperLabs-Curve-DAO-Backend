@@ -9,6 +9,9 @@ const votingPowerSchema = new Schema({
     power:{
       type:String
     },
+    block:{
+      type:String
+    },
 });
 
 var votingPower = mongoose.model("votingPower", votingPowerSchema);

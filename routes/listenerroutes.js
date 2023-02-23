@@ -97,6 +97,7 @@ async function geteventsdata(
     console.log("... Deployhash: ", deployHash);
     console.log("... Timestamp: ", timestamp);
     console.log("... Block hash: ", block_hash);
+    console.log("... Block number: ", blockNumber);
     console.log("Event Data: ", newData);
 
     if (eventName == "addLiquidity") {
@@ -111,7 +112,6 @@ async function geteventsdata(
       console.log("providerId: ", providerId);
       console.log("transactionHash: ", deployHash);
       console.log("registryAddress: ", registryAddress);
-      console.log("blockNumber: ", blockNumber);
 
       await request(
         process.env.GRAPHQL,
@@ -127,7 +127,6 @@ async function geteventsdata(
           $transactionHash: String!,
           $logIndex: String!,
           $registryAddress: String!,
-          $blockNumber: String!,
           $eventObjectId: String!
           ){
         handleAddLiquidity( 
@@ -142,7 +141,6 @@ async function geteventsdata(
             transactionHash: $transactionHash,
             logIndex: $logIndex,
             registryAddress: $registryAddress,
-            blockNumber: $blockNumber,
             eventObjectId: $eventObjectId
             ) {
           result
@@ -154,14 +152,13 @@ async function geteventsdata(
           fees: fees,
           invariant: invariant,
           tokenSupply: tokenSupply,
-          block: block_hash,
+          block: blockNumber,
           timestamp: timestamp,
           poolId: poolId,
           providerId: providerId,
           transactionHash: deployHash,
           logIndex: "0",
           registryAddress: registryAddress,
-          blockNumber: blockNumber,
           eventObjectId: eventResult._id,
         }
       );
@@ -179,7 +176,6 @@ async function geteventsdata(
       console.log("providerId: ", providerId);
       console.log("transactionHash: ", deployHash);
       console.log("registryAddress: ", registryAddress);
-      console.log("blockNumber: ", blockNumber);
 
       await request(
         process.env.GRAPHQL,
@@ -194,7 +190,6 @@ async function geteventsdata(
           $transactionHash: String!,
           $logIndex: String!,
           $registryAddress: String!,
-          $blockNumber: String!,
           $eventObjectId : String!
           ){
             handleRemoveLiquidity( 
@@ -208,7 +203,6 @@ async function geteventsdata(
             transactionHash: $transactionHash,
             logIndex: $logIndex,
             registryAddress: $registryAddress,
-            blockNumber: $blockNumber,
             eventObjectId: $eventObjectId
             ) {
           result
@@ -219,14 +213,13 @@ async function geteventsdata(
           tokenAmounts: tokenAmounts,
           fees: fees,
           tokenSupply: tokenSupply,
-          block: block_hash,
+          block: blockNumber,
           timestamp: timestamp,
           poolId: poolId,
           providerId: providerId,
           transactionHash: deployHash,
           logIndex: "0",
           registryAddress: registryAddress,
-          blockNumber: blockNumber,
           eventObjectId: eventResult._id,
         }
       );
@@ -246,7 +239,6 @@ async function geteventsdata(
       console.log("providerId: ", providerId);
       console.log("transactionHash: ", deployHash);
       console.log("registryAddress: ", registryAddress);
-      console.log("blockNumber: ", blockNumber);
 
       await request(
         process.env.GRAPHQL,
@@ -262,7 +254,6 @@ async function geteventsdata(
           $transactionHash: String!,
           $logIndex: String!,
           $registryAddress: String!,
-          $blockNumber: String!,
           $eventObjectId :  String!
           ){
             handleRemoveLiquidityImbalance( 
@@ -277,7 +268,6 @@ async function geteventsdata(
             transactionHash: $transactionHash,
             logIndex: $logIndex,
             registryAddress: $registryAddress,
-            blockNumber: $blockNumber,
             eventObjectId: $eventObjectId
             ) {
           result
@@ -289,14 +279,13 @@ async function geteventsdata(
           fees: fees,
           invariant: invariant,
           tokenSupply: tokenSupply,
-          block: block_hash,
+          block: blockNumber,
           timestamp: timestamp,
           poolId: poolId,
           providerId: providerId,
           transactionHash: deployHash,
           logIndex: "0",
           registryAddress: registryAddress,
-          blockNumber: blockNumber,
           eventObjectId: eventResult._id,
         }
       );
@@ -313,7 +302,6 @@ async function geteventsdata(
       console.log("providerId: ", providerId);
       console.log("transactionHash: ", deployHash);
       console.log("registryAddress: ", registryAddress);
-      console.log("blockNumber: ", blockNumber);
 
       await request(
         process.env.GRAPHQL,
@@ -327,7 +315,6 @@ async function geteventsdata(
           $transactionHash: String!,
           $logIndex: String!,
           $registryAddress: String!,
-          $blockNumber: String!,
           eventObjectId : String!
           ){
             handleRemoveLiquidityOne( 
@@ -340,7 +327,6 @@ async function geteventsdata(
             transactionHash: $transactionHash,
             logIndex: $logIndex,
             registryAddress: $registryAddress,
-            blockNumber: $blockNumber,
             eventObjectId : $eventObjectId
             ) {
           result
@@ -350,14 +336,13 @@ async function geteventsdata(
         {
           tokenAmount: tokenAmounts,
           coinAmount: coinAmount,
-          block: block_hash,
+          block: blockNumber,
           timestamp: timestamp,
           poolId: poolId,
           providerId: providerId,
           transactionHash: deployHash,
           logIndex: "0",
           registryAddress: registryAddress,
-          blockNumber: blockNumber,
           eventObjectId: eventResult._id,
         }
       );
@@ -412,7 +397,7 @@ async function geteventsdata(
         {
           poolId: poolId,
           transactionHash: deployHash,
-          block: block_hash,
+          block: blockNumber,
           timestamp: timestamp,
           logIndex: "0",
           buyer: buyer,
@@ -474,7 +459,7 @@ async function geteventsdata(
         {
           poolId: poolId,
           transactionHash: deployHash,
-          block: block_hash,
+          block: blockNumber,
           timestamp: timestamp,
           logIndex: "0",
           buyer: buyer,
@@ -523,7 +508,7 @@ async function geteventsdata(
         {
           poolId: poolId,
           transactionHash: deployHash,
-          block: block_hash,
+          block: blockNumber,
           timestamp: timestamp,
           logIndex: "0",
           admin: admin,
@@ -570,7 +555,7 @@ async function geteventsdata(
         {
           poolId: poolId,
           transactionHash: deployHash,
-          block: block_hash,
+          block: blockNumber,
           timestamp: timestamp,
           logIndex: "0",
           fee: fee,
@@ -623,7 +608,7 @@ async function geteventsdata(
           poolId: poolId,
           A: A,
           transactionHash: deployHash,
-          block: block_hash,
+          block: blockNumber,
           timestamp: timestamp,
           logIndex: "0",
           fee: fee,
@@ -670,7 +655,7 @@ async function geteventsdata(
           poolId: poolId,
           new_A: new_A,
           transactionHash: deployHash,
-          block: block_hash,
+          block: blockNumber,
           timestamp: timestamp,
           logIndex: "0",
           eventObjectId: eventResult._id,
@@ -715,7 +700,7 @@ async function geteventsdata(
           poolId: poolId,
           A: A,
           transactionHash: deployHash,
-          block: block_hash,
+          block: blockNumber,
           timestamp: timestamp,
           logIndex: "0",
           eventObjectId: eventResult._id,
@@ -757,7 +742,7 @@ async function geteventsdata(
         {
           addressProviderContractHash: addressProviderContractHash,
           id: contract_package_hash,
-          block: block_hash,
+          block: blockNumber,
           timestamp: timestamp,
           transactionHash: deployHash,
           eventObjectId: eventResult._id,
@@ -799,7 +784,7 @@ async function geteventsdata(
         {
           addressProviderContractHash: addressProviderContractHash,
           id: contract_package_hash,
-          block: block_hash,
+          block: blockNumber,
           timestamp: timestamp,
           transactionHash: deployHash,
           eventObjectId: eventResult._id,
@@ -825,7 +810,7 @@ async function geteventsdata(
         {
           poolId: poolId,
           transactionHash: deployHash,
-          block: block_hash,
+          block: blockNumber,
           timestamp: timestamp,
           eventObjectId: eventResult._id,
         }
@@ -851,7 +836,7 @@ async function geteventsdata(
         {
           poolId: poolId,
           transactionHash: deployHash,
-          block: block_hash,
+          block: blockNumber,
           timestamp: timestamp,
           eventObjectId: eventResult._id,
         }
@@ -881,7 +866,7 @@ async function geteventsdata(
           proxy: proxy,
           context: context,
           transactionHash: deployHash,
-          block: block_hash,
+          block: blockNumber,
           timestamp: timestamp,
           eventObjectId: eventResult._id,
         }
@@ -940,7 +925,7 @@ async function geteventsdata(
           working_balance: working_balance,
           working_supply: working_supply,
           transactionHash: deployHash,
-          block: block_hash,
+          block: blockNumber,
           timestamp: timestamp,
           eventObjectId: eventResult._id,
         }
@@ -959,8 +944,8 @@ async function geteventsdata(
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleDeposit( $provider: String!,$id: String!,$value: String!,$transactionHash: String!,$logIndex: String!, $eventObjectId : String!){
-           handleDeposit( provider: $provider,id: $id,value: $value,transactionHash: $transactionHash,logIndex: $logIndex, eventObjectId : $eventObjectId) {
+        `mutation handleDeposit( $provider: String!,$id: String!,$value: String!,$transactionHash: String!,$logIndex: String!,$block: String!, $eventObjectId : String!){
+           handleDeposit( provider: $provider,id: $id,value: $value,transactionHash: $transactionHash,logIndex: $logIndex,block : $block, eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -971,6 +956,7 @@ async function geteventsdata(
           value: value,
           transactionHash: deployHash,
           logIndex: "0",
+          block : blockNumber,
           eventObjectId: eventResult._id,
         }
       );
@@ -988,8 +974,8 @@ async function geteventsdata(
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleWithdraw( $provider: String!,$id: String!,$value: String!,$transactionHash: String!,$logIndex: String!, $eventObjectId : String!){
-          handleWithdraw( provider: $provider,id: $id,value: $value,transactionHash: $transactionHash,logIndex: $logIndex, eventObjectId : $eventObjectId) {
+        `mutation handleWithdraw( $provider: String!,$id: String!,$value: String!,$transactionHash: String!,$logIndex: String!,$block :String!, $eventObjectId : String!){
+          handleWithdraw( provider: $provider,id: $id,value: $value,transactionHash: $transactionHash,logIndex: $logIndex,block : $block, eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -1000,6 +986,7 @@ async function geteventsdata(
           value: value,
           transactionHash: deployHash,
           logIndex: "0",
+          block : blockNumber,
           eventObjectId: eventResult._id,
         }
       );
@@ -1016,8 +1003,8 @@ async function geteventsdata(
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleAddType( $id: String!,$type_id: String!,$timestamp: String!,$name: String!,$blockNumber: String!, $eventObjectId : String!){
-              handleAddType( id: $id,type_id: $type_id,timestamp: $timestamp,name:$name,blockNumber:$blockNumber, eventObjectId : $eventObjectId) {
+        `mutation handleAddType( $id: String!,$type_id: String!,$timestamp: String!,$name: String!,$block: String!, $eventObjectId : String!){
+              handleAddType( id: $id,type_id: $type_id,timestamp: $timestamp,name:$name,block:$block, eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -1027,7 +1014,7 @@ async function geteventsdata(
           type_id: type_id,
           timestamp: timestamp.toString(),
           name: name,
-          blockNumber:blockNumber,
+          block:blockNumber,
           eventObjectId: eventResult._id,
         }
       );
@@ -1045,15 +1032,15 @@ async function geteventsdata(
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleNewGauge($gaugeType: String!,$addr: String!,$blockNumber: String!,$transactionHash: String!,$weight: String!,$timestamp: String!,$eventObjectId : String!){
-              handleNewGauge(gaugeType: $gaugeType,addr: $addr,blockNumber: $blockNumber,transactionHash: $transactionHash,weight: $weight,timestamp: $timestamp,eventObjectId : $eventObjectId) {
+        `mutation handleNewGauge($gaugeType: String!,$addr: String!,$block: String!,$transactionHash: String!,$weight: String!,$timestamp: String!,$eventObjectId : String!){
+              handleNewGauge(gaugeType: $gaugeType,addr: $addr,block: $block,transactionHash: $transactionHash,weight: $weight,timestamp: $timestamp,eventObjectId : $eventObjectId) {
           result
       }
       }`,
         {
           gaugeType: gauge_type,
           addr: addr,
-          blockNumber: blockNumber,
+          block: blockNumber,
           transactionHash: deployHash,
           weight: weight,
           timestamp: timestamp.toString(),
@@ -1102,8 +1089,8 @@ async function geteventsdata(
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleNewGaugeWeight( $id: String!,$time: String!,$weight: String!,$gauge_address: String!,$blockNumber: String!,$eventObjectId : String!){
-           handleNewGaugeWeight( id: $id,time: $time,weight: $weight,gauge_address: $gauge_address,blockNumber: $blockNumber,eventObjectId : $eventObjectId) {
+        `mutation handleNewGaugeWeight( $id: String!,$time: String!,$weight: String!,$gauge_address: String!,$block: String!,$eventObjectId : String!){
+           handleNewGaugeWeight( id: $id,time: $time,weight: $weight,gauge_address: $gauge_address,block: $block,eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -1113,7 +1100,7 @@ async function geteventsdata(
           time: time,
           weight: weight,
           gauge_address: gauge_address,
-          blockNumber:blockNumber,
+          block:blockNumber,
           eventObjectId: eventResult._id,
         }
       );
@@ -1132,8 +1119,8 @@ async function geteventsdata(
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleNewTypeWeight( $id: String!,$time: String!,$weight: String!,$type_id: String!,$total_weight: String!, $eventObjectId : String!){
-           handleNewTypeWeight( id: $id,time: $time,weight: $weight,type_id: $type_id,total_weight: $total_weight, eventObjectId : $eventObjectId) {
+        `mutation handleNewTypeWeight( $id: String!,$time: String!,$weight: String!,$type_id: String!,$total_weight: String!,$block : String!, $eventObjectId : String!){
+           handleNewTypeWeight( id: $id,time: $time,weight: $weight,type_id: $type_id,total_weight: $total_weight,block : $block, eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -1144,6 +1131,7 @@ async function geteventsdata(
           weight: weight,
           type_id: type_id,
           total_weight: total_weight,
+          block : blockNumber,
           eventObjectId: eventResult._id,
         }
       );
@@ -1195,8 +1183,8 @@ async function geteventsdata(
 
       await request(
         process.env.GRAPHQL,
-        `mutation handleVoteForGauge( $id: String!,$time: String!,$weight: String!,$gauge_addr: String!,$user: String!,$blockNumber: String!, $eventObjectId : String!){
-           handleVoteForGauge( id: $id,time: $time,weight: $weight,gauge_addr: $gauge_addr,user: $user, blockNumber:$blockNumber,eventObjectId : $eventObjectId) {
+        `mutation handleVoteForGauge( $id: String!,$time: String!,$weight: String!,$gauge_addr: String!,$user: String!,$block: String!, $eventObjectId : String!){
+           handleVoteForGauge( id: $id,time: $time,weight: $weight,gauge_addr: $gauge_addr,user: $user, block:$block,eventObjectId : $eventObjectId) {
           result
       }
                 
@@ -1207,7 +1195,7 @@ async function geteventsdata(
           weight: weight,
           gauge_addr: gauge_addr,
           user: user,
-          blockNumber:blockNumber,
+          block:blockNumber,
           eventObjectId: eventResult._id,
         }
       );
@@ -1237,7 +1225,7 @@ async function geteventsdata(
           locktime: locktime,
           type: _type,
           timestamp: ts,
-          block: block_hash,
+          block: blockNumber,
           eventObjectId: eventResult._id,
         }
       );
@@ -1263,7 +1251,7 @@ async function geteventsdata(
           provider: provider,
           value: value,
           timestamp: ts,
-          block: block_hash,
+          block: blockNumber,
           eventObjectId: eventResult._id,
         }
       );
