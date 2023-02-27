@@ -3,6 +3,8 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+const swaggerUI = require("swagger-ui-express");
+const swaggerJsDoc = require("swagger-jsdoc");
 
 var app = express();
 require("dotenv").config();
@@ -21,6 +23,26 @@ var vestingEscrowRouter = require("./routes/vestingEscrowRoutes");
 var gaugeControllerRouter = require("./routes/gaugeControllerRoutes");
 var readWasmRouter = require("./routes/readWasm");
 
+//swaggerJsDocOptions
+const options = {
+	definition: {
+		openapi: "3.0.0",
+		info: {
+			title: "Curve graphQL API",
+			version: "1.0.0",
+			description: "A simple Express Curve graphQL API",
+		},
+		servers: [
+			{
+				url: "http://localhost:3000",
+			},
+		],
+	},
+	apis: ["./routes/*.js"],
+};
+
+const specs = swaggerJsDoc(options);
+
 //kafka setup
 const consumer = require("./consumer");
 
@@ -34,6 +56,7 @@ require("./backupDatabase");
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -79,7 +102,6 @@ app.use(
 );
 
 consumer.consumeEvent(redis);
-
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

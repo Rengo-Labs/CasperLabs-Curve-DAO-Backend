@@ -32,7 +32,7 @@
   },
   "engines": {
     "node": "16.14.0",
-    "npm": "8.10.0"
+    "npm": "9.2.0"
   },
   "dependencies": {
     "axios": "^0.24.0",
@@ -71,7 +71,9 @@
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.3.3",
     "aws-sdk": "^2.1224.0",
-    "node-cron": "^2.0.3"
+    "node-cron": "^2.0.3",
+    "swagger-jsdoc": "^6.0.1",
+    "swagger-ui-express": "^4.1.6"
   },
   "devDependencies": {
     "chai": "^4.3.6",

@@ -225,7 +225,5 @@ module.exports = {
   gauges, 
   getGaugesByAddress,
   userBalancesByUnlockTime,
-  userBalancesByWeight,
-  responses,
-  response,
+  userBalancesByWeight
 };
