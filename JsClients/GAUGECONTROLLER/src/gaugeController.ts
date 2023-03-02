@@ -126,8 +126,8 @@ class GaugeControllerClient {
 		);
 
     const runtimeArgs = RuntimeArgs.fromMap({
-      destination_package_hash: utils.createRecipientAddress(_packageHash),
-      destination_entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+      entrypoint: CLValueBuilder.string(entrypointName),
     });
 
     const deployHash = await installWasmFile({
@@ -160,8 +160,8 @@ class GaugeControllerClient {
 
     const _addr = new CLByteArray(Uint8Array.from(Buffer.from(addr, 'hex')));
     const runtimeArgs = RuntimeArgs.fromMap({
-      destination_package_hash: utils.createRecipientAddress(_packageHash),
-      destination_entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+      entrypoint: CLValueBuilder.string(entrypointName),
       addr: CLValueBuilder.key(_addr),
     });
 
@@ -194,8 +194,8 @@ class GaugeControllerClient {
 		);
 
     const runtimeArgs = RuntimeArgs.fromMap({
-      destination_package_hash: utils.createRecipientAddress(_packageHash),
-      destination_entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+      entrypoint: CLValueBuilder.string(entrypointName),
       type_id: CLValueBuilder.tuple2([CLValueBuilder.bool(true), CLValueBuilder.u128(type_id)])
     });
 

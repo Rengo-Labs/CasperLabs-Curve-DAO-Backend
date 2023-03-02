@@ -113,8 +113,8 @@ class CURVEREWARDSClient {
 			Uint8Array.from(Buffer.from(packageHash, "hex"))
 		);
     const runtimeArgs = RuntimeArgs.fromMap({
-      destination_package_hash: utils.createRecipientAddress(_packageHash),
-      destination_entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+      entrypoint: CLValueBuilder.string(entrypointName),
     });
 
     const deployHash = await installWasmFile({
@@ -144,8 +144,8 @@ class CURVEREWARDSClient {
 			Uint8Array.from(Buffer.from(packageHash, "hex"))
 		);
     const runtimeArgs = RuntimeArgs.fromMap({
-      destination_package_hash: utils.createRecipientAddress(_packageHash),
-      destination_entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+      entrypoint: CLValueBuilder.string(entrypointName),
     });
 
     const deployHash = await installWasmFile({
@@ -175,8 +175,8 @@ class CURVEREWARDSClient {
 			Uint8Array.from(Buffer.from(packageHash, "hex"))
 		);
     const runtimeArgs = RuntimeArgs.fromMap({
-      destination_package_hash: utils.createRecipientAddress(_packageHash),
-      destination_entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+      entrypoint: CLValueBuilder.string(entrypointName),
     });
 
     const deployHash = await installWasmFile({
@@ -207,8 +207,8 @@ class CURVEREWARDSClient {
 			Uint8Array.from(Buffer.from(packageHash, "hex"))
 		);
     const runtimeArgs = RuntimeArgs.fromMap({
-      destination_package_hash: utils.createRecipientAddress(_packageHash),
-      destination_entrypoint: CLValueBuilder.string(entrypointName),
+      package_hash: utils.createRecipientAddress(_packageHash),
+      entrypoint: CLValueBuilder.string(entrypointName),
       account:utils.createRecipientAddress(account)
     });
 
