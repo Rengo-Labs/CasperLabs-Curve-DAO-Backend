@@ -126,7 +126,7 @@ async function geteventsdata(
     blockNumber = blockNumber.toString();
     let newData = _eventdata;
     let deployHash = _deployHash;
-    let timestamp = _timestamp;
+    let timestamp = _timestamp.toString();
     let block_hash = _block_hash;
     let eventName = _eventname;
     console.log("... Deployhash: ", deployHash);
@@ -910,7 +910,7 @@ async function geteventsdata(
       return true;
     } else if (eventName == "UpdateLiquidityLimit") {
       console.log(eventName + " Event result: ");
-
+      
       let {user,contract_package_hash,original_balance,original_supply,
         working_balance,working_supply} = extractDataFromEvent(newData);
 
@@ -1047,7 +1047,7 @@ async function geteventsdata(
         {
           id: contract_package_hash,
           type_id: type_id,
-          timestamp: timestamp.toString(),
+          timestamp: timestamp,
           name: name,
           block:blockNumber,
           eventObjectId: eventResult._id,
@@ -1078,7 +1078,7 @@ async function geteventsdata(
           block: blockNumber,
           transactionHash: deployHash,
           weight: weight,
-          timestamp: timestamp.toString(),
+          timestamp: timestamp,
           eventObjectId: eventResult._id,
         }
       );
