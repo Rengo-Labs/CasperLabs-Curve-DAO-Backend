@@ -181,7 +181,7 @@ class VOTINGESCROWClient {
 
   async lockedEndAmount(account:string) {
     try {
-      const formattedString = "locked" + "_amount_" + account;
+      const formattedString = "locked" + "_amount_account-hash-" + account;
       const hash = keccak('keccak256').update(formattedString).digest('hex');
 
       console.log("lockedEndAmount hash", hash);
@@ -191,9 +191,9 @@ class VOTINGESCROWClient {
         this.namedKeys.locked
       );
 
-      console.log("lockedEndAmount value",parseInt(result.data.val.data._hex))
+      console.log("lockedEndAmount value",parseInt(result.data.val.data[1].data._hex))
      
-      return parseInt(result.data.val.data._hex);
+      return parseInt(result.data.val.data[1].data._hex);
     } catch (error) {
       return 0;
     }
@@ -201,7 +201,7 @@ class VOTINGESCROWClient {
 
   async lockedEndEnd(account:string) {
     try {
-      const formattedString = "locked" + "_end_" + account;
+      const formattedString = "locked" + "_end_account-hash-" + account;
       const hash = keccak('keccak256').update(formattedString).digest('hex');
 
       console.log("lockedEndEnd hash", hash);
