@@ -10,8 +10,21 @@ const allcontractsData = require("../../models/allcontractsData");
 // const expressPlayground = require("graphql-playground-middleware-express")
 //   .default;
 
+var adminRouter = require("../../routes/adminroutes");
+var afterDeploymentRouter = require("../../routes/afterDeploymentRoutes");
+var coinsmarketcapapiRouter = require("../../routes/coinsmarketcapapi");
+var erc20crvRouter = require("../../routes/erc20CrvRoutes");
+var gaugeControllerRouter = require("../../routes/gaugeControllerRoutes");
+var vestingEscrowRouter = require("../../routes/vestingEscrowRoutes");
+var votingEscrowRouter = require("../../routes/votingEscrowRoutes");
+var readWasmRouter = require("../../routes/readWasm");
+
+
 // Create a context for holding contextual data (db info in this case)
 const app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 startReplicaSet().then(
   async res => {
@@ -23,6 +36,15 @@ startReplicaSet().then(
 }).catch(err => {
   console.log(err.message);
 });
+
+app.use("/", adminRouter);
+app.use("/", afterDeploymentRouter);
+app.use("/", coinsmarketcapapiRouter);
+app.use("/", erc20crvRouter);
+app.use("/", gaugeControllerRouter);
+app.use("/", vestingEscrowRouter);
+app.use("/", votingEscrowRouter);
+app.use("/", readWasmRouter);
 
 app.use(
   "/graphqL",
