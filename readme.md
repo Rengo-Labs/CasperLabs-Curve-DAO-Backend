@@ -30,9 +30,14 @@ http://curvegraphqlbackendfinalized-env.eba-fn2jdxgn.us-east-1.elasticbeanstalk.
 
 ## Running Testcases 
 
-- npm install to install the require packages
-- Run npm run start-mock-server
-- Run npm run test in a seperate terminal once mock server has started successfully
+* npm install to install the require packages
+* make a new file and name it .env
+* copy paste the env.example file content into .env file
+* make sure env variables are set properly
+* Run npm run start-mock-server
+* Run npm run test in a seperate terminal once mock server has started successfully
+* That will run all tests included mutations tests, if you want to test only APIs,
+comment out other tests in folder tests, file index.test.js
 
 
 ## Deployment of Contracts
