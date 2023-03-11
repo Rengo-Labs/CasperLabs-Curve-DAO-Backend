@@ -8,7 +8,6 @@ async function getOrRegisterAccount(address) {
       id: address,
       address: address,
     });
-    await Account.create (account );
   }
 
   return account;

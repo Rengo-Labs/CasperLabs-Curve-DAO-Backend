@@ -1,5 +1,6 @@
 require("dotenv").config();
 const { GraphQLString } = require("graphql");
+const mongoose = require("mongoose")
 
 const Response = require("../../../models/response");
 const { responseType } = require("../../types/response");
@@ -7,8 +8,15 @@ const { responseType } = require("../../types/response");
 const GaugeDeposit = require("../../../models/gaugeDeposit");
 const GaugeLiquidity = require("../../../models/gaugeLiquidity");
 const GaugeWithdraw = require("../../../models/gaugeWithdraw");
+const eventsData = require("../../../models/eventsData");
 
 const { getOrRegisterAccount } = require("../../services/accounts");
+
+const transactionOptions = {
+  readPreference: "primary",
+  readConcern: { level: "local" },
+  writeConcern: { w: "majority" },
+};
 
 const handleUpdateLiquidityLimit = {
   type: responseType,
@@ -23,9 +31,26 @@ const handleUpdateLiquidityLimit = {
     transactionHash: { type: GraphQLString },
     block: { type: GraphQLString },
     timestamp: { type: GraphQLString },
+    eventObjectId : { type: GraphQLString },
   },
   async resolve(parent, args, context) {
     try {
+
+      // updating mutation status
+      let eventDataResult = await eventsData.findOne({
+        _id: args.eventObjectId,
+      });
+      eventDataResult.status = "completed";
+
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+        });
+        response.result = true;
+      }
+      
       let account = await getOrRegisterAccount(args.user);
 
       let gauge = new GaugeLiquidity({
@@ -40,19 +65,24 @@ const handleUpdateLiquidityLimit = {
         block: args.block,
         transaction: args.transactionHash,
       });
-      await GaugeLiquidity.create(gauge);
 
-      let response = await Response.findOne({ id: "1" });
-      if (response === null) {
-        // create new response
-        response = new Response({
-          id: "1",
-          result: true,
-        });
-        await response.save();
-      }
+      const session = await mongoose.startSession();
+    try{
+      await session.withTransaction(async () => {
+        await gauge.save({session});
+        await eventDataResult.save({ session });
+        await response.save({ session });
+        await account.save({ session });
+      }, transactionOptions);
+
       return response;
-    } catch (error) {
+    }catch(error){
+      throw new Error(error);
+    }finally {
+      // Ending the session
+      await session.endSession();
+    }
+    }catch (error) {
       throw new Error(error);
     }
   },
@@ -67,9 +97,26 @@ const handleDeposit = {
     value: { type: GraphQLString },
     transactionHash: { type: GraphQLString },
     logIndex: { type: GraphQLString },
+    block : {type : GraphQLString},
+    eventObjectId : { type: GraphQLString },
   },
   async resolve(parent, args, context) {
     try {
+      // updating mutation status
+      let eventDataResult = await eventsData.findOne({
+        _id: args.eventObjectId,
+      });
+      eventDataResult.status = "completed";
+
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+        });
+        response.result = true;
+      }
+      
       let provider = await getOrRegisterAccount(args.provider);
 
       let deposit = new GaugeDeposit({
@@ -77,19 +124,26 @@ const handleDeposit = {
         gauge: args.id,
         provider: provider.id,
         value: args.value,
+        block : args.block,
       });
-      await GaugeDeposit.create(deposit);
-      let response = await Response.findOne({ id: "1" });
-      if (response === null) {
-        // create new response
-        response = new Response({
-          id: "1",
-          result: true,
-        });
-        await response.save();
+
+      const session = await mongoose.startSession();
+      try{
+        await session.withTransaction(async () => {
+          await deposit.save({session});
+          await eventDataResult.save({ session });
+          await response.save({ session });
+          await provider.save({ session });
+        }, transactionOptions);
+  
+        return response;
+      }catch(error){
+        throw new Error(error);
+      }finally{
+      // Ending the session
+      await session.endSession();
       }
-      return response;
-    } catch (error) {
+    }catch (error) {
       throw new Error(error);
     }
   },
@@ -104,9 +158,26 @@ const handleWithdraw = {
     value: { type: GraphQLString },
     transactionHash: { type: GraphQLString },
     logIndex: { type: GraphQLString },
+    block : {type : GraphQLString},
+    eventObjectId : { type: GraphQLString },
   },
   async resolve(parent, args, context) {
     try {
+      // updating mutation status
+      let eventDataResult = await eventsData.findOne({
+        _id: args.eventObjectId,
+      });
+      eventDataResult.status = "completed";
+
+      let response = await Response.findOne({ id: "1" });
+      if (response === null) {
+        // create new response
+        response = new Response({
+          id: "1",
+        });
+        response.result = true;
+      }
+
       let provider = await getOrRegisterAccount(args.provider);
 
       let withdraw = new GaugeWithdraw({
@@ -114,19 +185,27 @@ const handleWithdraw = {
         gauge: args.id,
         provider: provider.id,
         value: args.value,
+        block : args.block,
       });
-      await GaugeWithdraw.create(withdraw);
-      let response = await Response.findOne({ id: "1" });
-      if (response === null) {
-        // create new response
-        response = new Response({
-          id: "1",
-          result: true,
-        });
-        await response.save();
+
+      const session = await mongoose.startSession();
+      try{
+        await session.withTransaction(async () => {
+        await withdraw.save({session});
+        await eventDataResult.save({ session });
+        await response.save({ session });
+        await provider.save({ session });
+      }, transactionOptions);
+
+        return response;
       }
-      return response;
-    } catch (error) {
+      catch(error){
+        throw new Error(error);
+      }finally{
+      // Ending the session
+      await session.endSession();
+      }
+    }catch (error) {
       throw new Error(error);
     }
   },

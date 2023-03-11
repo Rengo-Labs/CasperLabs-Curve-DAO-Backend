@@ -15,7 +15,9 @@ const gaugeWithdrawSchema = new Schema({
     value:{
         type:String
     },
-  
+    block:{
+      type:String
+    },
 });
 
 var gaugeWithdraw = mongoose.model("gaugeWithdraw", gaugeWithdrawSchema);

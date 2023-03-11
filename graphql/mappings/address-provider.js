@@ -1,15 +1,21 @@
+//This file is coded because it was in the subgraph code, currently not being used,
+//but not deleting it because can be used in the future.
+
 require("dotenv").config();
 const { GraphQLString } = require("graphql");
 const Response = require("../../models/response");
 const { responseType } = require("../types/response");
+const mongoose = require("mongoose");
 
 const Contract = require("../../models/contract");
 const ContractVersion = require("../../models/contractVersion");
+const eventsData = require("../../models/eventsData");
 const { getSystemState } = require("../services/system-state");
+var bigdecimal = require("bigdecimal");
 
 //const AddressProvider = require('../../JsClients/ADDRESSPROVIDER/test/installed.ts');
 
-async function registerContract(id, args) {
+async function registerContract(id, args, session) {
   console.log("registerContract");
   //let info = await AddressProvider.get_id_info(args.addressProviderContractHash,id);
 
@@ -29,17 +35,17 @@ async function registerContract(id, args) {
       addedAtBlock: args.block,
       addedAtTransaction: args.transactionHash,
     });
-    await Contract.create(newData);
+    await Contract.create([newData],{session});
     contract = newData;
     state.contractCount = (
-      BigInt(state.contractCount) + BigInt("1")
+      (new bigdecimal.BigDecimal(state.contractCount)).add(new bigdecimal.BigDecimal("1"))
     ).toString();
   }
 
   contract.modified = args.timestamp;
   contract.modifiedAtBlock = args.block;
   contract.modifiedAtTransaction = args.transactionHash;
-  await contract.save();
+  await contract.save({session});
 
   let newData2 = new ContractVersion({
     id: id + "-" + info.value2,
@@ -50,13 +56,13 @@ async function registerContract(id, args) {
     addedAtBlock: args.block,
     addedAtTransaction: args.transactionHash,
   });
-  await ContractVersion.create(newData2);
+  await ContractVersion.create([newData2],{session});
 
   if (contract.description == "Main Registry") {
     state.registryContract = info.value0;
   }
 
-  await state.save();
+  await state.save({session});
 
   return contract;
 }
@@ -71,9 +77,18 @@ const handleAddressModified = {
     timestamp: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
     try {
       console.log("handleAddressModified");
-      await registerContract(args.id, args);
+      await registerContract(args.id, args, session);
+
+       // updating mutation status
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
+
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
         // create new response
@@ -81,10 +96,19 @@ const handleAddressModified = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+       //committing the transaction 
+       await session.commitTransaction();
+
+       // Ending the session
+       session.endSession();
+
       return response;
     } catch (error) {
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+
       throw new Error(error);
     }
   },
@@ -101,9 +125,18 @@ const handleNewAddressIdentifier = {
     timestamp: { type: GraphQLString },
   },
   async resolve(parent, args, context) {
+    const session = await mongoose.startSession();
+    //starting the transaction
+    session.startTransaction();
     try {
       console.log("hello.");
-      await registerContract(args.id, args);
+      await registerContract(args.id, args,session);
+
+       // updating mutation status
+      //  let eventDataResult= await eventsData.findOne({_id:args.eventObjectId});
+      //  eventDataResult.status="completed"
+      //  await eventDataResult.save({ session });
+
       let response = await Response.findOne({ id: "1" });
       if (response === null) {
         // create new response
@@ -111,10 +144,19 @@ const handleNewAddressIdentifier = {
           id: "1",
           result: true,
         });
-        await response.save();
+        await response.save({session});
       }
+        //committing the transaction 
+        await session.commitTransaction();
+
+        // Ending the session
+        session.endSession();
+
       return response;
     } catch (error) {
+      // Rollback any changes made in the database
+      await session.abortTransaction();
+
       throw new Error(error);
     }
   },

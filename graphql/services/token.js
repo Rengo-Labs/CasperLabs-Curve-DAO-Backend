@@ -1,7 +1,8 @@
 const Token = require("../../models/token");
 const LpToken = require("../../models/lpToken");
-//let erc20= require('../JsClients/Registry/test/installed.ts')
+//let erc20= require('../JsClients/Registry/test/installed.ts');
 const { getSystemState } = require("../services/system-state");
+var bigdecimal = require("bigdecimal");
 
 class TokenInfo {
   name;
@@ -15,14 +16,14 @@ class TokenInfo {
   }
 }
 
-async function getOrCreateToken(address, args) {
+async function getOrCreateToken(address, args,session) {
   let token = await Token.findOne({ id: address });
   if (token == null) {
     token = new Token({
       id: address,
       address: address,
     });
-    await Token.create(token);
+    await Token.create([token],{session});
 
     let ETH_TOKEN_ADDRESS="123";
 
@@ -38,11 +39,11 @@ async function getOrCreateToken(address, args) {
       token.symbol = info.symbol;
       token.decimals = info.decimals;
     }
-    await token.save();
+    await token.save({session});
 
     let state = await getSystemState(args);
-    state.tokenCount = (BigInt(state.tokenCount) + BigInt("1")).toString();
-    await state.save();
+    state.tokenCount = ((new bigdecimal.BigDecimal(state.tokenCount)).add(new bigdecimal.BigDecimal("1"))).toString();
+    await state.save({session});
   }
 
   return token;
@@ -59,7 +60,6 @@ async function getOrCreateLpToken(address) {
       symbol: info.symbol,
       decimals: info.decimals,
     });
-    await LpToken.create(token);
   }
   return token;
 }

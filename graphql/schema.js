@@ -2,10 +2,18 @@
 const { GraphQLSchema, GraphQLObjectType } = require("graphql");
 
 // Import queries
-const { responses, response } = require("./queries");
-
-// Import mutations
-const { handleNewResponse } = require("./mutations");
+const {  
+  gaugeVotesByTime,
+  gaugeVotesByUser, 
+  votingEscrows, 
+  daoPowersByBlock,
+  daoPowersByTimestamp, 
+  votingPower, 
+  gauges, 
+  getGaugesByAddress,
+  userBalancesByUnlockTime,
+  userBalancesByWeight,
+} = require("./queries");
 
 // Import Pool mutations
 const {
@@ -44,17 +52,6 @@ const {
   handleWithdraw,
 } = require("../graphql/mappings/dao/gauge");
 
-// Import voting mutations
-const {
-  handleMinimumBalanceSet,
-  handleMinimumTimeSet,
-  handleChangeMinQuorum,
-  handleChangeSupportRequired,
-  handleStartVote,
-  handleCastVote,
-  handleExecuteVote,
-} = require("../graphql/mappings/dao/voting");
-
 //Import Gauge-Controller mutations
 const {
   handleAddType,
@@ -64,13 +61,26 @@ const {
   handleVoteForGauge
 } = require('../graphql/mappings/dao/gauge-controller');
 
+const {
+  handleVotingDeposit,
+  handleVotingWithdraw
+  } = require("../graphql/mappings/dao/votingescrow");
+
 // Define QueryType
 const QueryType = new GraphQLObjectType({
   name: "QueryType",
   description: "Queries",
   fields: {
-    responses,
-    response,
+    gaugeVotesByTime,
+    gaugeVotesByUser, 
+    votingEscrows, 
+    daoPowersByBlock,
+    daoPowersByTimestamp, 
+    votingPower, 
+    gauges, 
+    getGaugesByAddress,
+    userBalancesByUnlockTime,
+    userBalancesByWeight,
   },
 });
 
@@ -83,7 +93,6 @@ const MutationType = new GraphQLObjectType({
     handleRemoveLiquidity,
     handleRemoveLiquidityImbalance, 
     handleRemoveLiquidityOne,
-    handleNewResponse,
     handleTokenExchange,
     handleTokenExchangeUnderlying,
     handleNewAdmin,
@@ -99,18 +108,13 @@ const MutationType = new GraphQLObjectType({
     handleWithdraw,
     handlePoolAdded,
     handlePoolRemoved,
-    handleMinimumBalanceSet,
-    handleMinimumTimeSet,
-    handleChangeMinQuorum,
-    handleChangeSupportRequired,
-    handleStartVote,
-    handleCastVote,
-    handleExecuteVote,
     handleAddType,
     handleNewGauge,
     handleNewGaugeWeight,
     handleNewTypeWeight,
-    handleVoteForGauge
+    handleVoteForGauge,
+    handleVotingDeposit,
+    handleVotingWithdraw,
   },
 });
 

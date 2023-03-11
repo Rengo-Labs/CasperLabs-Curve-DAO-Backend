@@ -1,7 +1,6 @@
 const SystemState = require("../../models/systemState");
 
 async function getSystemState(args) {
-  console.log("getSystemState");
   let state = await SystemState.findOne({ id: "current" });
 
   if (state === null) {
@@ -14,12 +13,10 @@ async function getSystemState(args) {
       tokenCount: "0",
       totalPoolCount: "0",
     });
-    await SystemState.create(state);
   }
   state.updated = args.timestamp;
   state.updatedAtBlock = args.block;
   state.updatedAtTransaction = args.transactionHash;
-  await state.save();
   return state;
 }
 
